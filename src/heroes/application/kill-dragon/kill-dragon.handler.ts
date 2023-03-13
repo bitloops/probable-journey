@@ -1,14 +1,14 @@
 import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs';
 import { KillDragonCommand } from './kill-dragon.command';
-import { HeroRepository } from '../../infra/repository/hero.repository';
 import { Inject } from '@nestjs/common';
 import { HEROES_REPOSITORY } from '../../heroes.di-tokens';
+import { HeroRepositoryPort } from 'src/heroes/infra/repository/hero.repository.port';
 
 @CommandHandler(KillDragonCommand)
 export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
   constructor(
     @Inject(HEROES_REPOSITORY)
-    private repository: HeroRepository,
+    private repository: HeroRepositoryPort,
     private readonly publisher: EventPublisher,
   ) {}
 

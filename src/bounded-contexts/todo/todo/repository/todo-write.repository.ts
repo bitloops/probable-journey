@@ -2,10 +2,9 @@ import { Domain } from '@bitloops/bl-boilerplate-core';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { TitleVO } from '../domain/TitleVO';
-import { TodoEntity } from '../domain/TodoEntity';
-import { TodoWriteRepoPort } from '../ports/TodoWriteRepoPort';
+import { TodoWriteRepoPort } from 'src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 import { Todo, TodoDocument } from './schema/todo.schema';
+import { TodoEntity } from 'src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 
 @Injectable()
 export class TodoWriteRepository implements TodoWriteRepoPort {

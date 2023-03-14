@@ -33,11 +33,11 @@ services:
       - "4223:4223"
       - "6223:6223"
       - "8223:8223"
-    command: ["nats-server", "-js", "-m", "8223"]
     volumes:
       - nats_data:/usr/share/docker/nats-server
     networks:
       - bitloops
+    command: ["-js", "-m", "8223"]
 
   postgres:
     image: postgres:latest

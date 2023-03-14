@@ -2,8 +2,8 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Todo, TodoDocument } from './schema/todo.schema';
-import { TodoReadRepoPort } from '../ports/TodoReadRepoPort';
-import { TodoReadModel } from '../domain/TodoReadModel';
+import { TodoReadRepoPort } from 'src/lib/bounded-contexts/todo/todo/ports/TodoReadRepoPort';
+import { TodoReadModel } from 'src/lib/bounded-contexts/todo/todo/domain/TodoReadModel';
 
 @Injectable()
 export class TodoReadRepository implements TodoReadRepoPort {

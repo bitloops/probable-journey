@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { TodoReadModel } from '../bounded-contexts/todo/todo/domain/TodoReadModel';
-import { AddTodoCommand } from '../bounded-contexts/todo/todo/commands/add-todo.command';
+import { TodoReadModel } from '../lib/bounded-contexts/todo/todo/domain/TodoReadModel';
+import { AddTodoCommand } from '../lib/bounded-contexts/todo/todo/commands/add-todo.command';
 import { AddTodoDto } from './dto/add-todo.dto';
-import { GetTodosQuery } from '../bounded-contexts/todo/todo/queries/get-todos.query';
+import { GetTodosQuery } from '../lib/bounded-contexts/todo/todo/queries/get-todos.query';
 
 @Controller('todo')
 export class TodoController {

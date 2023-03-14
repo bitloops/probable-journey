@@ -8,17 +8,14 @@ import { HeroRepositoryPort } from 'src/heroes/infra/repository/hero.repository.
 export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
   constructor(
     @Inject(HEROES_REPOSITORY)
-    private repository: HeroRepositoryPort,
-    private readonly publisher: EventPublisher,
+    private repository: HeroRepositoryPort, // private readonly publisher: EventPublisher,
   ) {}
 
   async execute(command: KillDragonCommand): Promise<void> {
     const { heroId, dragonId } = command;
-    const hero = this.publisher.mergeObjectContext(
-      await this.repository.findOneById(+heroId),
-    );
+    const hero = await this.repository.findOneById(+heroId);
 
     hero.killEnemy(dragonId);
-    hero.commit();
+    await this.repository.save(hero);
   }
 }

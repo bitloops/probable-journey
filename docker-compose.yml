@@ -1,11 +1,62 @@
 version: '3.8'
+
 services:
   mysql:
-    image: mysql
-    container_name: mysql_container
+    image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: test
+      # MYSQL_USER: yourusername
+      # MYSQL_PASSWORD: yourpassword
     ports:
       - "3306:3306"
-    restart: always
+    volumes:
+      - mysql_data:/usr/share/docker/mysql
+    networks:
+      - bitloops
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/usr/share/docker/mongo
+    networks:
+      - bitloops
+
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+      - "6222:6222"
+      - "4223:4223"
+      - "6223:6223"
+      - "8223:8223"
+    command: ["nats-server", "-js", "-m", "8223"]
+    volumes:
+      - nats_data:/usr/share/docker/nats-server
+    networks:
+      - bitloops
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: postgres
+      # POSTGRES_DB: yourdbname
+      # POSTGRES_USER: yourusername
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/usr/share/docker/postgresql
+    networks:
+      - bitloops
+
+volumes:
+  mysql_data:
+  mongo_data:
+  nats_data:
+  postgres_data:
+
+networks:
+  bitloops:

@@ -20,7 +20,6 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@bitloops/bl-boilerplate-core": "^0.2.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/cqrs": "^9.0.3",
@@ -28,8 +27,10 @@
     "@nestjs/mongoose": "^9.2.1",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/typeorm": "^9.0.1",
+    "class-transformer": "^0.5.1",
     "mongoose": "^7.0.1",
     "mysql2": "^3.2.0",
+    "nats": "^2.13.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "typeorm": "^0.3.12"

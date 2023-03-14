@@ -355,15 +355,6 @@
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@bitloops/bl-boilerplate-core@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-core/-/bl-boilerplate-core-0.2.0.tgz#b6957d506dd5445fbf82eefa4272e54b92f4033c"
-  integrity sha512-tG31qfXZPNFqJzWR5BzuywKBoJjJk96g2jmEwLg1+iBVyaNuhTVAgyd8iSFjJDgChcB/YWwlB6h3R30YGBpdvw==
-  dependencies:
-    class-transformer "^0.5.1"
-    nats "^2.10.2"
-    reflect-metadata "^0.1.13"
-
 "@colors/colors@1.5.0":
   version "1.5.0"
   resolved "https://registry.npmjs.org/@colors/colors/-/colors-1.5.0.tgz"
@@ -3787,7 +3778,7 @@ named-placeholders@^1.1.3:
   dependencies:
     lru-cache "^7.14.1"
 
-nats@^2.10.2:
+nats@^2.13.1:
   version "2.13.1"
   resolved "https://registry.yarnpkg.com/nats/-/nats-2.13.1.tgz#05e3e8d617890f97f4dfd2931a8edca3b9cc5e63"
   integrity sha512-lHV/DQREZVHXtavlAI5fFA7XDyN2/LNBtnNX76mPQV9BIKpTehzYrD1Hw7t/1mV4AGdrJj6U60JkQ8AMrVc6Mg==

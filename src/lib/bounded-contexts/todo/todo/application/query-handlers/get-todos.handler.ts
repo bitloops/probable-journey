@@ -20,6 +20,7 @@ export class GetTodosHandler
   ) {}
   async execute(query: GetTodosQuery): Promise<GetTodosQueryHandlerResponse> {
     const todos = await this.todoRepo.getAll();
-    return ok(todos);
+    if (todos) return ok(todos);
+    return ok([]);
   }
 }

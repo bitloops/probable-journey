@@ -19,7 +19,7 @@ import { TodoReadRepository } from '../../../../bounded-contexts/todo/todo/repos
     CqrsModule,
     MongooseModule.forFeature([{ name: Todo.name, schema: TodoSchema }]),
   ],
-  controllers: [TodoController],
+  // controllers: [TodoController],
   providers: [
     ...CommandHandlers,
     ...EventHandlers,

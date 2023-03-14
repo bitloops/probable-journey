@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { HeroesController } from './heroes.controller';
+import { TodoController } from './todo.controller';
 
 @Module({
   imports: [CqrsModule],
-  controllers: [HeroesController],
+  controllers: [TodoController],
 })
-export class HeroesModule {}
+export class ApiModule {}

@@ -4,6 +4,7 @@ import { CatsModule } from './cats/cats.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { HeroesModule } from './heroes/heroes.module';
+import { ApiModule } from './api/api.module';
 import { TodoModule } from './lib/bounded-contexts/todo/todo/todo.module';
 
 @Module({
@@ -22,6 +23,7 @@ import { TodoModule } from './lib/bounded-contexts/todo/todo/todo.module';
     CatsModule,
     HeroesModule,
     TodoModule,
+    ApiModule,
   ],
   controllers: [],
   providers: [],

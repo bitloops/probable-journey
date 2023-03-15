@@ -1,6 +1,11 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import 'reflect-metadata';
 import { AppError } from './application/AppError';
-import { CRUDReadRepoPort, CRUDRepoPort, CRUDWriteRepoPort } from './application/ICRUDRepoPort';
+import {
+  CRUDReadRepoPort,
+  CRUDRepoPort,
+  CRUDWriteRepoPort,
+} from './application/ICRUDRepoPort';
 import { IMQ as IMQImport } from './application/mq/IMQ';
 import { UseCase } from './application/UseCase';
 import { AggregateRoot } from './domain/AggregateRoot';
@@ -15,7 +20,10 @@ import { IRule as IRuleImport } from './domain/IRule';
 import { IMessageBus as IMessageBusImport } from './domain/messages/IMessageBus';
 import { ReadModel as ReadModelImport } from './domain/ReadModel';
 import { UUIDv4 as UUIDv4Import } from './domain/UUIDv4';
-import { ValueObject as ValueObjectImport, ValueObjectProps } from './domain/ValueObject';
+import {
+  ValueObject as ValueObjectImport,
+  ValueObjectProps,
+} from './domain/ValueObject';
 import { Either, fail, ok } from './Either';
 import { EventBus as EventBusImport } from './infra/event-bus';
 import { IBaseGraphQLController as IBaseGraphQLControllerImport } from './infra/graphql/IBaseGraphQLController';
@@ -53,7 +61,9 @@ namespace Domain {
   export class Error extends DomainError {}
   export class Aggregate<T> extends AggregateRoot<T> {}
   export class Entity<T> extends EntityImport<T> {}
-  export class ValueObject<T extends ValueObjectProps> extends ValueObjectImport<T> {}
+  export class ValueObject<
+    T extends ValueObjectProps,
+  > extends ValueObjectImport<T> {}
   export class ReadModel<T> extends ReadModelImport<T> {}
   export class UUIDv4 extends UUIDv4Import {}
   export type IRule = IRuleImport;
@@ -81,9 +91,15 @@ namespace Application {
       export class NotFound extends NotFoundError {}
       export class Concurrency extends ConcurrencyError {}
     }
-    export type ICRUDPort<Aggregate, AggregateId> = CRUDRepoPort<Aggregate, AggregateId>;
+    export type ICRUDPort<Aggregate, AggregateId> = CRUDRepoPort<
+      Aggregate,
+      AggregateId
+    >;
     export type ICRUDReadPort<ReadModel> = CRUDReadRepoPort<ReadModel>;
-    export type ICRUDWritePort<Aggregate, AggregateId> = CRUDWriteRepoPort<Aggregate, AggregateId>;
+    export type ICRUDWritePort<Aggregate, AggregateId> = CRUDWriteRepoPort<
+      Aggregate,
+      AggregateId
+    >;
   }
 }
 
@@ -94,10 +110,8 @@ namespace Infra {
   }
 
   export namespace GraphQL {
-    export type IBaseController<TRequest, TResponseData> = IBaseGraphQLControllerImport<
-      TRequest,
-      TResponseData
-    >;
+    export type IBaseController<TRequest, TResponseData> =
+      IBaseGraphQLControllerImport<TRequest, TResponseData>;
   }
 
   export namespace EventBus {
@@ -132,4 +146,14 @@ namespace Constants {
   export type ApplicationConfig = ApplicationConfigImport;
 }
 
-export { Application, Domain, Either, Infra, fail, ok, Container, RespondWithPublish, Constants };
+export {
+  Application,
+  Domain,
+  Either,
+  Infra,
+  fail,
+  ok,
+  Container,
+  RespondWithPublish,
+  Constants,
+};

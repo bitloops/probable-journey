@@ -1,14 +1,12 @@
 import { Infra, Application } from '@bitloops/bl-boilerplate-core';
 import { TodoCompletedDomainEvent } from '../../../domain/events/todo-completed.event';
-import { TodoCompletedIntegrationEvent } from '../../../integration-events/todo-completed.integration-event';
+import { TodoCompletedIntegrationEvent } from '../../../contracts/integration-events/todo-completed.integration-event';
 
 export class TodoCompletedDomainToIntegrationEventHandler
   implements Application.IHandle
 {
   private eventBus: Infra.EventBus.IEventBus;
-  constructor() {
-    // this.eventBus =
-  }
+  constructor() {}
 
   public async handle(event: TodoCompletedDomainEvent): Promise<void> {
     const events = TodoCompletedIntegrationEvent.create(event);

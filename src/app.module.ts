@@ -7,6 +7,8 @@ import { JetstreamModule } from './infra/jetstream/jetstream.module';
 import { HeroesModule } from './heroes/heroes.module';
 import { ApiModule } from './api/api.module';
 import { TodoModule } from './bounded-contexts/todo/todo/todo.module';
+import { AuthModule } from './bounded-contexts/iam/authentication/auth.module';
+import { UsersModule } from './bounded-contexts/iam/users/users.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { TodoModule } from './bounded-contexts/todo/todo/todo.module';
     HeroesModule,
     TodoModule,
     ApiModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],

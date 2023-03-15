@@ -8,33 +8,44 @@ import {
 import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { LogInCommand } from '../../commands/log-in.command';
+import {
+  UserWriteRepoPortToken,
+  UserWriteRepoPort,
+} from '../../ports/UserWriteRepoPort';
+import { ApplicationErrors } from '../errors';
 
-type LogInUseCaseResponse = Either<void, never>;
+type LogInUseCaseResponse = Either<
+  void,
+  ApplicationErrors.UserNotFoundApplicationError
+>;
 
 @CommandHandler(LogInCommand)
 export class LogInHandler
-  implements
-    Application.IUseCase<LogInCommand, Promise<LogInUseCaseResponse>>
+  implements Application.IUseCase<LogInCommand, Promise<LogInUseCaseResponse>>
 {
   constructor(
-    // @Inject(IAMWriteRepoPortToken)
-    // private readonly userRepo: IAMWriteRepoPort,
-    // @Inject(TodoWriteRepoPortToken)
-    // private readonly authService: AuthService,
+    @Inject(UserWriteRepoPortToken)
+    private readonly userRepo: UserWriteRepoPort, // @Inject(IAMWriteRepoPortToken) private readonly authService: AuthService,
   ) {}
 
   async execute(command: LogInCommand): Promise<LogInUseCaseResponse> {
-    // const user = await this.userRepo.getById(command.email);
-    // if does not exist Application error - user does not exist
-
-    // if user exists check if password match
-    // if password does not match Application error - wrong password
-    
-    // const jwt = await this.authService.login(command);
-
-    // update user aggregate last login
     console.log('Login command');
-    // await this.userRepo.save(user);
+    const userId = new Domain.UUIDv4(command.userId);
+
+    const user = await this.userRepo.getById(userId);
+
+    if (!user) {
+      return fail(
+        new ApplicationErrors.UserNotFoundApplicationError(command.userId),
+      );
+    }
+
+    const loginOrError = user.login();
+    if (loginOrError.isFail()) {
+      return fail(loginOrError.value);
+    }
+
+    await this.userRepo.update(user);
     return ok();
   }
 }

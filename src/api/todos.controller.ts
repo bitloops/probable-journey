@@ -6,6 +6,7 @@ import {
   Injectable,
   Post,
 } from '@nestjs/common';
+import * as jwtwebtoken from 'jsonwebtoken';
 // import { CommandBus, QueryBus } from '@nestjs/cqrs';
 // import { NatsJetStreamContext } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 // import {
@@ -34,9 +35,10 @@ export class TodosController {
   @Post()
   async addTodo(@Body() dto: AddTodoDto) {
     // userId get from context
-    return this.commandBus.publish(
-      new AddTodoCommand({ title: dto.title, userId: dto.userId }),
-    );
+    const command = new AddTodoCommand(dto.title, dto.userId, {
+      jwt: jwtwebtoken.sign({ userId: dto.userId }, 'jwtSecret'),
+    });
+    return this.commandBus.publish(command);
   }
 
   // @Get()

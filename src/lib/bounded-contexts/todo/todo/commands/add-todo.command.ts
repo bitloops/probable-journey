@@ -3,16 +3,26 @@ export type TAddTodoCommand = {
   title: string;
   userId: string;
 };
-export class AddTodoCommand extends Application.Command {
+export class AddTodoCommandLegacy extends Application.Command {
   public readonly title: string;
   public readonly userId: string;
   public static readonly commandName = 'Todo.ADD_TODO';
   constructor(addTodo: TAddTodoCommand) {
-    super(AddTodoCommand.commandName, 'Todo');
+    super(AddTodoCommandLegacy.commandName, 'Todo');
     this.title = addTodo.title;
     this.userId = addTodo.userId;
   }
   static getCommandTopic(): string {
-    return super.getCommandTopic(AddTodoCommand.commandName, 'Todo');
+    return super.getCommandTopic(AddTodoCommandLegacy.commandName, 'Todo');
   }
+}
+
+export class AddTodoCommand {
+  public readonly boundedContext = 'Todo';
+  public readonly createdAt = Date.now();
+  constructor(
+    public readonly title: string,
+    public readonly userId: string,
+    public readonly ctx: any,
+  ) {}
 }

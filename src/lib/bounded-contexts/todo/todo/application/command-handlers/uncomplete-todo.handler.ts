@@ -28,6 +28,13 @@ export class UncompleteTodoHandler
       Promise<UncompleteTodoUseCaseResponse>
     >
 {
+  get command() {
+    return UncompleteTodoCommand;
+  }
+
+  get boundedContext() {
+    return 'Todo';
+  }
   constructor(
     @Inject(TodoWriteRepoPortToken)
     private readonly todoRepo: TodoWriteRepoPort,

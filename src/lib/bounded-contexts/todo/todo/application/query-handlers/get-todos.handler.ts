@@ -15,9 +15,17 @@ export class GetTodosHandler
   implements
     Application.IUseCase<GetTodosQuery, Promise<GetTodosQueryHandlerResponse>>
 {
+  get command() {
+    return GetTodosQuery;
+  }
+
+  get boundedContext() {
+    return 'Todo';
+  }
   constructor(
     @Inject(TodoReadRepoPortToken) private todoRepo: TodoReadRepoPort,
   ) {}
+
   async execute(query: GetTodosQuery): Promise<GetTodosQueryHandlerResponse> {
     const todos = await this.todoRepo.getAll();
     if (todos) return ok(todos);

@@ -13,6 +13,7 @@ import {
   EventBus,
   IMessageSource,
 } from '@nestjs/cqrs';
+import { Application } from '@bitloops/bl-boilerplate-core';
 import { Subject } from 'rxjs';
 import { v4 } from 'uuid';
 import {
@@ -44,17 +45,20 @@ export class Jetstream
     configService: any,
     @Inject(ProvidersConstants.JETSTREAM_STREAM_CONFIG_PROVIDER)
     jetstreamStreamConfig: any,
+    // @Inject('PubsubCommandHandlers') private pubsubCommandHandlers: any[],
     private readonly eventsBus: EventBus,
   ) {
     this.jetstream = jetstream;
     // this.jetstream.connect(configService.options || {});
-    this.featureSubjectPrefix =
-      jetstreamStreamConfig.featureSubjectPrefix || '';
-    this.addEventHandlers(jetstreamStreamConfig.eventHandlers);
+    // this.featureSubjectPrefix =
+    //   jetstreamStreamConfig.featureSubjectPrefix || '';
+    // this.addEventHandlers(jetstreamStreamConfig.eventHandlers);
 
-    const subjectSubscriptions = jetstreamStreamConfig.subscriptions;
+    // const subjectSubscriptions = jetstreamStreamConfig.subscriptions;
+    const { pubsubCommandHandlers } = jetstreamStreamConfig;
+    this.subscribePubsubCommandHandlers(pubsubCommandHandlers);
 
-    this.subscribeSubjects(subjectSubscriptions);
+    // this.subscribeSubjects(subjectSubscriptions);
   }
 
   // async sendAck(id: string) {
@@ -64,6 +68,38 @@ export class Jetstream
   //     this.logger.error(err);
   //   }
   // }
+
+  async subscribePubsubCommandHandlers(
+    pubsubCommandHandlers: Application.IUseCase<any, any>[],
+  ) {
+    console.log('pubsubCommandHandlers', pubsubCommandHandlers);
+    pubsubCommandHandlers.forEach((handler) => {
+      const command = handler.command;
+      const boundedContext = handler.boundedContext;
+      this.pubSubSubscribe(`${boundedContext}.${command?.name}`, handler);
+    });
+  }
+
+  async pubSubSubscribe(
+    subject: string,
+    handler: Application.IUseCase<any, any>,
+  ) {
+    const nc = this.jetstream.getConnection();
+    try {
+      this.logger.log(`
+        Subscribing ${subject}!
+      `);
+      const sub = nc.subscribe('hello');
+      (async () => {
+        for await (const m of sub) {
+          const command = jsonCodec.decode(m.data);
+          await handler.execute(command);
+          console.log(`[${sub.getProcessed()}]: ${jsonCodec.decode(m.data)}`);
+        }
+        console.log('subscription closed');
+      })();
+    } catch (err) {}
+  }
 
   async publish(event: IEvent, stream?: string) {
     if (event === undefined) {

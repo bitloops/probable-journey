@@ -53,6 +53,7 @@ export class JetstreamModule {
             ...config,
           },
         },
+        // ...config.pubsubCommandHandlers,
         Jetstream,
       ],
       exports: [Jetstream],

@@ -31,6 +31,14 @@ export class ModifyTodoTitleHandler
     private readonly todoRepo: TodoWriteRepoPort,
   ) {}
 
+  get command() {
+    return ModifyTodoTitleCommand;
+  }
+
+  get boundedContext() {
+    return 'Todo';
+  }
+
   async execute(
     command: ModifyTodoTitleCommand,
   ): Promise<ModifyTodoTitleResponse> {

@@ -33,6 +33,14 @@ export class CompleteTodoHandler
     private readonly todoRepo: TodoWriteRepoPort,
   ) {}
 
+  get command() {
+    return CompleteTodoCommand;
+  }
+
+  get boundedContext() {
+    return 'Todo';
+  }
+
   async execute(
     command: CompleteTodoCommand,
   ): Promise<CompleteTodoUseCaseResponse> {

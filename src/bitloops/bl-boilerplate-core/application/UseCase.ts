@@ -15,5 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 export interface UseCase<IRequest, IResponse> {
+  get command(): any;
+  get boundedContext(): string;
   execute(request?: IRequest): Promise<IResponse> | IResponse;
 }

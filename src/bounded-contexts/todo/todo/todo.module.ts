@@ -6,6 +6,7 @@ import { TodoReadRepository } from './repository/todo-read.repository';
 import { TodoModule as LibTodoModule } from 'src/lib/bounded-contexts/todo/todo/todo.module';
 import { TodoWriteRepoPortToken } from '@src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 import { TodoReadRepoPortToken } from '@src/lib/bounded-contexts/todo/todo/ports/TodoReadRepoPort';
+import { MongoModule } from '@src/infra/db/mongo/mongo.module';
 
 const RepoProviders = [
   {
@@ -24,6 +25,7 @@ const RepoProviders = [
       inject: [...RepoProviders],
       imports: [
         MongooseModule.forFeature([{ name: Todo.name, schema: TodoSchema }]),
+        MongoModule,
       ],
     }),
   ],

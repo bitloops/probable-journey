@@ -1,38 +1,52 @@
-import { Module } from '@nestjs/common';
+import { Module, Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { TodoModule } from '@src/bounded-contexts/todo/todo/todo.module';
+import {
+  PubSubCommandBus,
+  PubSubCommandBusToken,
+} from '@src/infra/jetstream/buses/nats-pubsub-command-bus';
 import { NestjsJetstream } from '@src/infra/jetstream/nestjs-jetstream.class';
-import { CommandHandlers } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers';
+import {
+  CommandHandlers,
+  PubsubCommandHandlers,
+} from '@src/lib/bounded-contexts/todo/todo/application/command-handlers';
 import { TodoCompletedDomainToIntegrationEventHandler } from '@src/lib/bounded-contexts/todo/todo/application/event-handlers/domain/todo-completed.handler';
 import { JetstreamModule } from '../infra/jetstream/jetstream.module';
 import { TodoController } from './todo.controller';
 import { TodosController } from './todos.controller';
 
+const pubsubCommandHandlers: Provider<any>[] = [
+  {
+    provide: 'PubsubCommandHandlers',
+    useFactory: (commandBus: PubSubCommandBus, ...args) => {
+      console.log('pubsubCommandHandler', pubsubCommandHandlers);
+      args.forEach((handler) => {
+        const command = handler.command;
+        const boundedContext = handler.boundedContext;
+        commandBus.pubSubSubscribe(
+          `${boundedContext}.${command?.name}`,
+          handler,
+        );
+      });
+      [...args];
+      return;
+    },
+    inject: [
+      { token: PubSubCommandBusToken, optional: false },
+      ...PubsubCommandHandlers,
+    ],
+  },
+];
 @Module({
   imports: [
     CqrsModule,
-    JetstreamModule.forFeature({
-      featureSubjectPrefix: '', // Events will be published with this prefix.
-      subscriptions: [
-        {
-          name: 'test.test-subject', // Insert the consumer delivery target
-        },
-      ],
-      eventHandlers: {
-        // TodoCompletedDomainEvent: (data, ack, raw) =>
-        //   new TodoCompletedDomainToIntegrationEventHandler().handle({
-        //     data,
-        //     metadata: { ack: ack as () => Promise<void> },
-        //   }),
-        // 'USER.UserLoggedInEvent': (data, ack, raw) =>
-        //   new UserLoggedInEvent(data, ack, raw),
-        // 'USER.UserRegisteredEvent': (data, ack, raw) =>
-        //   new UserRegisteredEvent(data, ack, raw),
-        // 'USER.EmailVerifiedEvent': (data, ack, raw) =>
-        //   new EmailVerifiedEvent(data, ack, raw),
-      },
-    }),
+    TodoModule,
+    // JetstreamModule.forFeature({
+    //   pubsubCommandHandlers: [...PubsubCommandHandlers],
+    // }),
   ],
   providers: [
+    ...pubsubCommandHandlers,
     // CommandBus,
     // {
     //   provide: 'SIMPLE_NATS',

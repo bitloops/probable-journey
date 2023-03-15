@@ -8,10 +8,13 @@ import { TodoEntity } from 'src/lib/bounded-contexts/todo/todo/domain/TodoEntity
 
 @Injectable()
 export class TodoWriteRepository implements TodoWriteRepoPort {
-  constructor(@InjectModel(Todo.name) private todoModel: Model<TodoDocument>) {}
+  constructor(@InjectModel(Todo.name) private todoModel: Model<TodoDocument>) { }
 
-  async getById(id: Domain.UUIDv4): Promise<TodoEntity> {
-    throw new Error('Method not implemented.');
+  async getById(id: Domain.UUIDv4): Promise<TodoEntity | null> {
+    const todoRaw = await this.todoModel.findById(id.toString());
+    const todoJSON = JSON.parse(JSON.stringify(todoRaw));
+    const todo = TodoEntity.fromPrimitives(todoJSON);
+    return todo;
   }
 
   async update(todo: TodoEntity): Promise<void> {

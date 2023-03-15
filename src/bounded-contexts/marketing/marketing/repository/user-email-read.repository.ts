@@ -22,15 +22,16 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
 
     async getAll(): Promise<UserEmailReadModel[]> {
         throw new Error('Method not implemented.');
-        // const todos = await this.todoModel.find().exec();
-        // return todos.map((todoObj) => {
-        //     console.log(todoObj);
-        //     const todo = (todoObj as any)._doc;
-        //     const res = TodoReadModel.fromPrimitives({
-        //         ...todo,
-        //         id: todoObj._id.toString(),
-        //     });
-        //     return res;
-        // });
     }
+
+    async save(userEmailReadModel: UserEmailReadModel): Promise<void> {
+        const primitives = userEmailReadModel.toPrimitives()
+        const objToSave = {
+            _id: primitives.userId,
+            email: primitives.email,
+        }
+        const createdUserEmail = new this.userEmailModel(objToSave);
+        await createdUserEmail.save()
+    }
+
 }

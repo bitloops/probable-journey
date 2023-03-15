@@ -14,6 +14,7 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
     public async handle(event: TodoCompletionsIncrementedDomainEvent): Promise<void> {
         const { user } = event;
         const completedTodosCounter = user.completedTodos.counter;
+        //TODO domain service?
         if (completedTodosCounter === 1) {
             const userid = user.id;
             const email = await this.emailRepoPort.getUserEmail(userid);

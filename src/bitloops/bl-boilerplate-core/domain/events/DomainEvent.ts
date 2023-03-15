@@ -23,15 +23,11 @@ import { IDomainEvent } from './IDomainEvent';
 
 export type TDomainEventInputMetadata = {
   id?: string;
-  // @CHANGED HERE
-  ack?: () => Promise<void>;
   fromContextId: string;
 };
 
 export class DomainEvent<T> extends Event<T> implements IDomainEvent {
   private aggregateId: UUIDv4;
-  // @CHANGED HERE
-  private _ack?: () => Promise<void>;
 
   constructor(
     eventName: string,
@@ -41,16 +37,9 @@ export class DomainEvent<T> extends Event<T> implements IDomainEvent {
   ) {
     super(eventName, data, metadata);
     this.aggregateId = aggregateId;
-    // @CHANGED HERE
-    this._ack = metadata.ack;
   }
 
   getAggregateId() {
     return this.aggregateId;
-  }
-
-  ack() {
-    // @CHANGED HERE
-    this._ack?.();
   }
 }

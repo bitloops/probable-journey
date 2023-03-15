@@ -21,13 +21,21 @@ const ok = (metadata?: Metadata) => {
   };
 };
 
-const replyToResponseTopic = async <L, A>(metadata: Metadata, res: Either<L, A>) => {
-  const messageBus = Container.getMessageBusFromContext(metadata.toContextId);
-  if (metadata.responseTopic) await messageBus.publish(metadata.responseTopic, res);
+const replyToResponseTopic = async <L, A>(
+  metadata: Metadata,
+  res: Either<L, A>,
+) => {
+  const messageBus = Container.getMessageBus();
+  if (metadata.responseTopic)
+    await messageBus.publish(metadata.responseTopic, res);
 };
 
 export function RespondWithPublish() {
-  return function (_target: any, _propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (
+    _target: any,
+    _propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ) {
     const originalMethod = descriptor.value;
     descriptor.value = async function (...args: any[]) {
       const metadata = args[0].metadata;

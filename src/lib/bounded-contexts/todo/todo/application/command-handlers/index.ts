@@ -8,3 +8,12 @@ export const CommandHandlers = [
   UncompleteTodoHandler,
   ModifyTodoTitleHandler,
 ];
+
+export const PubsubCommandHandlers = [
+  AddTodoHandler,
+  CompleteTodoHandler,
+  UncompleteTodoHandler,
+  ModifyTodoTitleHandler,
+];
+
+export const StreamingCommandHandlers = [AddTodoHandler, CompleteTodoHandler];

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { NestjsJetstream } from '@src/infra/jetstream/nestjs-jetstream.class';
 import { CommandHandlers } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers';
 import { TodoCompletedDomainToIntegrationEventHandler } from '@src/lib/bounded-contexts/todo/todo/application/event-handlers/domain/todo-completed.handler';
 import { JetstreamModule } from '../infra/jetstream/jetstream.module';
@@ -9,7 +10,7 @@ import { TodosController } from './todos.controller';
 @Module({
   imports: [
     CqrsModule,
-    JetstreamModule.registerFeature({
+    JetstreamModule.forFeature({
       featureSubjectPrefix: '', // Events will be published with this prefix.
       subscriptions: [
         {
@@ -31,7 +32,13 @@ import { TodosController } from './todos.controller';
       },
     }),
   ],
-  // providers: [...CommandHandlers],
+  providers: [
+    // CommandBus,
+    // {
+    //   provide: 'SIMPLE_NATS',
+    //   useClass: NestjsJetstream,
+    // },
+  ],
   controllers: [TodoController, TodosController],
 })
 export class ApiModule {}

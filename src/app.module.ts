@@ -6,7 +6,7 @@ import { DataSource } from 'typeorm';
 import { JetstreamModule } from './infra/jetstream/jetstream.module';
 import { HeroesModule } from './heroes/heroes.module';
 import { ApiModule } from './api/api.module';
-import { TodoModule } from './lib/bounded-contexts/todo/todo/todo.module';
+import { TodoModule } from './bounded-contexts/todo/todo/todo.module';
 
 @Module({
   imports: [

@@ -46,18 +46,26 @@ export class Container {
   private static events: DomainEvents;
   private static appConfig: ApplicationConfig;
 
-  static async initializeServices(appConfig: ApplicationConfig): Promise<IServices> {
+  static async initializeServices(
+    appConfig: ApplicationConfig,
+  ): Promise<IServices> {
     Container.appConfig = appConfig;
     Container.inProcessMessageBus = new InProcessMessageBus();
     Container.externalMessageBus = await ExternalMessageBusFactory(
       ExternalMessageBusProviders.NATS,
     );
 
-    Container.inProcessCommandBus = new CommandBus(Container.inProcessMessageBus);
-    Container.externalCommandBus = new ExternalCommandBus(Container.externalMessageBus);
+    Container.inProcessCommandBus = new CommandBus(
+      Container.inProcessMessageBus,
+    );
+    Container.externalCommandBus = new ExternalCommandBus(
+      Container.externalMessageBus,
+    );
 
     Container.inProcessQueryBus = new QueryBus(Container.inProcessMessageBus);
-    Container.externalQueryBus = new ExternalQueryBus(Container.externalMessageBus);
+    Container.externalQueryBus = new ExternalQueryBus(
+      Container.externalMessageBus,
+    );
 
     Container.inProcessEventBus = new EventBus(Container.inProcessMessageBus);
     Container.externalEventBus = new EventBus(Container.externalMessageBus);
@@ -80,17 +88,13 @@ export class Container {
     return services;
   }
 
-  static getCommandBusFromContext(contextId: string): ICommandBus {
+  static getCommandBus(): ICommandBus {
     let commandBus: ICommandBus;
-    if (!Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId]) {
-      throw new Error(`Context id: ${contextId} is missing from mappings`);
-    }
-    if (
-      Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId].COMMAND_BUS === CONTEXT_TYPES.InProcess
-    ) {
+
+    if (Container.appConfig.BUSES.COMMAND_BUS === CONTEXT_TYPES.InProcess) {
       commandBus = Container.inProcessCommandBus;
     } else if (
-      Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId].COMMAND_BUS === CONTEXT_TYPES.External
+      Container.appConfig.BUSES.COMMAND_BUS === CONTEXT_TYPES.External
     ) {
       commandBus = Container.externalCommandBus;
     } else {
@@ -100,16 +104,11 @@ export class Container {
     return commandBus;
   }
 
-  static getQueryBusFromContext(contextId: string): IQueryBus {
+  static getQueryBus(): IQueryBus {
     let queryBus: IQueryBus;
-    if (!Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId]) {
-      throw new Error(`Context id: ${contextId} is missing from mappings`);
-    }
-    if (Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId].QUERY_BUS === CONTEXT_TYPES.InProcess) {
+    if (Container.appConfig.BUSES.QUERY_BUS === CONTEXT_TYPES.InProcess) {
       queryBus = Container.inProcessQueryBus;
-    } else if (
-      Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId].QUERY_BUS === CONTEXT_TYPES.External
-    ) {
+    } else if (Container.appConfig.BUSES.QUERY_BUS === CONTEXT_TYPES.External) {
       queryBus = Container.externalQueryBus;
     } else {
       // default
@@ -118,17 +117,12 @@ export class Container {
     return queryBus;
   }
 
-  static getMessageBusFromContext(contextId: string): IMessageBus {
+  static getMessageBus(): IMessageBus {
     let messageBus: IMessageBus;
-    if (!Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId]) {
-      throw new Error(`Context id: ${contextId} is missing from mappings`);
-    }
-    if (
-      Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId].COMMAND_BUS === CONTEXT_TYPES.InProcess
-    ) {
+    if (Container.appConfig.BUSES.COMMAND_BUS === CONTEXT_TYPES.InProcess) {
       messageBus = Container.inProcessMessageBus;
     } else if (
-      Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId].COMMAND_BUS === CONTEXT_TYPES.External
+      Container.appConfig.BUSES.COMMAND_BUS === CONTEXT_TYPES.External
     ) {
       messageBus = Container.externalMessageBus;
     } else {
@@ -138,16 +132,11 @@ export class Container {
     return messageBus;
   }
 
-  static getEventBusFromContext(contextId: string): IEventBus {
+  static getEventBus(): IEventBus {
     let eventBus: IEventBus;
-    if (!Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId]) {
-      throw new Error(`Context id: ${contextId} is missing from mappings`);
-    }
-    if (Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId].EVENT_BUS === CONTEXT_TYPES.InProcess) {
+    if (Container.appConfig.BUSES.EVENT_BUS === CONTEXT_TYPES.InProcess) {
       eventBus = Container.inProcessEventBus;
-    } else if (
-      Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId].EVENT_BUS === CONTEXT_TYPES.External
-    ) {
+    } else if (Container.appConfig.BUSES.EVENT_BUS === CONTEXT_TYPES.External) {
       eventBus = Container.externalEventBus;
     } else {
       eventBus = Container.inProcessEventBus;
@@ -156,19 +145,15 @@ export class Container {
     return eventBus;
   }
 
-  static getIntegrationEventBusFromContext(contextId: string): IEventBus {
+  static getIntegrationEventBus(): IEventBus {
     let eventBus: IEventBus;
-    if (!Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId]) {
-      throw new Error(`Context id: ${contextId} is missing from mappings`);
-    }
     if (
-      Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId].INTEGRATION_EVENT_BUS ===
+      Container.appConfig.BUSES.INTEGRATION_EVENT_BUS ===
       CONTEXT_TYPES.InProcess
     ) {
       eventBus = Container.inProcessEventBus;
     } else if (
-      Container.appConfig.CONTEXT_IDs_MAPPINGS[contextId].INTEGRATION_EVENT_BUS ===
-      CONTEXT_TYPES.External
+      Container.appConfig.BUSES.INTEGRATION_EVENT_BUS === CONTEXT_TYPES.External
     ) {
       eventBus = Container.externalEventBus;
     } else {

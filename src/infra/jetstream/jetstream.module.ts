@@ -1,22 +1,61 @@
-import { DynamicModule, Module } from '@nestjs/common';
-import { JetstreamCoreModule } from './jetstream-core.module';
+import { DynamicModule, Global, Module } from '@nestjs/common';
+import { Jetstream } from './jetstream.service';
+import { NestjsJetstream } from './nestjs-jetstream.class';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ProvidersConstants } from './contract';
+import {
+  NatsPubSubCommandBus,
+  PubSubCommandBusToken,
+} from './buses/nats-pubsub-command-bus';
 
+@Global()
 @Module({
   imports: [CqrsModule],
 })
 export class JetstreamModule {
   static register(option: any): DynamicModule {
+    const jetstreamProviders = {
+      provide: ProvidersConstants.JETSTREAM_PROVIDER,
+      useFactory: (): any => {
+        return new NestjsJetstream().connect(option);
+      },
+    };
+
+    const configProv = {
+      provide: ProvidersConstants.JETSTREAM_CONNECTION_CONFIG_PROVIDER,
+      useValue: {
+        ...option,
+      },
+    };
+    const pubsubCommandBus = {
+      provide: PubSubCommandBusToken,
+      useClass: NatsPubSubCommandBus,
+    };
+
     return {
       module: JetstreamModule,
-      imports: [JetstreamCoreModule.register(option)],
+      providers: [jetstreamProviders, configProv, pubsubCommandBus],
+      exports: [jetstreamProviders, configProv, pubsubCommandBus],
     };
   }
 
-  static registerFeature(config: any): DynamicModule {
+  static forFeature(config: any): DynamicModule {
+    if (config === undefined || config === null) {
+      throw new Error('Config missing');
+    }
+
     return {
       module: JetstreamModule,
-      imports: [JetstreamCoreModule.registerFeature(config)],
+      providers: [
+        {
+          provide: ProvidersConstants.JETSTREAM_STREAM_CONFIG_PROVIDER,
+          useValue: {
+            ...config,
+          },
+        },
+        Jetstream,
+      ],
+      exports: [Jetstream],
     };
   }
 }

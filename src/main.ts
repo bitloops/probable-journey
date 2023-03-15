@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { NestFastifyApplication } from '@nestjs/platform-fastify';
 // import { CustomStrategy } from '@nestjs/microservices';
 // import { NatsJetStreamServer } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
@@ -24,7 +25,7 @@ async function bootstrap() {
   //   }),
   // };
 
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, {
     abortOnError: false,
   });
   // const microService = app.connectMicroservice(options);

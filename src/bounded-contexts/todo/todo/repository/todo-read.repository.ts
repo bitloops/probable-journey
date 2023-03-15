@@ -15,10 +15,12 @@ export class TodoReadRepository implements TodoReadRepoPort {
 
   async getAll(): Promise<TodoReadModel[]> {
     const todos = await this.todoModel.find().exec();
-    return todos.map((todo) => {
+    return todos.map((todoObj) => {
+      console.log(todoObj);
+      const todo = (todoObj as any)._doc;
       const res = TodoReadModel.fromPrimitives({
         ...todo,
-        id: todo._id.toString(),
+        id: todoObj._id.toString(),
       });
       return res;
     });

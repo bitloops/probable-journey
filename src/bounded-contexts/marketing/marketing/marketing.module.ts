@@ -8,8 +8,10 @@ import { UserEmailReadRepoPortToken } from '@src/lib/bounded-contexts/marketing/
 import { UserEmailReadRepository } from './repository/user-email-read.repository';
 import { User, UserSchema } from './repository/schema/user.schema';
 import { EmailSchema, UserEmail } from './repository/schema/email.schema';
-import { NotificationTemplateReadRepoPortToken } from '@src/lib/bounded-contexts/marketing/marketing/ports/notification-template-read.repo-port.'
-import { NotificationTemplateReadRepository } from './repository/notification-template.repository'
+import { NotificationTemplateReadRepoPortToken } from '@src/lib/bounded-contexts/marketing/marketing/ports/notification-template-read.repo-port.';
+import { NotificationTemplateReadRepository } from './repository/notification-template.repository';
+import { EmailServicePortToken } from '@src/lib/bounded-contexts/marketing/marketing/constants';
+import { MockEmailService } from './service';
 const RepoProviders = [
   {
     provide: UserWriteRepoPortToken,
@@ -21,8 +23,12 @@ const RepoProviders = [
   },
   {
     provide: NotificationTemplateReadRepoPortToken,
-    useClass: NotificationTemplateReadRepository
-  }
+    useClass: NotificationTemplateReadRepository,
+  },
+  {
+    provide: EmailServicePortToken,
+    useClass: MockEmailService,
+  },
 ];
 @Module({
   imports: [
@@ -30,7 +36,9 @@ const RepoProviders = [
     LibMarketingModule.register({
       inject: [...RepoProviders],
       imports: [
-        MongooseModule.forFeature([{ name: UserEmail.name, schema: EmailSchema }]),
+        MongooseModule.forFeature([
+          { name: UserEmail.name, schema: EmailSchema },
+        ]),
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
         //schema for notificationTemplate
       ],
@@ -41,4 +49,4 @@ const RepoProviders = [
   //   providers: [...RepoProviders],
   exports: [LibMarketingModule],
 })
-export class MarketingModule { }
+export class MarketingModule {}

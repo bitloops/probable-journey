@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -11,9 +12,11 @@ import { MarketingModule } from './bounded-contexts/marketing/marketing/marketin
 
 @Module({
   imports: [
-    JetstreamModule.forRoot({
-      name: 'test',
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.development.env',
     }),
+    JetstreamModule.forRoot({}),
     MongooseModule.forRoot('mongodb://localhost/todo'),
     TypeOrmModule.forRoot({
       type: 'mysql',

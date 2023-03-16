@@ -1,4 +1,7 @@
-import { EmailServicePort, SendEmailRequest } from 'src/lib/bounded-contexts/marketing/marketing/ports/email-service-port';
+import {
+  EmailServicePort,
+  SendEmailRequest,
+} from 'src/lib/bounded-contexts/marketing/marketing/ports/email-service-port';
 
 export class MockEmailService implements EmailServicePort {
   send(data: SendEmailRequest): void {

@@ -10,7 +10,7 @@ import { IMQ as IMQImport } from './application/mq/IMQ';
 import { CommandHandler, UseCase, QueryHandler } from './application/UseCase';
 import { AggregateRoot } from './domain/AggregateRoot';
 import { applyRules as applyRulesImport } from './domain/applyRule';
-import { ICommandBus as ICommandBusImport } from './domain/commands/ICommandBus';
+import { IPubSubCommandBus as IPubSubCommandBusImport } from './domain/commands/ICommandBus';
 import { DomainError } from './domain/DomainError';
 import { Entity as EntityImport } from './domain/Entity';
 import { DomainEvent } from './domain/events/DomainEvent';
@@ -25,14 +25,6 @@ import {
   ValueObjectProps,
 } from './domain/ValueObject';
 import { Either, fail, ok } from './Either';
-import { EventBus as EventBusImport } from './infra/event-bus';
-import { IBaseGraphQLController as IBaseGraphQLControllerImport } from './infra/graphql/IBaseGraphQLController';
-import { InProcessMessageBus as InProcessMessageBusImport } from './infra/message-bus/InProcessMessageBus';
-import {
-  ErrorMessage as ErrorMessageImport,
-  IBaseRESTController as IBaseControllerImport,
-} from './infra/rest/IBaseRESTController';
-
 import { Command as CommandImport } from './domain/commands/Command';
 import { IDomainEvent as IDomainEventImport } from './domain/events/IDomainEvent';
 import { Query as QueryImport } from './domain/queries/Query';
@@ -47,8 +39,6 @@ import {
 import { IQueryBus as IQueryBusImport } from './domain/queries/IQueryBus';
 import { NotFoundError } from './errors/repository/NotFoundError';
 import { ConcurrencyError } from './errors/repository/ConcurrencyError';
-import { CommandBus as CommandBusImport } from './infra/command-bus/';
-import { QueryBus as QueryBusImport } from './infra/query-bus/QueryBus';
 import {
   CurrencyVO as CurrencyVOImport,
   ErrorTypes as CurrencyVOErrorTypesImport,
@@ -108,38 +98,30 @@ namespace Application {
 }
 
 namespace Infra {
-  export namespace REST {
-    export type IBaseController<Req, Res> = IBaseControllerImport<Req, Res>;
-    export type ErrorMessage = ErrorMessageImport;
-  }
+  // export namespace REST {
+  //   export type IBaseController<Req, Res> = IBaseControllerImport<Req, Res>;
+  //   export type ErrorMessage = ErrorMessageImport;
+  // }
 
-  export namespace GraphQL {
-    export type IBaseController<TRequest, TResponseData> =
-      IBaseGraphQLControllerImport<TRequest, TResponseData>;
-  }
+  // export namespace GraphQL {
+  //   export type IBaseController<TRequest, TResponseData> =
+  //     IBaseGraphQLControllerImport<TRequest, TResponseData>;
+  // }
 
   export namespace EventBus {
     export class IntegrationEvent<T> extends IntegrationEventImport<T> {}
-    export class EventBus extends EventBusImport {}
     export type IEventBus = IEventBusImport;
   }
   export namespace CommandBus {
-    export class CommandBus extends CommandBusImport {}
-    export type ICommandBus = ICommandBusImport;
+    export type IPubSubCommandBus = IPubSubCommandBusImport;
   }
 
   export namespace QueryBus {
-    export class QueryBus extends QueryBusImport {}
     export type IQueryBus = IQueryBusImport;
   }
 
   export namespace MessageBus {
     export type IMessageBus = IMessageBusImport;
-    export class InProcessMessageBus extends InProcessMessageBusImport {}
-  }
-
-  export namespace MQ {
-    export type IMQ<Connection> = IMQImport<Connection>;
   }
 }
 

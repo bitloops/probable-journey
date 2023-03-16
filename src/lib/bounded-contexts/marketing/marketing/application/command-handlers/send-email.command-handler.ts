@@ -1,27 +1,32 @@
-import {
-  Application,
-  Either,
-  ok,
-} from '@bitloops/bl-boilerplate-core';
+import { Application, Either, ok } from '@bitloops/bl-boilerplate-core';
 import { CommandHandler } from '@nestjs/cqrs';
 import { SendEmailCommand } from '../../commands/send-email.command';
 import { Inject } from '@nestjs/common';
-import { EmailServicePort, EmailServicePortToken } from '../../ports/email-service-port';
+import { EmailServicePort } from '../../ports/email-service-port';
+import { EmailServicePortToken } from '../../constants';
 
 type SendEmailCommandHandlerResponse = Either<void, void>;
 
 @CommandHandler(SendEmailCommand)
 export class SendEmailCommandHandler
   implements
-  Application.IUseCase<
-    SendEmailCommand,
-    Promise<SendEmailCommandHandlerResponse>
-  >
+    Application.ICommandHandler<
+      SendEmailCommand,
+      Promise<SendEmailCommandHandlerResponse>
+    >
 {
   constructor(
     @Inject(EmailServicePortToken)
     private readonly emailService: EmailServicePort,
-  ) { }
+  ) {}
+
+  get command() {
+    return SendEmailCommand;
+  }
+
+  get boundedContext(): string {
+    return 'Marketing';
+  }
 
   async execute(
     command: SendEmailCommand,
@@ -30,8 +35,8 @@ export class SendEmailCommandHandler
     await this.emailService.send({
       origin: command.origin,
       destination: command.destination,
-      content: command.content
-    })
+      content: command.content,
+    });
     return ok();
   }
 }

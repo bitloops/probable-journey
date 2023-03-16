@@ -1,32 +1,46 @@
-import { Application, ok, Either, RespondWithPublish, Domain } from '@bitloops/bl-boilerplate-core';
+import { Application, ok, Either, Domain } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { UpdateUserEmailCommand } from '../../commands/update-user-email.command';
 import { UserEmailReadModel } from '../../domain/read-models/user-email.read-model';
-import { UserEmailReadRepoPort, UserEmailReadRepoPortToken } from '../../ports/user-email-read.repo-port';
+import {
+  UserEmailReadRepoPort,
+  UserEmailReadRepoPortToken,
+} from '../../ports/user-email-read.repo-port';
 
-type UpdateUserEmailCommandHandlerResponse = Either<
-    void,
-    never>;
+type UpdateUserEmailCommandHandlerResponse = Either<void, never>;
 
 @CommandHandler(UpdateUserEmailCommand)
 export class IncrementTodosCommandHandler
-    implements
-    Application.IUseCase<
-        UpdateUserEmailCommand,
-        Promise<UpdateUserEmailCommandHandlerResponse>
+  implements
+    Application.ICommandHandler<
+      UpdateUserEmailCommand,
+      Promise<UpdateUserEmailCommandHandlerResponse>
     >
 {
-    constructor(@Inject(UserEmailReadRepoPortToken) private userEmailRepo: UserEmailReadRepoPort) { }
+  constructor(
+    @Inject(UserEmailReadRepoPortToken)
+    private userEmailRepo: UserEmailReadRepoPort,
+  ) {}
 
-    @RespondWithPublish()
-    async execute(
-        command: UpdateUserEmailCommand,
-    ): Promise<UpdateUserEmailCommandHandlerResponse> {
-        const requestUserId = new Domain.UUIDv4(command.userId);
-        const userIdEmail = new UserEmailReadModel(requestUserId.toString(), command.email);
+  get command() {
+    return UpdateUserEmailCommand;
+  }
 
-        await this.userEmailRepo.save(userIdEmail);
-        return ok();
-    }
+  get boundedContext(): string {
+    return 'Marketing';
+  }
+
+  async execute(
+    command: UpdateUserEmailCommand,
+  ): Promise<UpdateUserEmailCommandHandlerResponse> {
+    const requestUserId = new Domain.UUIDv4(command.userId);
+    const userIdEmail = new UserEmailReadModel(
+      requestUserId.toString(),
+      command.email,
+    );
+
+    await this.userEmailRepo.save(userIdEmail);
+    return ok();
+  }
 }

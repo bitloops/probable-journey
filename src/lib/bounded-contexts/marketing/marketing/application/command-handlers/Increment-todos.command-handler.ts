@@ -1,4 +1,4 @@
-import { Application, ok, Either, RespondWithPublish, Domain } from '@bitloops/bl-boilerplate-core';
+import { Application, ok, Either, Domain } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { IncrementTodosCommand } from '../../commands/Increment-todos.command';
@@ -6,23 +6,36 @@ import { CompletedTodosVO } from '../../domain/completed-todos.vo';
 import { DomainErrors } from '../../domain/errors';
 import { UserEntity } from '../../domain/user.entity';
 import { UserIdVO } from '../../domain/user-id.vo';
-import { UserWriteRepoPort, UserWriteRepoPortToken } from '../../ports/user-write.repo-port';
+import {
+  UserWriteRepoPort,
+  UserWriteRepoPortToken,
+} from '../../ports/user-write.repo-port';
 
 type IncrementDepositsCommandHandlerResponse = Either<
   void,
-  DomainErrors.InvalidTodosCounterError>;
+  DomainErrors.InvalidTodosCounterError
+>;
 
 @CommandHandler(IncrementTodosCommand)
 export class IncrementTodosCommandHandler
   implements
-  Application.IUseCase<
-    IncrementTodosCommand,
-    Promise<IncrementDepositsCommandHandlerResponse>
-  >
+    Application.IUseCase<
+      IncrementTodosCommand,
+      Promise<IncrementDepositsCommandHandlerResponse>
+    >
 {
-  constructor(@Inject(UserWriteRepoPortToken) private userRepo: UserWriteRepoPort) { }
+  constructor(
+    @Inject(UserWriteRepoPortToken) private userRepo: UserWriteRepoPort,
+  ) {}
 
-  @RespondWithPublish()
+  get command() {
+    return IncrementTodosCommand;
+  }
+
+  get boundedContext(): string {
+    return 'Marketing';
+  }
+
   async execute(
     command: IncrementTodosCommand,
   ): Promise<IncrementDepositsCommandHandlerResponse> {
@@ -36,7 +49,10 @@ export class IncrementTodosCommandHandler
         return fail(completedTodosVO.value);
       }
       const userId = UserIdVO.create({ id: requestUserId });
-      const newUserOrError = UserEntity.create({ completedTodos: completedTodosVO.value, userId: userId.value });
+      const newUserOrError = UserEntity.create({
+        completedTodos: completedTodosVO.value,
+        userId: userId.value,
+      });
       if (newUserOrError.isFail()) {
         return fail(newUserOrError.value);
       }
@@ -49,6 +65,5 @@ export class IncrementTodosCommandHandler
       await this.userRepo.save(user);
       return ok();
     }
-
   }
 }

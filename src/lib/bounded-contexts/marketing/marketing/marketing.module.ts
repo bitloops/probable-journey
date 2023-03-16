@@ -1,27 +1,26 @@
 import { Module, Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { CommandHandlers } from './application/command-handlers';
+import { StreamingCommandHandlers } from './application/command-handlers';
 import { EventHandlers } from './application/event-handlers';
 // import { QueryHandlers } from './application/query-handlers';
 
-@Module({
-})
+@Module({})
 export class MarketingModule {
   static register(options: { inject: Provider<any>[]; imports: any[] }) {
     const InjectedProviders = options.inject || [];
     return {
       module: MarketingModule,
-      imports: [
-        CqrsModule,
-        ...options.imports,
-      ],
+      imports: [CqrsModule, ...options.imports],
       providers: [
-        ...CommandHandlers,
+        ...StreamingCommandHandlers,
         ...EventHandlers,
         // ...QueryHandlers,
         ...InjectedProviders,
       ],
-      exports: [...CommandHandlers, ...EventHandlers, /*...QueryHandlers*/],
+      exports: [
+        ...StreamingCommandHandlers,
+        ...EventHandlers /*...QueryHandlers*/,
+      ],
     };
   }
 }

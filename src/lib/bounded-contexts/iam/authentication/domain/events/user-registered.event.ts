@@ -8,7 +8,7 @@ export class UserRegisteredDomainEvent
   public aggregateId: any;
 
   constructor(public readonly data: UserEntity, uuid?: string) {
-    const metadata = {
+    this.metadata = {
       fromContextId: 'IAM',
       id: uuid,
     };

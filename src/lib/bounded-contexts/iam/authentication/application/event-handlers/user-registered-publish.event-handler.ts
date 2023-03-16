@@ -12,7 +12,7 @@ export class UserRegisteredPublishIntegrationEventHandler
   }
 
   get boundedContext(): string {
-    return 'Iam';
+    return 'IAM';
   }
 
   public async handle(event: UserRegisteredDomainEvent): Promise<void> {

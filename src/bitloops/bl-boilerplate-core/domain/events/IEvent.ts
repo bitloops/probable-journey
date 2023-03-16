@@ -22,7 +22,6 @@ import { IMessage } from '../messages/IMessage';
 export interface TEventMetadata {
   id: string;
   createdAtTimestamp: number;
-  version?: string;
   fromContextId: string;
 }
 

@@ -42,6 +42,7 @@ import {
   CurrencyVO as CurrencyVOImport,
   ErrorTypes as CurrencyVOErrorTypesImport,
 } from './domain/standard-values';
+import { IErrorEvent as IErrorEventImport } from './application/events/IErrorEvent';
 
 namespace Domain {
   export class Error extends DomainError {}
@@ -66,6 +67,7 @@ namespace Domain {
 
 namespace Application {
   export class Error extends AppError {}
+  export type IErrorEvent = IErrorEventImport<any>;
   export type IUseCase<IRequest, IResponse> = UseCase<IRequest, IResponse>;
   export type ICommandHandler<IRequest, IResponse> = CommandHandler<
     IRequest,

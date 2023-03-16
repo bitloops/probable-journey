@@ -1,12 +1,16 @@
 import { Infra, Application } from '@bitloops/bl-boilerplate-core';
+import { Inject } from '@nestjs/common';
 import { TodoCompletedDomainEvent } from '../../../domain/events/todo-completed.event';
 import { TodoCompletedIntegrationEvent } from '../../../contracts/integration-events/todo-completed.integration-event';
+import { StreamingIntegrationEventBusToken } from '../../../constants';
 
 export class TodoCompletedDomainToIntegrationEventHandler
   implements Application.IHandle
 {
-  private integrationEventBus: Infra.EventBus.IEventBus;
-  constructor() {}
+  constructor(
+    @Inject(StreamingIntegrationEventBusToken)
+    private integrationEventBus: Infra.EventBus.IEventBus,
+  ) {}
   get event() {
     return TodoCompletedDomainEvent;
   }

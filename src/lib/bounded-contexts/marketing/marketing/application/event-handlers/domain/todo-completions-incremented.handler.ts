@@ -19,7 +19,7 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
     private readonly emailRepoPort: UserEmailReadRepoPort,
     @Inject(NotificationTemplateReadRepoPortToken)
     private notificationTemplateRepo: NotificationTemplateReadRepoPort,
-  ) { }
+  ) {}
 
   get event() {
     return TodoCompletionsIncrementedDomainEvent;

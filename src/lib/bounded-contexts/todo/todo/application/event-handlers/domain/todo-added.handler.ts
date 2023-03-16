@@ -9,7 +9,7 @@ export class TodoAddedDomainToIntegrationEventHandler
 {
   constructor(
     @Inject(StreamingIntegrationEventBusToken)
-    private integrationEventBus: Infra.EventBus.IEventBus,
+    private eventBus: Infra.EventBus.IEventBus,
   ) {}
   get event() {
     return TodoAddedDomainEvent;
@@ -22,7 +22,7 @@ export class TodoAddedDomainToIntegrationEventHandler
   public async handle(event: TodoAddedDomainEvent): Promise<void> {
     const events = TodoCompletedIntegrationEvent.create(event);
 
-    await this.integrationEventBus.publish(events);
+    await this.eventBus.publish(events);
 
     console.log(
       `[TodoAddedDomainEventHandler]: Successfully published TodoAddedIntegrationEvent`,

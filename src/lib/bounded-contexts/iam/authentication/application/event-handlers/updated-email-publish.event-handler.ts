@@ -1,21 +1,31 @@
 import { Infra, Application } from '@bitloops/bl-boilerplate-core';
+import { Inject } from '@nestjs/common';
+import { StreamingIntegrationEventBusToken } from '../../constants';
 import { UserUpdatedEmailIntegrationEvent } from '../../contracts/integration-events/user-updated-email.integration-event';
 import { UserUpdatedEmailDomainEvent } from '../../domain/events/user-updated-email.event';
 
+export class UserUpdatedEmailPublishIntegrationEventHandler
+  implements Application.IHandle
+{
+  constructor(
+    @Inject(StreamingIntegrationEventBusToken)
+    private eventBus: Infra.EventBus.IEventBus,
+  ) {}
 
-export class UserUpdatedEmailPublishIntegrationEventHandler implements Application.IHandle {
-    private eventBus: Infra.EventBus.IEventBus;
-    constructor() {
-    }
+  get event() {
+    return UserUpdatedEmailDomainEvent;
+  }
 
-    public async handle(event: UserUpdatedEmailDomainEvent): Promise<void> {
-        const events = UserUpdatedEmailIntegrationEvent.create(
-            event
-        );
-        await this.eventBus.publishMany(events);
+  get boundedContext(): string {
+    return 'IAM';
+  }
 
-        console.log(
-            `[UserUpdatedEmailPublishIntegrationEventHandler]: Successfully published UserUpdatedEmailIntegrationEvent`,
-        );
-    }
+  public async handle(event: UserUpdatedEmailDomainEvent): Promise<void> {
+    const events = UserUpdatedEmailIntegrationEvent.create(event);
+    await this.eventBus.publish(events);
+
+    console.log(
+      `[UserUpdatedEmailPublishIntegrationEventHandler]: Successfully published UserUpdatedEmailIntegrationEvent`,
+    );
+  }
 }

@@ -5,21 +5,21 @@ import {
   PubSubCommandBus,
   PubSubCommandBusToken,
 } from '@src/infra/jetstream/buses/nats-pubsub-command-bus';
-import { NestjsJetstream } from '@src/infra/jetstream/nestjs-jetstream.class';
 import {
-  CommandHandlers,
-  PubsubCommandHandlers,
-} from '@src/lib/bounded-contexts/todo/todo/application/command-handlers';
-import { TodoCompletedDomainToIntegrationEventHandler } from '@src/lib/bounded-contexts/todo/todo/application/event-handlers/domain/todo-completed.handler';
-import { JetstreamModule } from '../infra/jetstream/jetstream.module';
+  PubSubQueryBus,
+  PubSubQueryBusToken,
+} from '@src/infra/jetstream/buses/nats-pubsub-query-bus';
+import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers';
+import { PubSubQueryHandlers } from '@src/lib/bounded-contexts/todo/todo/application/query-handlers';
+// import { TodoCompletedDomainToIntegrationEventHandler } from '@src/lib/bounded-contexts/todo/todo/application/event-handlers/domain/todo-completed.handler';
 import { TodoController } from './todo.controller';
 import { TodosController } from './todos.controller';
 
-const pubsubCommandHandlers: Provider<any>[] = [
+const pubSubCommandHandlers: Provider<any>[] = [
   {
-    provide: 'PubsubCommandHandlers',
+    provide: 'PubSubCommandHandlers',
     useFactory: (commandBus: PubSubCommandBus, ...args) => {
-      console.log('pubsubCommandHandler', pubsubCommandHandlers);
+      console.log('pubSubCommandHandler', pubSubCommandHandlers);
       args.forEach((handler) => {
         const command = handler.command;
         const boundedContext = handler.boundedContext;
@@ -33,7 +33,27 @@ const pubsubCommandHandlers: Provider<any>[] = [
     },
     inject: [
       { token: PubSubCommandBusToken, optional: false },
-      ...PubsubCommandHandlers,
+      ...PubSubCommandHandlers,
+    ],
+  },
+];
+const pubSubQueryHandlers: Provider<any>[] = [
+  {
+    provide: 'PubSubQueryHandlers',
+    useFactory: (queryBus: PubSubQueryBus, ...args) => {
+      console.log('pubSubQueryHandler', pubSubQueryHandlers);
+      args.forEach((handler) => {
+        const query = handler.query;
+        const boundedContext = handler.boundedContext;
+        console.log('subscribe', `${boundedContext}.${query?.name}`, handler);
+        queryBus.pubSubSubscribe(`${boundedContext}.${query?.name}`, handler);
+      });
+      [...args];
+      return;
+    },
+    inject: [
+      { token: PubSubQueryBusToken, optional: false },
+      ...PubSubQueryHandlers,
     ],
   },
 ];
@@ -42,11 +62,12 @@ const pubsubCommandHandlers: Provider<any>[] = [
     CqrsModule,
     TodoModule,
     // JetstreamModule.forFeature({
-    //   pubsubCommandHandlers: [...PubsubCommandHandlers],
+    //   pubSubCommandHandlers: [...PubSubCommandHandlers],
     // }),
   ],
   providers: [
-    ...pubsubCommandHandlers,
+    ...pubSubCommandHandlers,
+    ...pubSubQueryHandlers,
     // CommandBus,
     // {
     //   provide: 'SIMPLE_NATS',

@@ -45,7 +45,7 @@ export class Jetstream
     configService: any,
     @Inject(ProvidersConstants.JETSTREAM_STREAM_CONFIG_PROVIDER)
     jetstreamStreamConfig: any,
-    // @Inject('PubsubCommandHandlers') private pubsubCommandHandlers: any[],
+    // @Inject('PubSubCommandHandlers') private pubSubCommandHandlers: any[],
     private readonly eventsBus: EventBus,
   ) {
     this.jetstream = jetstream;
@@ -55,8 +55,8 @@ export class Jetstream
     // this.addEventHandlers(jetstreamStreamConfig.eventHandlers);
 
     // const subjectSubscriptions = jetstreamStreamConfig.subscriptions;
-    const { pubsubCommandHandlers } = jetstreamStreamConfig;
-    this.subscribePubsubCommandHandlers(pubsubCommandHandlers);
+    const { pubSubCommandHandlers } = jetstreamStreamConfig;
+    this.subscribePubSubCommandHandlers(pubSubCommandHandlers);
 
     // this.subscribeSubjects(subjectSubscriptions);
   }
@@ -69,11 +69,11 @@ export class Jetstream
   //   }
   // }
 
-  async subscribePubsubCommandHandlers(
-    pubsubCommandHandlers: Application.IUseCase<any, any>[],
+  async subscribePubSubCommandHandlers(
+    pubSubCommandHandlers: Application.IUseCase<any, any>[],
   ) {
-    console.log('pubsubCommandHandlers', pubsubCommandHandlers);
-    pubsubCommandHandlers.forEach((handler) => {
+    console.log('pubSubCommandHandlers', pubSubCommandHandlers);
+    pubSubCommandHandlers.forEach((handler) => {
       const command = handler.command;
       const boundedContext = handler.boundedContext;
       this.pubSubSubscribe(`${boundedContext}.${command?.name}`, handler);

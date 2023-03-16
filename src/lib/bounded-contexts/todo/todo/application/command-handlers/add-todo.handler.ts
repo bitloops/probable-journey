@@ -20,11 +20,17 @@ import {
 } from '../../ports/TodoWriteRepoPort';
 import { UserIdVO } from '../../domain/UserIdVO';
 
-type AddTodoUseCaseResponse = Either<void, DomainErrors.TitleOutOfBoundsError>;
+type AddTodoUseCaseResponse = Either<
+  string,
+  DomainErrors.TitleOutOfBoundsError
+>;
 
 export class AddTodoHandler
   implements
-    Application.IUseCase<AddTodoCommand, Promise<AddTodoUseCaseResponse>>
+    Application.ICommandHandler<
+      AddTodoCommand,
+      Promise<AddTodoUseCaseResponse>
+    >
 {
   private ctx: any;
   constructor(
@@ -60,7 +66,7 @@ export class AddTodoHandler
 
     await this.todoRepo.save(todo.value, this.ctx);
 
-    return ok();
+    return ok(todo.value.id.toString());
   }
 }
 

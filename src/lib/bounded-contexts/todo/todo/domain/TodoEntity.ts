@@ -97,7 +97,7 @@ export class TodoEntity extends Domain.Aggregate<TodoProps> {
   public toPrimitives(): TTodoEntityPrimitives {
     return {
       userId: this.props.userId.id.toString(),
-      id: this.id.toString(),
+      id: this._id.toString(),
       title: this.props.title.title,
       completed: this.props.completed,
     };

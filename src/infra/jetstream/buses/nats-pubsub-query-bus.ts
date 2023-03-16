@@ -5,19 +5,18 @@ import { Application } from '@src/bitloops/bl-boilerplate-core';
 
 const jsonCodec = JSONCodec();
 
-export interface PubSubCommandBus {
-  publish(command: any): Promise<void>;
-  request(command: any): Promise<any>;
+export interface PubSubQueryBus {
+  request(query: any): Promise<any>;
   pubSubSubscribe(
     subject: string,
-    handler: Application.IUseCase<any, any>,
+    handler: Application.IQueryHandler<any, any>,
   ): Promise<void>;
 }
 
-export const PubSubCommandBusToken = Symbol('PubSubCommandBus');
+export const PubSubQueryBusToken = Symbol('PubSubQueryBus');
 
 @Injectable()
-export class NatsPubSubCommandBus implements PubSubCommandBus {
+export class NatsPubSubQueryBus implements PubSubQueryBus {
   private nc: NatsConnection;
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER) private readonly nats: any,
@@ -25,43 +24,45 @@ export class NatsPubSubCommandBus implements PubSubCommandBus {
     this.nc = this.nats.getConnection();
   }
 
-  async publish(command: any): Promise<void> {
-    const boundedContext = command.boundedContext;
-    const topic = `${boundedContext}.${command.constructor.name}`;
+  async publish(query: any): Promise<void> {
+    const boundedContext = query.boundedContext;
+    const topic = `${boundedContext}.${query.constructor.name}`;
     console.log(
       'Publishing in server:',
       topic,
       this.nats.getConnection().getServer(),
     );
 
-    this.nc.publish(topic, jsonCodec.encode(command));
+    this.nc.publish(topic, jsonCodec.encode(query));
   }
 
-  async request(command: any): Promise<any> {
-    const boundedContext = command.boundedContext;
-    const topic = `${boundedContext}.${command.constructor.name}`;
+  async request(query: any): Promise<any> {
+    const boundedContext = query.boundedContext;
+    const topic = `${boundedContext}.${query.constructor.name}`;
     console.log(
-      'Publishing in server:',
+      'Publishing request in server:',
       topic,
       this.nats.getConnection().getServer(),
+      query,
     );
-
     return await this.nc
-      .request(topic, jsonCodec.encode(command))
+      .request(topic, jsonCodec.encode(query))
       .then((response) => {
-        return jsonCodec.decode(response.data);
+        const data = jsonCodec.decode(response.data);
+        console.log('Response in query request:', data);
+        return data;
       })
       .catch((err) => {
-        console.log('Error in command request:', err);
+        console.log('Error in query request:', err);
       });
   }
 
   async pubSubSubscribe(
     subject: string,
-    handler: Application.ICommandHandler<any, any>,
+    handler: Application.IQueryHandler<any, any>,
   ) {
     try {
-      console.log('Subscribing to:', subject);
+      console.log('Subscribing query to:', subject, handler);
       // this.logger.log(`
       //   Subscribing ${subject}!
       // `);

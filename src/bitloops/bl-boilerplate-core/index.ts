@@ -7,7 +7,7 @@ import {
   CRUDWriteRepoPort,
 } from './application/ICRUDRepoPort';
 import { IMQ as IMQImport } from './application/mq/IMQ';
-import { UseCase } from './application/UseCase';
+import { CommandHandler, UseCase, QueryHandler } from './application/UseCase';
 import { AggregateRoot } from './domain/AggregateRoot';
 import { applyRules as applyRulesImport } from './domain/applyRule';
 import { ICommandBus as ICommandBusImport } from './domain/commands/ICommandBus';
@@ -82,6 +82,14 @@ namespace Domain {
 namespace Application {
   export class Error extends AppError {}
   export type IUseCase<IRequest, IResponse> = UseCase<IRequest, IResponse>;
+  export type ICommandHandler<IRequest, IResponse> = CommandHandler<
+    IRequest,
+    IResponse
+  >;
+  export type IQueryHandler<IRequest, IResponse> = QueryHandler<
+    IRequest,
+    IResponse
+  >;
   export type IHandle = IHandleImport;
   export class Command extends CommandImport {}
   export class Query extends QueryImport {}

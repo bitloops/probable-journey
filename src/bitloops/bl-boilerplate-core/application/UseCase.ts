@@ -19,3 +19,15 @@ export interface UseCase<IRequest, IResponse> {
   get boundedContext(): string;
   execute(request?: IRequest): Promise<IResponse> | IResponse;
 }
+
+export interface CommandHandler<IRequest, IResponse> {
+  get command(): any;
+  get boundedContext(): string;
+  execute(request?: IRequest): Promise<IResponse> | IResponse;
+}
+
+export interface QueryHandler<IRequest, IResponse> {
+  get query(): any;
+  get boundedContext(): string;
+  execute(request?: IRequest): Promise<IResponse> | IResponse;
+}

@@ -1,9 +1,11 @@
 import { Domain } from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
-import { MongoClient, Collection } from 'mongodb';
+import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
 import { TodoWriteRepoPort } from 'src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 import { TodoEntity } from 'src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
+
+const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
 
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'todo';
 const MONGO_DB_TODO_COLLECTION =
@@ -25,9 +27,9 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
-      jwtPayload = jwtwebtoken.verify(jwt, 'jwtSecret');
+      jwtPayload = jwtwebtoken.verify(jwt, JWT_SECRET);
     } catch (err) {
-      throw new Error('Invalid token');
+      throw new Error('Invalid JWT!');
     }
     const result = await this.collection.findOne({
       _id: id.toString() as any,
@@ -68,17 +70,19 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
-      jwtPayload = jwt.verify(jwt, 'jwtSecret');
+      jwtPayload = jwtwebtoken.verify(jwt, JWT_SECRET);
     } catch (err) {
-      throw new Error('Invalid token');
+      throw new Error('Invalid JWT!');
     }
     const createdTodo = todo.toPrimitives();
     if (createdTodo.userId !== jwtPayload.userId) {
       throw new Error('Invalid userId');
     }
     const { id, ...todoInfo } = createdTodo;
+    console.log('id', id);
     await this.collection.insertOne({
       _id: id as any,
+      id: id,
       ...todoInfo,
     });
   }

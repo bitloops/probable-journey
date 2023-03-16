@@ -7,6 +7,10 @@ import {
   NatsPubSubCommandBus,
   PubSubCommandBusToken,
 } from './buses/nats-pubsub-command-bus';
+import {
+  NatsPubSubQueryBus,
+  PubSubQueryBusToken,
+} from './buses/nats-pubsub-query-bus';
 
 @Global()
 @Module({
@@ -27,15 +31,29 @@ export class JetstreamModule {
         ...option,
       },
     };
-    const pubsubCommandBus = {
+    const pubSubCommandBus = {
       provide: PubSubCommandBusToken,
       useClass: NatsPubSubCommandBus,
+    };
+    const pubSubQueryBus = {
+      provide: PubSubQueryBusToken,
+      useClass: NatsPubSubQueryBus,
     };
 
     return {
       module: JetstreamModule,
-      providers: [jetstreamProviders, configProv, pubsubCommandBus],
-      exports: [jetstreamProviders, configProv, pubsubCommandBus],
+      providers: [
+        jetstreamProviders,
+        configProv,
+        pubSubCommandBus,
+        pubSubQueryBus,
+      ],
+      exports: [
+        jetstreamProviders,
+        configProv,
+        pubSubCommandBus,
+        pubSubQueryBus,
+      ],
     };
   }
 
@@ -53,7 +71,7 @@ export class JetstreamModule {
             ...config,
           },
         },
-        // ...config.pubsubCommandHandlers,
+        // ...config.pubSubCommandHandlers,
         Jetstream,
       ],
       exports: [Jetstream],

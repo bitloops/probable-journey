@@ -1,8 +1,8 @@
 import { Module, Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { CommandHandlers } from './application/command-handlers';
+import { PubSubCommandHandlers } from './application/command-handlers';
 import { EventHandlers } from './application/event-handlers';
-import { QueryHandlers } from './application/query-handlers';
+import { PubSubQueryHandlers } from './application/query-handlers';
 
 @Module({
   // imports: [
@@ -37,12 +37,16 @@ export class TodoModule {
       ],
       // controllers: [TodoController],
       providers: [
-        ...CommandHandlers,
+        ...PubSubCommandHandlers,
         ...EventHandlers,
-        ...QueryHandlers,
+        ...PubSubQueryHandlers,
         ...InjectedProviders,
       ],
-      exports: [...CommandHandlers, ...EventHandlers, ...QueryHandlers],
+      exports: [
+        ...PubSubCommandHandlers,
+        ...EventHandlers,
+        ...PubSubQueryHandlers,
+      ],
     };
   }
 }

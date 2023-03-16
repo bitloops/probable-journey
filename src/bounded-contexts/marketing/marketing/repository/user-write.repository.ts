@@ -3,8 +3,8 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schema/user.schema';
-import { UserEntity } from '@src/lib/bounded-contexts/marketing/marketing/domain/UserEntity';
-import { UserWriteRepoPort } from '@src/lib/bounded-contexts/marketing/marketing/ports/UserWriteRepoPort';
+import { UserEntity } from '@src/lib/bounded-contexts/marketing/marketing/domain/user.entity';
+import { UserWriteRepoPort } from '@src/lib/bounded-contexts/marketing/marketing/ports/user-write.repo-port';
 
 @Injectable()
 export class UserWriteRepository implements UserWriteRepoPort {

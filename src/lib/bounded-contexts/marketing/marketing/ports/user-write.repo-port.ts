@@ -1,5 +1,5 @@
 import { Application, Domain } from '@bitloops/bl-boilerplate-core';
-import { UserEntity } from '../domain/UserEntity.js';
+import { UserEntity } from '../domain/user.entity';
 
 export interface UserWriteRepoPort extends Application.Repo.ICRUDWritePort<
   UserEntity,

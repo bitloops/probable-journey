@@ -1,5 +1,5 @@
 import { Application } from '@bitloops/bl-boilerplate-core';
-import { IncrementTodosDTO } from '../dtos/incrementTodosDTO';
+import { IncrementTodosDTO } from '../dtos/increment-todos.dto';
 
 
 export class IncrementTodosCommand extends Application.Command {

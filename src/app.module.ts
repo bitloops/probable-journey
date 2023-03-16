@@ -7,7 +7,7 @@ import { JetstreamModule } from './infra/jetstream/jetstream.module';
 import { HeroesModule } from './heroes/heroes.module';
 import { ApiModule } from './api/api.module';
 import { TodoModule } from './bounded-contexts/todo/todo/todo.module';
-
+import { MarketingModule } from './bounded-contexts/marketing/marketing/marketing.module';
 @Module({
   imports: [
     JetstreamModule.register({}),
@@ -26,10 +26,11 @@ import { TodoModule } from './bounded-contexts/todo/todo/todo.module';
     HeroesModule,
     TodoModule,
     ApiModule,
+    MarketingModule
   ],
   controllers: [],
   providers: [],
 })
 export class AppModule {
-  constructor(private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource) { }
 }

@@ -1,11 +1,11 @@
 import { Either, Domain, ok } from "@src/bitloops/bl-boilerplate-core";
-import { CompletedTodosVO } from "./CompletedTodosVO";
-import { UserIdVO } from "./UserIdVO";
+import { CompletedTodosVO } from "./completed-todos.vo";
+import { UserIdVO } from "./user-id.vo";
 import { TodoCompletionsIncrementedDomainEvent } from "./events/todo-completions-incremented.event";
 
 export interface UserProps {
-    userId: UserIdVO;
-    completedTodos: CompletedTodosVO;
+  userId: UserIdVO;
+  completedTodos: CompletedTodosVO;
 }
 
 type TUserEntityPrimitives = {
@@ -39,6 +39,10 @@ export class UserEntity extends Domain.Aggregate<UserProps> {
 
     this.props.completedTodos = completedTodos;
     this.addDomainEvent(new TodoCompletionsIncrementedDomainEvent(this))
+  }
+
+  isFirstTodo(): boolean {
+    return this.props.completedTodos.counter === 1;
   }
 
   public static fromPrimitives(data: TUserEntityPrimitives): UserEntity {

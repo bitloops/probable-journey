@@ -2,8 +2,8 @@ import { Application, ok, Either, RespondWithPublish, Domain } from '@bitloops/b
 import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { UpdateUserEmailCommand } from '../../commands/update-user-email.command';
-import { UserEmailReadModel } from '../../domain/read-models/userEmailReadModel';
-import { UserEmailReadRepoPort, UserEmailReadRepoPortToken } from '../../ports/UserEmailReadRepoPort';
+import { UserEmailReadModel } from '../../domain/read-models/user-email.read-model';
+import { UserEmailReadRepoPort, UserEmailReadRepoPortToken } from '../../ports/user-email-read.repo-port';
 
 type UpdateUserEmailCommandHandlerResponse = Either<
     void,

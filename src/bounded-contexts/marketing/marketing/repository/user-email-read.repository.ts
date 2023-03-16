@@ -3,8 +3,8 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserEmail, UserEmailDocument } from './schema/email.schema';
-import { UserEmailReadRepoPort } from '@src/lib/bounded-contexts/marketing/marketing/ports/UserEmailReadRepoPort';
-import { UserEmailReadModel } from '@src/lib/bounded-contexts/marketing/marketing/domain/read-models/userEmailReadModel';
+import { UserEmailReadRepoPort } from '@src/lib/bounded-contexts/marketing/marketing/ports/user-email-read.repo-port';
+import { UserEmailReadModel } from '@src/lib/bounded-contexts/marketing/marketing/domain/read-models/user-email.read-model';
 
 
 @Injectable()

@@ -2,11 +2,11 @@ import { Application, ok, Either, RespondWithPublish, Domain } from '@bitloops/b
 import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { IncrementTodosCommand } from '../../commands/Increment-todos.command';
-import { CompletedTodosVO } from '../../domain/CompletedTodosVO';
+import { CompletedTodosVO } from '../../domain/completed-todos.vo';
 import { DomainErrors } from '../../domain/errors';
-import { UserEntity } from '../../domain/UserEntity';
-import { UserIdVO } from '../../domain/UserIdVO';
-import { UserWriteRepoPort, UserWriteRepoPortToken } from '../../ports/UserWriteRepoPort';
+import { UserEntity } from '../../domain/user.entity';
+import { UserIdVO } from '../../domain/user-id.vo';
+import { UserWriteRepoPort, UserWriteRepoPortToken } from '../../ports/user-write.repo-port';
 
 type IncrementDepositsCommandHandlerResponse = Either<
   void,
@@ -31,12 +31,12 @@ export class IncrementTodosCommandHandler
 
     if (!user) {
       // Create account with 0 deposits
-      const counterVO = CompletedTodosVO.create({ counter: 0 });
-      if (counterVO.isFail()) {
-        return fail(counterVO.value);
+      const completedTodosVO = CompletedTodosVO.create({ counter: 0 });
+      if (completedTodosVO.isFail()) {
+        return fail(completedTodosVO.value);
       }
       const userId = UserIdVO.create({ id: requestUserId });
-      const newUserOrError = UserEntity.create({ completedTodos: counterVO.value, userId: userId.value });
+      const newUserOrError = UserEntity.create({ completedTodos: completedTodosVO.value, userId: userId.value });
       if (newUserOrError.isFail()) {
         return fail(newUserOrError.value);
       }
@@ -44,9 +44,11 @@ export class IncrementTodosCommandHandler
       newUser.incrementCompletedTodos();
       await this.userRepo.save(newUser);
       return ok();
+    } else {
+      user.incrementCompletedTodos();
+      await this.userRepo.save(user);
+      return ok();
     }
-    user.incrementCompletedTodos();
-    await this.userRepo.update(user);
-    return ok();
+
   }
 }

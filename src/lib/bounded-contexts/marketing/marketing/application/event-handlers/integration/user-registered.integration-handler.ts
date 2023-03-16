@@ -1,5 +1,5 @@
 import { Infra, Application } from "@src/bitloops/bl-boilerplate-core";
-import { UserRegisteredIntegrationEvent } from "@src/lib/bounded-contexts/auth";
+// import { UserRegisteredIntegrationEvent } from "@src/lib/bounded-contexts/auth";
 import { UpdateUserEmailCommand } from "../../../commands/update-user-email.command";
 
 export class UserRegisteredIntegrationEventHandler implements Application.IHandle {

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { UserEmailReadModel } from '@src/lib/bounded-contexts/marketing/marketing/domain/read-models/userEmailReadModel';
+import { UserEmailReadModel } from '@src/lib/bounded-contexts/marketing/marketing/domain/read-models/user-email.read-model';
 import { HydratedDocument } from 'mongoose';
 
 export type UserEmailDocument = HydratedDocument<UserEmailReadModel>;

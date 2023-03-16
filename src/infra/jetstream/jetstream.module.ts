@@ -1,4 +1,5 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
+import { ConnectionOptions } from 'nats';
 import { Jetstream } from './jetstream.service';
 import { NestjsJetstream } from './nestjs-jetstream.class';
 import { ProvidersConstants } from './contract';
@@ -13,12 +14,21 @@ import {
   PubSubQueryBusToken,
 } from './buses/nats-pubsub-query-bus';
 
+const pubSubCommandBus = {
+  provide: PubSubCommandBusToken,
+  useClass: NatsPubSubCommandBus,
+};
+const pubSubQueryBus = {
+  provide: PubSubQueryBusToken,
+  useClass: NatsPubSubQueryBus,
+};
+
 @Global()
 @Module({
   imports: [],
 })
 export class JetstreamModule {
-  static register(option: any): DynamicModule {
+  static forRoot(option: ConnectionOptions): DynamicModule {
     const jetstreamProviders = {
       provide: ProvidersConstants.JETSTREAM_PROVIDER,
       useFactory: (): any => {
@@ -31,14 +41,6 @@ export class JetstreamModule {
       useValue: {
         ...option,
       },
-    };
-    const pubSubCommandBus = {
-      provide: PubSubCommandBusToken,
-      useClass: NatsPubSubCommandBus,
-    };
-    const pubSubQueryBus = {
-      provide: PubSubQueryBusToken,
-      useClass: NatsPubSubQueryBus,
     };
 
     return {

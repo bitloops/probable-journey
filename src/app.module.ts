@@ -7,10 +7,13 @@ import { ApiModule } from './api/api.module';
 import { TodoModule } from './bounded-contexts/todo/todo/todo.module';
 import { AuthModule } from './bounded-contexts/iam/authentication/auth.module';
 import { UsersModule } from './bounded-contexts/iam/users/users.module';
+import { MarketingModule } from './bounded-contexts/marketing/marketing/marketing.module';
 
 @Module({
   imports: [
-    JetstreamModule.register({}),
+    JetstreamModule.forRoot({
+      name: 'test',
+    }),
     MongooseModule.forRoot('mongodb://localhost/todo'),
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -22,11 +25,11 @@ import { UsersModule } from './bounded-contexts/iam/users/users.module';
       synchronize: true,
       autoLoadEntities: true,
     }),
-
     TodoModule,
     ApiModule,
     AuthModule,
     UsersModule,
+    MarketingModule,
   ],
   controllers: [],
   providers: [],

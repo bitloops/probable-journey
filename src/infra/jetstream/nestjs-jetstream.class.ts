@@ -1,6 +1,11 @@
 import { NatsConnectionOptions } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { Logger } from '@nestjs/common';
-import { connect, JetStreamManager, NatsConnection } from 'nats';
+import {
+  connect,
+  JetStreamManager,
+  NatsConnection,
+  ConnectionOptions,
+} from 'nats';
 
 /**
  * @description NATS setup from https://github.com/nats-io/nats.js
@@ -15,14 +20,14 @@ export class NestjsJetstream {
     this.type = 'nats-jetstream';
   }
 
-  async connect(options: NatsConnectionOptions) {
+  async connect(options: ConnectionOptions) {
     try {
       this.nc = await connect(options);
       console.log('options', options);
       this.jsm = await this.nc.jetstreamManager();
       console.log(`connected to ${this.nc.getServer()}`);
       // add a stream
-      const stream = 'test';
+      const stream = options.name || 'test';
       const subj = 'test.*';
       await this.jsm.streams.add({ name: stream, subjects: [subj] });
       // this.connection.on('connect', () => {

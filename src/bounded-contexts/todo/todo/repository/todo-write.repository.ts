@@ -4,6 +4,10 @@ import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
 import { TodoWriteRepoPort } from 'src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 import { TodoEntity } from 'src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
+import {
+  StreamingDomainEventBus,
+  StreamingDomainEventBusToken,
+} from '@src/infra/jetstream/buses/nats-streaming-domain-event-bus';
 
 const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
 
@@ -17,7 +21,11 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
   private dbName = MONGO_DB_DATABASE;
   private collection: Collection;
 
-  constructor(@Inject('MONGO_DB_CONNECTION') private client: MongoClient) {
+  constructor(
+    @Inject('MONGO_DB_CONNECTION') private client: MongoClient,
+    @Inject(StreamingDomainEventBusToken)
+    private readonly domainEventBus: StreamingDomainEventBus,
+  ) {
     this.collection = this.client
       .db(this.dbName)
       .collection(this.collectionName);
@@ -85,5 +93,6 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
       id: id,
       ...todoInfo,
     });
+    this.domainEventBus.publish(todo.domainEvents);
   }
 }

@@ -3,12 +3,19 @@ import { UserRegisteredIntegrationEvent } from '@src/lib/bounded-contexts/iam/au
 import { UpdateUserEmailCommand } from '../../../commands/update-user-email.command';
 
 export class UserRegisteredIntegrationEventHandler
-  implements Application.IHandle {
-  constructor(private commandBus: Infra.CommandBus.IPubSubCommandBus) { }
+  implements Application.IHandle
+{
+  constructor(private commandBus: Infra.CommandBus.IPubSubCommandBus) {}
 
-  public async handle(
-    event: UserRegisteredIntegrationEvent,
-  ): Promise<void> {
+  get event() {
+    return UserRegisteredIntegrationEvent;
+  }
+
+  get boundedContext() {
+    return 'Marketing';
+  }
+
+  public async handle(event: UserRegisteredIntegrationEvent): Promise<void> {
     const { data } = event;
     const command = new UpdateUserEmailCommand({
       userId: data.userId,

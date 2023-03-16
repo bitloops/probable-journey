@@ -11,21 +11,23 @@ type ToIntegrationDataMapper = (
   data: TodoCompletedDomainEvent,
 ) => IntegrationSchemas;
 
-export class TodoCompletedIntegrationEvent extends Infra.EventBus
-  .IntegrationEvent<IntegrationSchemas> {
+export class TodoCompletedIntegrationEvent
+  implements Infra.EventBus.IntegrationEvent<IntegrationSchemas>
+{
   static versions = ['v1'];
-  public static readonly fromContextId = TodoCompletedDomainEvent.fromContextId; // get from it's own context in case we have some props as input
+  public static readonly fromContextId = 'Todo'; // TodoCompletedDomainEvent.fromContextId; // get from it's own context in case we have some props as input
   static versionMappers: Record<string, ToIntegrationDataMapper> = {
     v1: TodoCompletedIntegrationEvent.toIntegrationDataV1,
   };
+  public metadata: any;
 
-  constructor(data: IntegrationSchemas, version: string, uuid?: string) {
-    const metadata = {
+  constructor(public data: IntegrationSchemas, version: string, uuid?: string) {
+    this.metadata = {
       id: uuid,
       fromContextId: TodoCompletedIntegrationEvent.fromContextId,
       version,
     };
-    super(TodoCompletedIntegrationEvent.getEventTopic(version), data, metadata);
+    // super(TodoCompletedIntegrationEvent.getEventTopic(version), data, metadata);
   }
 
   static create(
@@ -39,11 +41,11 @@ export class TodoCompletedIntegrationEvent extends Infra.EventBus
   }
 
   static toIntegrationDataV1(
-    data: TodoCompletedDomainEvent,
+    event: TodoCompletedDomainEvent,
   ): IntegrationSchemaV1 {
     return {
-      todoId: data.todo.id.toString(),
-      userId: data.todo.userId.toString(),
+      todoId: event.data.id.toString(),
+      userId: event.data.userId.toString(),
     };
   }
 

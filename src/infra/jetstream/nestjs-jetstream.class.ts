@@ -24,12 +24,12 @@ export class NestjsJetstream {
     try {
       this.nc = await connect(options);
       console.log('options', options);
-      this.jsm = await this.nc.jetstreamManager();
-      console.log(`connected to ${this.nc.getServer()}`);
-      // add a stream
-      const stream = options.name || 'test';
-      const subj = 'test.*';
-      await this.jsm.streams.add({ name: stream, subjects: [subj] });
+      // this.jsm = await this.nc.jetstreamManager();
+      // console.log(`connected to ${this.nc.getServer()}`);
+      // // add a stream
+      // const stream = options.name || 'test';
+      // const subj = 'test.*';
+      // await this.jsm.streams.add({ name: stream, subjects: [subj] });
       // this.connection.on('connect', () => {
       //   this.isConnected = true;
       //   this.logger.log('NATS connected!');

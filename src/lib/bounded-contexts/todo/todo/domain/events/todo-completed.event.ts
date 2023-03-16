@@ -1,26 +1,24 @@
 import { Domain } from '@bitloops/bl-boilerplate-core';
 import { TodoEntity } from '../TodoEntity';
 
-export class TodoCompletedDomainEvent extends Domain.Event<TodoEntity> {
-  public static readonly eventName = TodoCompletedDomainEvent.name;
-  public static readonly fromContextId = 'Todo';
+export class TodoCompletedDomainEvent
+  implements Domain.IDomainEvent<TodoEntity>
+{
+  public aggregateId: string;
+  public metadata: any;
 
   constructor(
-    public readonly todo: TodoEntity,
+    public readonly data: TodoEntity,
     // @CHANGED HERE
     ack?: () => Promise<void>,
     uuid?: string,
   ) {
-    const metadata = {
-      fromContextId: TodoCompletedDomainEvent.fromContextId,
+    this.metadata = {
+      fromContextId: 'Todo',
       // @CHANGED HERE
       ack,
       id: uuid,
     };
-    super(TodoCompletedDomainEvent.getEventTopic(), todo, metadata, todo.id);
-  }
-
-  static getEventTopic() {
-    return TodoCompletedDomainEvent.eventName;
+    this.aggregateId = data.id.toString();
   }
 }

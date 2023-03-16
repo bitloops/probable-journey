@@ -10,6 +10,12 @@ import { MongoModule } from '@src/infra/db/mongo/mongo.module';
 import { JetstreamModule } from '@src/infra/jetstream/jetstream.module';
 import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers';
 import { PubSubQueryHandlers } from '@src/lib/bounded-contexts/todo/todo/application/query-handlers';
+import {
+  StreamingDomainEventHandlers,
+  StreamingIntegrationEventHandlers,
+} from '@src/lib/bounded-contexts/todo/todo/application/event-handlers';
+import { StreamingIntegrationEventBusToken } from '@src/lib/bounded-contexts/todo/todo/constants';
+import { NatsStreamingIntegrationEventBus } from '@src/infra/jetstream/buses/nats-streaming-integration-event-bus';
 
 const RepoProviders = [
   {
@@ -19,6 +25,10 @@ const RepoProviders = [
   {
     provide: TodoReadRepoPortToken,
     useClass: TodoReadRepository,
+  },
+  {
+    provide: StreamingIntegrationEventBusToken,
+    useClass: NatsStreamingIntegrationEventBus,
   },
 ];
 @Module({
@@ -35,6 +45,8 @@ const RepoProviders = [
       importedModule: TodoModule,
       pubSubCommandHandlers: [...PubSubCommandHandlers],
       pubSubQueryHandlers: [...PubSubQueryHandlers],
+      streamingDomainEventHandlers: [...StreamingDomainEventHandlers],
+      streamingIntegrationEventHandlers: [...StreamingIntegrationEventHandlers],
     }),
   ],
   controllers: [],

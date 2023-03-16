@@ -17,29 +17,29 @@
  *
  *  For further information you can contact legal(at)bitloops.com.
  */
-import { UUIDv4 } from '../UUIDv4';
-import { Event } from './Event';
-import { IDomainEvent } from './IDomainEvent';
+// import { UUIDv4 } from '../UUIDv4';
+// import { Event } from './Event';
+// import { IDomainEvent } from './IDomainEvent';
 
-export type TDomainEventInputMetadata = {
-  id?: string;
-  fromContextId: string;
-};
+// export type TDomainEventInputMetadata = {
+//   id?: string;
+//   fromContextId: string;
+// };
 
-export class DomainEvent<T> extends Event<T> implements IDomainEvent {
-  private aggregateId: UUIDv4;
+// export class DomainEvent<T> extends Event<T> implements IDomainEvent {
+//   private aggregateId: UUIDv4;
 
-  constructor(
-    eventName: string,
-    data: T,
-    metadata: TDomainEventInputMetadata,
-    aggregateId: UUIDv4,
-  ) {
-    super(eventName, data, metadata);
-    this.aggregateId = aggregateId;
-  }
+//   constructor(
+//     eventName: string,
+//     data: T,
+//     metadata: TDomainEventInputMetadata,
+//     aggregateId: UUIDv4,
+//   ) {
+//     super(eventName, data, metadata);
+//     this.aggregateId = aggregateId;
+//   }
 
-  getAggregateId() {
-    return this.aggregateId;
-  }
-}
+//   getAggregateId() {
+//     return this.aggregateId;
+//   }
+// }

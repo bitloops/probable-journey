@@ -5,13 +5,20 @@ import { TodoCompletedIntegrationEvent } from '../../../contracts/integration-ev
 export class TodoCompletedDomainToIntegrationEventHandler
   implements Application.IHandle
 {
-  private eventBus: Infra.EventBus.IEventBus;
+  private integrationEventBus: Infra.EventBus.IEventBus;
   constructor() {}
+  get event() {
+    return TodoCompletedDomainEvent;
+  }
+
+  get boundedContext(): string {
+    return 'Todo';
+  }
 
   public async handle(event: TodoCompletedDomainEvent): Promise<void> {
     const events = TodoCompletedIntegrationEvent.create(event);
 
-    await this.eventBus.publishMany(events);
+    await this.integrationEventBus.publish(events);
 
     console.log(
       `[TodoCompletedDomainEventHandler]: Successfully published TodoCompletedIntegrationEvent`,

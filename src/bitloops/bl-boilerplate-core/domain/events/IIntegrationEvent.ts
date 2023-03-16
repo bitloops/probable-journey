@@ -18,17 +18,19 @@
  *  For further information you can contact legal(at)bitloops.com.
  */
 
-import { Event } from './Event';
+import { IEvent, TEventMetadata } from './IEvent';
 
-type TIntegrationEventInputMetadata = {
-  id?: string;
-  version?: string;
-  fromContextId: string;
-};
-
-export abstract class IntegrationEvent<T> extends Event<T> {
-  constructor(eventTopic: string, data: T, metadata: TIntegrationEventInputMetadata) {
-    super(eventTopic, data, metadata);
-    this.metadata = { ...this.metadata, version: metadata.version };
-  }
+interface IIntegrationEventInputMetadata extends TEventMetadata {
+  version: string;
 }
+
+export interface IIntegrationEvent<T> extends IEvent<T> {
+  metadata: IIntegrationEventInputMetadata;
+}
+
+// export abstract class IntegrationEvent<T> extends Event<T> {
+//   constructor(eventTopic: string, data: T, metadata: TIntegrationEventInputMetadata) {
+//     super(eventTopic, data, metadata);
+//     this.metadata = { ...this.metadata, version: metadata.version };
+//   }
+// }

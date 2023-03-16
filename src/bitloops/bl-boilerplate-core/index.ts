@@ -13,9 +13,8 @@ import { applyRules as applyRulesImport } from './domain/applyRule';
 import { IPubSubCommandBus as IPubSubCommandBusImport } from './domain/commands/ICommandBus';
 import { DomainError } from './domain/DomainError';
 import { Entity as EntityImport } from './domain/Entity';
-import { DomainEvent } from './domain/events/DomainEvent';
 import { IEventBus as IEventBusImport } from './domain/events/IEventBus';
-import { IntegrationEvent as IntegrationEventImport } from './domain/events/IntegrationEvent';
+import { IIntegrationEvent as IIntegrationEventImport } from './domain/events/IIntegrationEvent';
 import { IRule as IRuleImport } from './domain/IRule';
 import { IMessageBus as IMessageBusImport } from './domain/messages/IMessageBus';
 import { ReadModel as ReadModelImport } from './domain/ReadModel';
@@ -55,8 +54,8 @@ namespace Domain {
   export class UUIDv4 extends UUIDv4Import {}
   export type IRule = IRuleImport;
   export const applyRules = applyRulesImport;
-  export class Event<T> extends DomainEvent<T> {}
-  export type IDomainEvent = IDomainEventImport;
+  // export type Event<T> = IEvent<T>;
+  export type IDomainEvent<T> = IDomainEventImport<T>;
   export namespace StandardVO {
     export namespace Currency {
       export class Value extends CurrencyVOImport {}
@@ -109,7 +108,7 @@ namespace Infra {
   // }
 
   export namespace EventBus {
-    export class IntegrationEvent<T> extends IntegrationEventImport<T> {}
+    export type IntegrationEvent<T> = IIntegrationEventImport<T>;
     export type IEventBus = IEventBusImport;
   }
   export namespace CommandBus {

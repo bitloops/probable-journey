@@ -7,6 +7,9 @@ import { TodoModule as LibTodoModule } from 'src/lib/bounded-contexts/todo/todo/
 import { TodoWriteRepoPortToken } from '@src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 import { TodoReadRepoPortToken } from '@src/lib/bounded-contexts/todo/todo/ports/TodoReadRepoPort';
 import { MongoModule } from '@src/infra/db/mongo/mongo.module';
+import { JetstreamModule } from '@src/infra/jetstream/jetstream.module';
+import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers';
+import { PubSubQueryHandlers } from '@src/lib/bounded-contexts/todo/todo/application/query-handlers';
 
 const RepoProviders = [
   {
@@ -27,6 +30,11 @@ const RepoProviders = [
         MongooseModule.forFeature([{ name: Todo.name, schema: TodoSchema }]),
         MongoModule,
       ],
+    }),
+    JetstreamModule.forFeature({
+      importedModule: TodoModule,
+      pubSubCommandHandlers: [...PubSubCommandHandlers],
+      pubSubQueryHandlers: [...PubSubQueryHandlers],
     }),
   ],
   controllers: [],

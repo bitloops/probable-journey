@@ -37,13 +37,7 @@ export abstract class AggregateRoot<T> extends Entity<T> {
 
   protected addDomainEvent(domainEvent: IDomainEvent): void {
     // Add the domain event to this aggregate's list of domain events
-    // @CHANGED HERE
-    // const { events } = Container.getServices();
     this._domainEvents.push(domainEvent);
-    // Add this aggregate instance to the domain event's list of aggregates who's
-    // events it eventually needs to dispatch.
-    // @CHANGED HERE
-    // events.markAggregateForDispatch(this);
     // Log the domain event
     this.logDomainEventAdded(domainEvent);
   }

@@ -7,12 +7,7 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import {
-  IEvent,
-  IEventPublisher,
-  EventBus,
-  IMessageSource,
-} from '@nestjs/cqrs';
+import { IEvent, IEventPublisher, IMessageSource } from '@nestjs/cqrs';
 import { Application } from '@bitloops/bl-boilerplate-core';
 import { Subject } from 'rxjs';
 import { v4 } from 'uuid';
@@ -31,7 +26,7 @@ const jsonCodec = JSONCodec();
  */
 @Injectable()
 export class Jetstream
-  implements IEventPublisher, OnModuleDestroy, OnModuleInit, IMessageSource
+  implements IEventPublisher, OnModuleDestroy, /*OnModuleInit,*/ IMessageSource
 {
   private logger = new Logger(this.constructor.name);
   private jetstream: NestjsJetstream;
@@ -46,7 +41,6 @@ export class Jetstream
     @Inject(ProvidersConstants.JETSTREAM_STREAM_CONFIG_PROVIDER)
     jetstreamStreamConfig: any,
     // @Inject('PubSubCommandHandlers') private pubSubCommandHandlers: any[],
-    private readonly eventsBus: EventBus,
   ) {
     this.jetstream = jetstream;
     // this.jetstream.connect(configService.options || {});
@@ -203,11 +197,11 @@ export class Jetstream
   addEventHandlers(eventHandlers: IEventConstructors) {
     this.eventHandlers = { ...this.eventHandlers, ...eventHandlers };
   }
-  onModuleInit(): any {
-    this.subject$ = (this.eventsBus as any).subject$;
-    this.bridgeEventsTo((this.eventsBus as any).subject$);
-    this.eventsBus.publisher = this;
-  }
+  // onModuleInit(): any {
+  //   this.subject$ = (this.eventsBus as any).subject$;
+  //   this.bridgeEventsTo((this.eventsBus as any).subject$);
+  //   this.eventsBus.publisher = this;
+  // }
 
   onModuleDestroy(): any {
     this.jetstream.close();

@@ -33,11 +33,9 @@ import {
   IBaseRESTController as IBaseControllerImport,
 } from './infra/rest/IBaseRESTController';
 
-import { Container } from './Container';
 import { Command as CommandImport } from './domain/commands/Command';
 import { IDomainEvent as IDomainEventImport } from './domain/events/IDomainEvent';
 import { Query as QueryImport } from './domain/queries/Query';
-import { RespondWithPublish } from './ResultWithPublish';
 
 import { IHandle as IHandleImport } from './application/IHandle';
 import {
@@ -46,7 +44,6 @@ import {
   MESSAGE_BUS as MESSAGE_BUS_IMPORT,
   TOPIC_PREFIXES as TOPIC_PREFIXES_IMPORT,
 } from './config';
-import { dispatchEventsCallback as dispatchEventsCallbackImport } from './domain/events/dispatchEventsCallback';
 import { IQueryBus as IQueryBusImport } from './domain/queries/IQueryBus';
 import { NotFoundError } from './errors/repository/NotFoundError';
 import { ConcurrencyError } from './errors/repository/ConcurrencyError';
@@ -70,7 +67,6 @@ namespace Domain {
   export const applyRules = applyRulesImport;
   export class Event<T> extends DomainEvent<T> {}
   export type IDomainEvent = IDomainEventImport;
-  export const dispatchEventsCallback = dispatchEventsCallbackImport;
   export namespace StandardVO {
     export namespace Currency {
       export class Value extends CurrencyVOImport {}
@@ -154,14 +150,4 @@ namespace Constants {
   export type ApplicationConfig = ApplicationConfigImport;
 }
 
-export {
-  Application,
-  Domain,
-  Either,
-  Infra,
-  fail,
-  ok,
-  Container,
-  RespondWithPublish,
-  Constants,
-};
+export { Application, Domain, Either, Infra, fail, ok, Constants };

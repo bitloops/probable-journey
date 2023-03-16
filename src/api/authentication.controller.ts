@@ -5,6 +5,7 @@ import {
   Post,
   Request,
   UseGuards,
+  Inject,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { LocalAuthGuard } from '@src/bounded-contexts/iam/authentication/local-auth.guard';
@@ -12,11 +13,22 @@ import { AuthService } from '@src/bounded-contexts/iam/authentication/auth.servi
 import { LogInCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/log-in.command';
 import { JwtAuthGuard } from '@src/bounded-contexts/iam/authentication/jwt-auth.guard';
 
+import {
+  PubSubCommandBus,
+  PubSubCommandBusToken,
+} from '@src/infra/jetstream/buses/nats-pubsub-command-bus';
+import {
+  PubSubQueryBus,
+  PubSubQueryBusToken,
+} from '@src/infra/jetstream/buses/nats-pubsub-query-bus';
+
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
+    @Inject(PubSubCommandBusToken)
+    private readonly commandBus: PubSubCommandBus, // private readonly queryBus: QueryBus, // @Inject('NATS_JETSTREAM') private readonly nc: any,
+    @Inject(PubSubQueryBusToken)
+    private readonly queryBus: PubSubQueryBus,
     private readonly authService: AuthService,
   ) {}
 

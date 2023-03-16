@@ -13,6 +13,11 @@ import {
   PubSubQueryBus,
   PubSubQueryBusToken,
 } from './buses/nats-pubsub-query-bus';
+import {
+  NatsStreamingDomainEventBus,
+  StreamingDomainEventBusToken,
+} from './buses/nats-streaming-domain-event-bus';
+import { JetstreamModuleFeatureConfig } from './interfaces/module-feature-input.interface';
 
 const pubSubCommandBus = {
   provide: PubSubCommandBusToken,
@@ -23,10 +28,13 @@ const pubSubQueryBus = {
   useClass: NatsPubSubQueryBus,
 };
 
+const streamingDomainEventBus = {
+  provide: StreamingDomainEventBusToken,
+  useClass: NatsStreamingDomainEventBus,
+};
+
 @Global()
-@Module({
-  imports: [],
-})
+@Module({})
 export class JetstreamModule {
   static forRoot(option: ConnectionOptions): DynamicModule {
     const jetstreamProviders = {
@@ -50,29 +58,35 @@ export class JetstreamModule {
         configProv,
         pubSubCommandBus,
         pubSubQueryBus,
+        streamingDomainEventBus,
       ],
       exports: [
         jetstreamProviders,
         configProv,
         pubSubCommandBus,
         pubSubQueryBus,
+        streamingDomainEventBus,
       ],
     };
   }
 
-  static forFeature(config: any): DynamicModule {
+  static forFeature(config: JetstreamModuleFeatureConfig): DynamicModule {
     if (config === undefined || config === null) {
       throw new Error('Config missing');
     }
-    const { pubSubCommandHandlers, importedModule, pubSubQueryHandlers } =
-      config;
+    const {
+      pubSubCommandHandlers,
+      importedModule,
+      pubSubQueryHandlers,
+      streamingDomainEventHandlers,
+    } = config;
 
     const PubSubCommandHandlers: Provider<any>[] = [
       {
         provide: 'PubSubCommandHandlers',
-        useFactory: (commandBus: PubSubCommandBus, ...args) => {
+        useFactory: (commandBus: PubSubCommandBus, ...commandHandlers) => {
           console.log('pubSubCommandHandler', pubSubCommandHandlers);
-          args.forEach((handler) => {
+          commandHandlers.forEach((handler) => {
             const command = handler.command;
             const boundedContext = handler.boundedContext;
             commandBus.pubSubSubscribe(
@@ -80,7 +94,6 @@ export class JetstreamModule {
               handler,
             );
           });
-          [...args];
           return;
         },
         inject: [
@@ -92,27 +105,48 @@ export class JetstreamModule {
     const PubSubQueryHandlers: Provider<any>[] = [
       {
         provide: 'PubSubQueryHandlers',
-        useFactory: (queryBus: PubSubQueryBus, ...args) => {
+        useFactory: (queryBus: PubSubQueryBus, ...queryHandlers) => {
           console.log('pubSubQueryHandler', pubSubQueryHandlers);
-          args.forEach((handler) => {
+          queryHandlers.forEach((handler) => {
             const query = handler.query;
             const boundedContext = handler.boundedContext;
             console.log(
-              'subscribe',
+              'Subscribe PubSubQueryHandlers',
               `${boundedContext}.${query?.name}`,
-              handler,
             );
             queryBus.pubSubSubscribe(
               `${boundedContext}.${query?.name}`,
               handler,
             );
           });
-          [...args];
           return;
         },
         inject: [
           { token: PubSubQueryBusToken, optional: false },
           ...pubSubQueryHandlers,
+        ],
+      },
+    ];
+    const StreamingDomainEventHandlers: Provider<any>[] = [
+      {
+        provide: 'StreamingDomainEventHandlers',
+        useFactory: (
+          eventBus: NatsStreamingDomainEventBus,
+          ...domainEventHandlers
+        ) => {
+          domainEventHandlers.forEach((handler) => {
+            const event = handler.event;
+            const boundedContext = handler.boundedContext;
+            const stream = `DomainEvents_${boundedContext}`;
+            const subject = `${stream}.${event.name}`;
+            console.log('Subscribe StreamingDomainEventHandler', subject);
+            eventBus.subscribe(subject, handler);
+          });
+          return;
+        },
+        inject: [
+          { token: StreamingDomainEventBusToken, optional: false },
+          ...streamingDomainEventHandlers,
         ],
       },
     ];
@@ -129,6 +163,7 @@ export class JetstreamModule {
         },
         ...PubSubCommandHandlers,
         ...PubSubQueryHandlers,
+        ...StreamingDomainEventHandlers,
         // ...config.pubSubCommandHandlers,
         Jetstream,
       ],

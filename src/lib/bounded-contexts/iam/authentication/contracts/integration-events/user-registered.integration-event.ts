@@ -11,26 +11,24 @@ type ToIntegrationDataMapper = (
   data: UserRegisteredDomainEvent,
 ) => IntegrationSchemas;
 
-export class UserRegisteredIntegrationEvent extends Infra.EventBus
-  .IntegrationEvent<IntegrationSchemas> {
+export class UserRegisteredIntegrationEvent
+  implements Infra.EventBus.IntegrationEvent<IntegrationSchemas>
+{
   static versions = ['v1'];
-  public static readonly fromContextId =
-    UserRegisteredDomainEvent.fromContextId; // get from it's own context in case we have some props as input
+  public static readonly fromContextId = 'IAM';
+  // UserRegisteredDomainEvent.fromContextId; // get from it's own context in case we have some props as input
   static versionMappers: Record<string, ToIntegrationDataMapper> = {
     v1: UserRegisteredIntegrationEvent.toIntegrationDataV1,
   };
+  public metadata: any;
 
-  constructor(data: IntegrationSchemas, version: string, uuid?: string) {
-    const metadata = {
+  constructor(public data: IntegrationSchemas, version: string, uuid?: string) {
+    this.metadata = {
       id: uuid,
       fromContextId: UserRegisteredIntegrationEvent.fromContextId,
       version,
     };
-    super(
-      UserRegisteredIntegrationEvent.getEventTopic(version),
-      data,
-      metadata,
-    );
+    // UserRegisteredIntegrationEvent.getEventTopic(version),
   }
 
   static create(
@@ -44,18 +42,18 @@ export class UserRegisteredIntegrationEvent extends Infra.EventBus
   }
 
   static toIntegrationDataV1(
-    data: UserRegisteredDomainEvent,
+    event: UserRegisteredDomainEvent,
   ): IntegrationSchemaV1 {
     return {
-      userId: data.user.id.toString(),
-      email: data.user.email.email,
+      userId: event.data.id.toString(),
+      email: event.data.email.email,
     };
   }
 
-  static getEventTopic(version?: string) {
-    const topic = `integration.${UserRegisteredIntegrationEvent.name}`;
+  // static getEventTopic(version?: string) {
+  //   const topic = `integration.${UserRegisteredIntegrationEvent.name}`;
 
-    const eventTopic = version === undefined ? topic : `${topic}.${version}`;
-    return eventTopic;
-  }
+  //   const eventTopic = version === undefined ? topic : `${topic}.${version}`;
+  //   return eventTopic;
+  // }
 }

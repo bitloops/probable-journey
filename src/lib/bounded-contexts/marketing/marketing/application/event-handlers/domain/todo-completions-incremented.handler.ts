@@ -19,12 +19,20 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
     private readonly emailRepoPort: UserEmailReadRepoPort,
     @Inject(NotificationTemplateReadRepoPortToken)
     private notificationTemplateRepo: NotificationTemplateReadRepoPort,
-  ) { }
+  ) {}
+
+  get event() {
+    return TodoCompletionsIncrementedDomainEvent;
+  }
+
+  get boundedContext() {
+    return 'Marketing';
+  }
 
   public async handle(
     event: TodoCompletionsIncrementedDomainEvent,
   ): Promise<void> {
-    const { user } = event;
+    const { data: user } = event;
 
     const marketingNotificationService = new MarketingNotificationService(
       this.notificationTemplateRepo,
@@ -38,13 +46,13 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
     const userid = user.id;
     const userEmail = await this.emailRepoPort.getUserEmail(userid);
     if (!userEmail) {
-      // return new ;
+      // TODO Error bus
       return;
     }
 
     const command = new SendEmailCommand({
       origin: emailToBeSentInfo.emailOrigin,
-      destination: userEmail.toPrimitives().email,
+      destination: userEmail.email,
       content: emailToBeSentInfo.notificationTemplate?.template || '',
     });
     await this.commandBus.publish(command);

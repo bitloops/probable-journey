@@ -25,14 +25,14 @@ export class AuthController {
   async login(@Request() req) {
     const jwt = this.authService.login(req.user);
     // this.commandBus.execute(
-    //         new LogInCommand({ email: dto.title, password: dto.userId }),
+    //         new LogInCommand({ userId: dto.userId }),
     //       );
     return jwt;
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Post('login2')
-  // async login2(@Request() req) {
-  //   console.log('req', req);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post('login2')
+  async login2(@Request() req) {
+    console.log('req', req.user);
+  }
 }

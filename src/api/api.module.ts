@@ -1,5 +1,6 @@
 import { Module, Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { AuthModule } from '@src/bounded-contexts/iam/authentication/auth.module';
 import { TodoModule } from '@src/bounded-contexts/todo/todo/todo.module';
 import {
   PubSubCommandBus,
@@ -11,6 +12,7 @@ import {
 } from '@src/infra/jetstream/buses/nats-pubsub-query-bus';
 import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers';
 import { PubSubQueryHandlers } from '@src/lib/bounded-contexts/todo/todo/application/query-handlers';
+import { AuthController } from './authentication.controller';
 // import { TodoCompletedDomainToIntegrationEventHandler } from '@src/lib/bounded-contexts/todo/todo/application/event-handlers/domain/todo-completed.handler';
 import { TodoController } from './todo.controller';
 import { TodosController } from './todos.controller';
@@ -59,6 +61,7 @@ const pubSubQueryHandlers: Provider<any>[] = [
 ];
 @Module({
   imports: [
+    AuthModule,
     CqrsModule,
     TodoModule,
     // JetstreamModule.forFeature({
@@ -73,7 +76,10 @@ const pubSubQueryHandlers: Provider<any>[] = [
     //   provide: 'SIMPLE_NATS',
     //   useClass: NestjsJetstream,
     // },
+    // AuthService,
+    // UsersService,
+    // JwtService,
   ],
-  controllers: [TodoController, TodosController],
+  controllers: [TodoController, TodosController, AuthController],
 })
 export class ApiModule {}

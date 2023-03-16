@@ -2,6 +2,7 @@ import { Domain, Either, ok } from '@bitloops/bl-boilerplate-core';
 import { UserRegisteredDomainEvent } from './events/user-registered.event';
 import { UserLoggedInDomainEvent } from './events/user-logged-in.event';
 import { EmailVO } from './EmailVO';
+import { UserUpdatedEmailDomainEvent } from './events/user-updated-email.event';
 
 export interface UserProps {
   id?: Domain.UUIDv4;
@@ -54,6 +55,11 @@ export class UserEntity extends Domain.Aggregate<UserProps> {
     // this.props.lastLogin = timestampVO; // update last login
     this.addDomainEvent(new UserLoggedInDomainEvent(this));
     return ok();
+  }
+
+  public updateEmail(email: EmailVO): void {
+    this.props.email = email;
+    this.addDomainEvent(new UserUpdatedEmailDomainEvent(this));
   }
 
   public static fromPrimitives(data: TUserEntityPrimitives): UserEntity {

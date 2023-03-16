@@ -6,7 +6,7 @@ export class IncrementTodosCommand extends Application.Command {
   public userId: string;
 
   // Set static name so we can refer to them easily
-  public static readonly commandName = 'Marketing.INCREMENT_DEPOSITS';
+  public static readonly commandName = 'Marketing.INCREMENT_TODOS';
 
   constructor(incrementTodosDTO: IncrementTodosDTO) {
     super(IncrementTodosCommand.commandName, 'Marketing');

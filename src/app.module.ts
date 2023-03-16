@@ -9,6 +9,7 @@ import { TodoModule } from './bounded-contexts/todo/todo/todo.module';
 import { AuthModule } from './bounded-contexts/iam/authentication/auth.module';
 import { UsersModule } from './bounded-contexts/iam/users/users.module';
 import { MarketingModule } from './bounded-contexts/marketing/marketing/marketing.module';
+import { IamModule } from './bounded-contexts/iam/iam.module';
 
 @Module({
   imports: [
@@ -33,10 +34,11 @@ import { MarketingModule } from './bounded-contexts/marketing/marketing/marketin
     AuthModule,
     UsersModule,
     MarketingModule,
+    IamModule,
   ],
   controllers: [],
   providers: [],
 })
 export class AppModule {
-  constructor(private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource) { }
 }

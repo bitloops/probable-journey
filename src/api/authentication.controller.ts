@@ -6,8 +6,9 @@ import {
   Request,
   UseGuards,
   Inject,
+  HttpStatus,
+  HttpException,
 } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { LocalAuthGuard } from '@src/bounded-contexts/iam/authentication/local-auth.guard';
 import { AuthService } from '@src/bounded-contexts/iam/authentication/auth.service';
 import { LogInCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/log-in.command';
@@ -21,6 +22,10 @@ import {
   PubSubQueryBus,
   PubSubQueryBusToken,
 } from '@src/infra/jetstream/buses/nats-pubsub-query-bus';
+import { RegisterCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/register.command';
+import { UpdateEmailCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/update-email.command';
+import { UpdateEmailDTO } from './dto/update-email.dto';
+import { RegisterDTO } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -30,7 +35,7 @@ export class AuthController {
     @Inject(PubSubQueryBusToken)
     private readonly queryBus: PubSubQueryBus,
     private readonly authService: AuthService,
-  ) {}
+  ) { }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -43,8 +48,22 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('login2')
-  async login2(@Request() req) {
+  @Post('updateEmail')
+  async updateEmail(@Request() req, @Body() dto: UpdateEmailDTO) {
     console.log('req', req.user);
+    const command = new UpdateEmailCommand({ email: dto.email, userId: req.user.userId });
+    const results = await this.commandBus.request(command);
+    if (results.isOk) return results.data;
+    else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('register')
+  async register(@Request() req, @Body() body: RegisterDTO) {
+    console.log('req', req.user);
+    const command = new RegisterCommand({ email: body.email, password: body.password });
+    const results = await this.commandBus.request(command);
+    if (results.isOk) return results.data;
+    else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 }

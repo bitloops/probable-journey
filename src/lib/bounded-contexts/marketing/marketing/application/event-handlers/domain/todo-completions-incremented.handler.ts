@@ -37,8 +37,10 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
     const emailToBeSentInfo = emailToBeSentInfoResponse.value;
     const userid = user.id;
     const userEmail = await this.emailRepoPort.getUserEmail(userid);
+
+    //TODO figure out how to return this error to controller
     if (!userEmail) {
-      // return new ;
+      // this.integrationEventBus().publish(new EmailNotFoundErrorMessage(new ApplicationErrors.EmailNotFoundError(userid.toString())));
       return;
     }
 

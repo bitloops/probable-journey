@@ -1,5 +1,5 @@
 import { Infra } from '@bitloops/bl-boilerplate-core';
-import { TodoCompletedDomainEvent } from '../domain/events/todo-completed.event';
+import { TodoCompletedDomainEvent } from '../../domain/events/todo-completed.event';
 
 export type IntegrationSchemaV1 = {
   todoId: string;

@@ -82,10 +82,10 @@ export class TodoEntity extends Domain.Aggregate<TodoProps> {
   }
 
   public static fromPrimitives(data: TTodoEntityPrimitives): TodoEntity {
-    const TodoEntityProps = {
+    const TodoEntityProps: TodoProps = {
       userId: UserIdVO.create({ id: new Domain.UUIDv4(data.userId) })
         .value as UserIdVO,
-      id: new Domain.UUIDv4(data.id) as Domain.UUIDv4,
+      id: new Domain.UUIDv4(data.id),
       title: TitleVO.create({
         title: data.title,
       }).value as TitleVO,

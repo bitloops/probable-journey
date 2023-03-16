@@ -81,14 +81,25 @@
       "ts"
     ],
     "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "testRegex": "(__tests__\\/)(.*)(test|spec|steps)(\\.)(m)?ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/setup-jest.js"
+    ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "@src/(.*)": "<rootDir>/$1",
+      "@bitloops/(.*)": "<rootDir>/bitloops/$1",
+      "@modules/(.*)": "<rootDir>/modules/$1",
+      "@config/(.*)": "<rootDir>/config/$1",
+      "@lib/(.*)": "<rootDir>/lib/$1",
+      "@tests/(.*)": "tests/$1"
+    }
   }
 }

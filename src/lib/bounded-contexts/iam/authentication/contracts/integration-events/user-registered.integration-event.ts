@@ -3,6 +3,7 @@ import { UserRegisteredDomainEvent } from '../../domain/events/user-registered.e
 
 export type IntegrationSchemaV1 = {
   userId: string;
+  email: string;
 };
 
 type IntegrationSchemas = IntegrationSchemaV1;
@@ -12,7 +13,7 @@ type ToIntegrationDataMapper = (
 
 export class UserRegisteredIntegrationEvent extends Infra.EventBus
   .IntegrationEvent<IntegrationSchemas> {
-  static versions = ['v1', 'v2.0.1'];
+  static versions = ['v1'];
   public static readonly fromContextId =
     UserRegisteredDomainEvent.fromContextId; // get from it's own context in case we have some props as input
   static versionMappers: Record<string, ToIntegrationDataMapper> = {
@@ -47,6 +48,7 @@ export class UserRegisteredIntegrationEvent extends Infra.EventBus
   ): IntegrationSchemaV1 {
     return {
       userId: data.user.id.toString(),
+      email: data.user.email.email,
     };
   }
 

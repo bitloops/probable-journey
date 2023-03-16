@@ -13,7 +13,7 @@ type ToIntegrationDataMapper = (
 
 export class TodoCompletedIntegrationEvent extends Infra.EventBus
   .IntegrationEvent<IntegrationSchemas> {
-  static versions = ['v1', 'v2.0.1'];
+  static versions = ['v1'];
   public static readonly fromContextId = TodoCompletedDomainEvent.fromContextId; // get from it's own context in case we have some props as input
   static versionMappers: Record<string, ToIntegrationDataMapper> = {
     v1: TodoCompletedIntegrationEvent.toIntegrationDataV1,

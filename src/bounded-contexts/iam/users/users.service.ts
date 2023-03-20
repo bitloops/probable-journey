@@ -1,24 +1,20 @@
-import { Injectable } from '@nestjs/common';
-
-// This should be a real class/interface representing a user entity
-export type User = any;
+import { Inject, Injectable } from '@nestjs/common';
+import { UserEntity } from '@src/lib/bounded-contexts/iam/authentication/domain/UserEntity';
+import {
+  UserWriteRepoPort,
+  UserWriteRepoPortToken,
+} from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
 
 @Injectable()
 export class UsersService {
-  private readonly users = [
-    {
-      userId: '13-sfsf',
-      username: 'john',
-      password: 'changeme',
-    },
-    {
-      userId: 'fss-342',
-      username: 'maria',
-      password: 'guess',
-    },
-  ];
+  constructor(
+    @Inject(UserWriteRepoPortToken)
+    private readonly userRepo: UserWriteRepoPort,
+  ) {}
 
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find((user) => user.username === username);
+  // TODO maybe return primitives and specific fields of UserEntity
+  async findOne(email: string): Promise<UserEntity | null> {
+    const user = await this.userRepo.getByEmail(email);
+    return user;
   }
 }

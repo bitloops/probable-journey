@@ -1,6 +1,6 @@
 import { Module, Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { StreamingCommandHandlers } from './application/command-handlers';
+import { PubSubCommandHandlers } from './application/command-handlers';
 import { EventHandlers } from './application/event-handlers';
 // import { QueryHandlers } from './application/query-handlers';
 
@@ -12,13 +12,13 @@ export class IamModule {
       module: IamModule,
       imports: [CqrsModule, ...options.imports],
       providers: [
-        ...StreamingCommandHandlers,
+        ...PubSubCommandHandlers,
         ...EventHandlers,
         // ...QueryHandlers,
         ...InjectedProviders,
       ],
       exports: [
-        ...StreamingCommandHandlers,
+        ...PubSubCommandHandlers,
         ...EventHandlers /*...QueryHandlers*/,
       ],
     };

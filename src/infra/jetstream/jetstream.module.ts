@@ -70,12 +70,15 @@ export class JetstreamModule {
     if (config === undefined || config === null) {
       throw new Error('Config missing');
     }
-    const {
+    const { importedModule } = config;
+    let {
       pubSubCommandHandlers,
-      importedModule,
       pubSubQueryHandlers,
       streamingDomainEventHandlers,
     } = config;
+    if (!pubSubCommandHandlers) pubSubCommandHandlers = [];
+    if (!pubSubQueryHandlers) pubSubQueryHandlers = [];
+    if (!streamingDomainEventHandlers) streamingDomainEventHandlers = [];
 
     const PubSubCommandHandlers: Provider<any>[] = [
       {

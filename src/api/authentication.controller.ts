@@ -55,14 +55,9 @@ export class AuthController {
     else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('register')
-  async register(@Request() req, @Body() body: RegisterDTO) {
-    console.log('req', req.user);
-    const command = new RegisterCommand({
-      email: body.email,
-      password: body.password,
-    });
+  async register(@Body() body: RegisterDTO) {
+    const command = new RegisterCommand(body.email, body.password);
     const results = await this.commandBus.request(command);
     if (results.isOk) return results.data;
     else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);

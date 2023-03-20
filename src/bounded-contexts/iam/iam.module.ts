@@ -6,6 +6,8 @@ import { UserWriteRepoPortToken } from '@src/lib/bounded-contexts/iam/authentica
 import { UserWriteRepository } from './repository/user-write.repository';
 import { NatsStreamingIntegrationEventBus } from '@src/infra/jetstream/buses/nats-streaming-integration-event-bus';
 import { StreamingIntegrationEventBusToken } from '@src/lib/bounded-contexts/iam/authentication/constants';
+import { JetstreamModule } from '@src/infra/jetstream/jetstream.module';
+import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/iam/authentication/application/command-handlers';
 
 const RepoProviders = [
   {
@@ -22,6 +24,10 @@ const RepoProviders = [
     LibIamModule.register({
       inject: [...RepoProviders],
       imports: [MongoModule],
+    }),
+    JetstreamModule.forFeature({
+      importedModule: IamModule,
+      pubSubCommandHandlers: [...PubSubCommandHandlers],
     }),
   ],
   controllers: [],

@@ -9,6 +9,7 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { LocalAuthGuard } from '@src/bounded-contexts/iam/authentication/local-auth.guard';
 import { AuthService } from '@src/bounded-contexts/iam/authentication/auth.service';
 import { LogInCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/log-in.command';
@@ -57,9 +58,15 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() body: RegisterDTO) {
-    const command = new RegisterCommand(body.email, body.password);
+    const hashedPassword = await this.hashPassword(body.password);
+    const command = new RegisterCommand(body.email, hashedPassword);
     const results = await this.commandBus.request(command);
     if (results.isOk) return results.data;
     else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+  }
+
+  private hashPassword(password: string) {
+    const saltOrRounds = 10;
+    return bcrypt.hash(password, saltOrRounds);
   }
 }

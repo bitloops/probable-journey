@@ -43,6 +43,7 @@ import {
   ErrorTypes as CurrencyVOErrorTypesImport,
 } from './domain/standard-values';
 import { IErrorEvent as IErrorEventImport } from './application/events/IErrorEvent';
+import { ConflictError } from './errors/repository/ConflictError';
 
 namespace Domain {
   export class Error extends DomainError {}
@@ -85,6 +86,7 @@ namespace Application {
     export namespace Errors {
       export class NotFound extends NotFoundError {}
       export class Concurrency extends ConcurrencyError {}
+      export class Conflict extends ConflictError {}
     }
     export type ICRUDPort<Aggregate, AggregateId> = CRUDRepoPort<
       Aggregate,

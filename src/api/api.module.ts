@@ -6,6 +6,12 @@ import { JetstreamModule } from '@src/bitloops/nest-jetstream';
 
 @Module({
   imports: [AuthModule, JetstreamModule],
-  controllers: [TodoController, AuthController],
+  controllers: [AuthController, TodoController],
 })
 export class ApiModule {}
+
+// @Module({
+//   imports: [JwtAuthModule, JetstreamModule],
+//   controllers: [TodoController],
+// })
+// export class ApiTodoModule {}

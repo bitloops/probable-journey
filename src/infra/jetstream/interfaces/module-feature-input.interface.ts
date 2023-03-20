@@ -1,5 +1,5 @@
 export interface JetstreamModuleFeatureConfig {
-  importedModule: any;
+  moduleOfHandlers: any;
   pubSubCommandHandlers?: any[];
   pubSubQueryHandlers?: any[];
   streamingDomainEventHandlers?: any[];

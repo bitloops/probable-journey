@@ -31,10 +31,22 @@ export class NatsStreamingIntegrationEventBus
     this.js = this.nc.jetstream();
   }
 
+  static getStreamName(boundedContext: string) {
+    return `IntegrationEvents_${boundedContext}`;
+  }
+
+  static getDurableName(subject: string, handler: Application.IHandle) {
+    // Durable name cannot contain a dot
+    const subjectWithoutDots = subject.replace('.', '-');
+    return `${subjectWithoutDots}-${handler.constructor.name}`;
+  }
+
   async publish(integrationEvent: any): Promise<void> {
     const boundedContext = integrationEvent.boundedContext;
-    const stream = `IntegrationEvents_${boundedContext}`;
+    const stream =
+      NatsStreamingIntegrationEventBus.getStreamName(boundedContext);
     const subject = `${stream}.${integrationEvent.constructor.name}`;
+    // TODO Replace msgID with instanceId
     const options: Partial<JetStreamPublishOptions> = { msgID: '' };
     // const pubAck =
     try {
@@ -46,21 +58,6 @@ export class NatsStreamingIntegrationEventBus
     } catch (err) {
       // NatsError: 503
       console.error('Error publishing integration event:', err);
-      const jsm = await this.nc.jetstreamManager();
-      try {
-        await jsm.streams.add({ name: stream, subjects: [subject] });
-      } catch (err) {
-        // retrieve info about the stream by its name
-        try {
-          const si = await jsm.streams.info(stream);
-
-          // update a stream configuration
-          si.config.subjects?.push(subject);
-          await jsm.streams.update(stream, si.config);
-        } catch (err) {
-          console.error('Error updating stream:', err);
-        }
-      }
     }
 
     // the jetstream returns an acknowledgement with the
@@ -72,12 +69,12 @@ export class NatsStreamingIntegrationEventBus
   }
 
   async subscribe(subject: string, handler: Application.IHandle) {
-    // Durable name cannot contain a dot
-    const subjectWithoutDots = subject.replace('.', '-');
-    const durableName = `${subjectWithoutDots}-${handler.constructor.name}`;
+    const durableName = NatsStreamingIntegrationEventBus.getDurableName(
+      subject,
+      handler,
+    );
 
     const stream = subject.split('.')[0];
-    // console.log('Checking if stream exists:', { stream, subject });
     await this.jetStreamProvider.createStreamIfNotExists(stream, subject);
     const opts = consumerOpts();
     opts.durable(durableName);

@@ -26,7 +26,7 @@ const RepoProviders = [
       imports: [MongoModule],
     }),
     JetstreamModule.forFeature({
-      importedModule: IamModule,
+      moduleOfHandlers: IamModule,
       pubSubCommandHandlers: [...PubSubCommandHandlers],
     }),
   ],

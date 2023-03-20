@@ -36,11 +36,6 @@ export class Jetstream
 
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER) jetstream: NestjsJetstream,
-    @Inject(ProvidersConstants.JETSTREAM_CONNECTION_CONFIG_PROVIDER)
-    configService: any,
-    @Inject(ProvidersConstants.JETSTREAM_STREAM_CONFIG_PROVIDER)
-    jetstreamStreamConfig: any,
-    // @Inject('PubSubCommandHandlers') private pubSubCommandHandlers: any[],
   ) {
     this.jetstream = jetstream;
     // this.jetstream.connect(configService.options || {});
@@ -49,8 +44,8 @@ export class Jetstream
     // this.addEventHandlers(jetstreamStreamConfig.eventHandlers);
 
     // const subjectSubscriptions = jetstreamStreamConfig.subscriptions;
-    const { pubSubCommandHandlers } = jetstreamStreamConfig;
-    this.subscribePubSubCommandHandlers(pubSubCommandHandlers);
+    // const { pubSubCommandHandlers } = jetstreamStreamConfig;
+    // this.subscribePubSubCommandHandlers(pubSubCommandHandlers);
 
     // this.subscribeSubjects(subjectSubscriptions);
   }

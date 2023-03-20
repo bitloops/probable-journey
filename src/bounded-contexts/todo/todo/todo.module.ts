@@ -33,25 +33,23 @@ const RepoProviders = [
 ];
 @Module({
   imports: [
-    // MongooseModule.forFeature([{ name: Todo.name, schema: TodoSchema }]),
     LibTodoModule.register({
-      inject: [...RepoProviders],
       imports: [
         MongooseModule.forFeature([{ name: Todo.name, schema: TodoSchema }]),
         MongoModule,
+        JetstreamModule.forFeature({
+          moduleOfHandlers: TodoModule,
+          pubSubCommandHandlers: [...PubSubCommandHandlers],
+          pubSubQueryHandlers: [...PubSubQueryHandlers],
+          streamingDomainEventHandlers: [...StreamingDomainEventHandlers],
+          streamingIntegrationEventHandlers: [
+            ...StreamingIntegrationEventHandlers,
+          ],
+        }),
       ],
-    }),
-    JetstreamModule.forFeature({
-      importedModule: TodoModule,
-      pubSubCommandHandlers: [...PubSubCommandHandlers],
-      pubSubQueryHandlers: [...PubSubQueryHandlers],
-      streamingDomainEventHandlers: [...StreamingDomainEventHandlers],
-      streamingIntegrationEventHandlers: [...StreamingIntegrationEventHandlers],
+      inject: [...RepoProviders],
     }),
   ],
-  controllers: [],
-  // Probably don't need to inject the repositories here
-  //   providers: [...RepoProviders],
   exports: [LibTodoModule],
 })
 export class TodoModule {}

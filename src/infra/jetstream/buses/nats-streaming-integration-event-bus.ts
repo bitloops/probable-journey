@@ -17,10 +17,6 @@ export interface StreamingIntegrationEventBus {
   subscribe(subject: string, handler: Application.IHandle): Promise<void>;
 }
 
-export const StreamingIntegrationEventBusToken = Symbol(
-  'StreamingIntegrationEventBusToken',
-);
-
 @Injectable()
 export class NatsStreamingIntegrationEventBus
   implements StreamingIntegrationEventBus

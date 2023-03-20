@@ -6,30 +6,26 @@ import { ProvidersConstants } from './contract';
 import {
   NatsPubSubCommandBus,
   PubSubCommandBus,
-  PubSubCommandBusToken,
 } from './buses/nats-pubsub-command-bus';
 import {
   NatsPubSubQueryBus,
   PubSubQueryBus,
-  PubSubQueryBusToken,
 } from './buses/nats-pubsub-query-bus';
-import {
-  NatsStreamingDomainEventBus,
-  StreamingDomainEventBusToken,
-} from './buses/nats-streaming-domain-event-bus';
+import { NatsStreamingDomainEventBus } from './buses/nats-streaming-domain-event-bus';
 import { JetstreamModuleFeatureConfig } from './interfaces/module-feature-input.interface';
+import { BUSES_TOKENS } from './buses/constants';
 
 const pubSubCommandBus = {
-  provide: PubSubCommandBusToken,
+  provide: BUSES_TOKENS.PUBSUB_COMMAND_BUS,
   useClass: NatsPubSubCommandBus,
 };
 const pubSubQueryBus = {
-  provide: PubSubQueryBusToken,
+  provide: BUSES_TOKENS.PUBSUB_QUERY_BYS,
   useClass: NatsPubSubQueryBus,
 };
 
 const streamingDomainEventBus = {
-  provide: StreamingDomainEventBusToken,
+  provide: BUSES_TOKENS.STREAMING_DOMAIN_EVENS_BUS,
   useClass: NatsStreamingDomainEventBus,
 };
 
@@ -97,7 +93,7 @@ export class JetstreamModule {
           return;
         },
         inject: [
-          { token: PubSubCommandBusToken, optional: false },
+          { token: BUSES_TOKENS.PUBSUB_COMMAND_BUS, optional: false },
           ...pubSubCommandHandlers,
         ],
       },
@@ -122,7 +118,7 @@ export class JetstreamModule {
           return;
         },
         inject: [
-          { token: PubSubQueryBusToken, optional: false },
+          { token: BUSES_TOKENS.PUBSUB_QUERY_BYS, optional: false },
           ...pubSubQueryHandlers,
         ],
       },
@@ -145,7 +141,7 @@ export class JetstreamModule {
           return;
         },
         inject: [
-          { token: StreamingDomainEventBusToken, optional: false },
+          { token: BUSES_TOKENS.STREAMING_DOMAIN_EVENS_BUS, optional: false },
           ...streamingDomainEventHandlers,
         ],
       },
@@ -166,8 +162,16 @@ export class JetstreamModule {
         ...StreamingDomainEventHandlers,
         // ...config.pubSubCommandHandlers,
         Jetstream,
+        pubSubCommandBus,
+        pubSubQueryBus,
+        streamingDomainEventBus,
       ],
-      exports: [Jetstream],
+      exports: [
+        Jetstream,
+        pubSubCommandBus,
+        pubSubQueryBus,
+        streamingDomainEventBus,
+      ],
     };
   }
 }

@@ -18,10 +18,6 @@ export interface StreamingDomainEventBus {
   subscribe(subject: string, handler: Application.IHandle): Promise<void>;
 }
 
-export const StreamingDomainEventBusToken = Symbol(
-  'StreamingDomainEventBusToken',
-);
-
 @Injectable()
 export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
   private nc: NatsConnection;
@@ -73,8 +69,8 @@ export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
     opts.ackExplicit();
     opts.deliverTo(createInbox());
 
-    // console.log('all streams');
-    // await this.jetStreamProvider.listAllStreams();
+    console.log('all streams');
+    console.log(await this.jetStreamProvider.listAllStreams());
     const stream = subject.split('.')[0];
     // console.log('Checking if stream exists:', { stream, subject });
     await this.jetStreamProvider.createStreamIfNotExists(stream, subject);
@@ -95,6 +91,8 @@ export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
     //     console.error('Error updating stream:', err);
     //   }
     // }
+    // await this.jetStreamProvider.deleteStream(stream);
+    // console.log('Deleted stream:', stream);
 
     try {
       console.log('Subscribing domain event to:', subject);

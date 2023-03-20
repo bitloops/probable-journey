@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { Mutex } from 'async-mutex';
 import {
   connect,
   JetStreamManager,
@@ -14,9 +15,11 @@ export class NestjsJetstream {
   private logger: Logger = new Logger(this.constructor.name);
   private nc: NatsConnection;
   private jsm: JetStreamManager;
+  private mutex: Mutex;
 
   constructor() {
     this.type = 'nats-jetstream';
+    this.mutex = new Mutex();
   }
 
   async connect(options: ConnectionOptions) {
@@ -74,14 +77,17 @@ export class NestjsJetstream {
     stream: string,
     subject: string,
   ): Promise<void> {
-    // If stream and subject exists return
-    if (await this.streamAndSubjectExists(stream, subject)) return;
+    // We use locks here, because of race conditions when run by multiple subscribes in parallel
+    await this.mutex.runExclusive(async () => {
+      if (await this.streamAndSubjectExists(stream, subject)) return;
 
-    if (await this.streamExists(stream)) {
-      await this.addSubjectToStream(stream, subject);
-      return;
-    }
-    await this.createStreamWithSubject(stream, subject);
+      if (await this.streamExists(stream)) {
+        await this.addSubjectToStream(stream, subject);
+        return;
+      }
+
+      await this.createStreamWithSubject(stream, subject);
+    });
   }
 
   async streamAndSubjectExists(
@@ -112,5 +118,9 @@ export class NestjsJetstream {
     subject: string,
   ): Promise<void> {
     await this.jsm.streams.add({ name: stream, subjects: [subject] });
+  }
+
+  async deleteStream(stream: string): Promise<void> {
+    await this.jsm.streams.delete(stream);
   }
 }

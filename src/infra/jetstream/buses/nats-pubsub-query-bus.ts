@@ -13,8 +13,6 @@ export interface PubSubQueryBus {
   ): Promise<void>;
 }
 
-export const PubSubQueryBusToken = Symbol('PubSubQueryBus');
-
 @Injectable()
 export class NatsPubSubQueryBus implements PubSubQueryBus {
   private nc: NatsConnection;

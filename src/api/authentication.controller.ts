@@ -14,28 +14,23 @@ import { AuthService } from '@src/bounded-contexts/iam/authentication/auth.servi
 import { LogInCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/log-in.command';
 import { JwtAuthGuard } from '@src/bounded-contexts/iam/authentication/jwt-auth.guard';
 
-import {
-  PubSubCommandBus,
-  PubSubCommandBusToken,
-} from '@src/infra/jetstream/buses/nats-pubsub-command-bus';
-import {
-  PubSubQueryBus,
-  PubSubQueryBusToken,
-} from '@src/infra/jetstream/buses/nats-pubsub-query-bus';
+import { PubSubCommandBus } from '@src/infra/jetstream/buses/nats-pubsub-command-bus';
+import { PubSubQueryBus } from '@src/infra/jetstream/buses/nats-pubsub-query-bus';
 import { RegisterCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/register.command';
 import { UpdateEmailCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/update-email.command';
 import { UpdateEmailDTO } from './dto/update-email.dto';
 import { RegisterDTO } from './dto/register.dto';
+import { BUSES_TOKENS } from '@src/infra/jetstream/buses/constants';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    @Inject(PubSubCommandBusToken)
+    @Inject(BUSES_TOKENS.PUBSUB_COMMAND_BUS)
     private readonly commandBus: PubSubCommandBus, // private readonly queryBus: QueryBus, // @Inject('NATS_JETSTREAM') private readonly nc: any,
-    @Inject(PubSubQueryBusToken)
+    @Inject(BUSES_TOKENS.PUBSUB_QUERY_BYS)
     private readonly queryBus: PubSubQueryBus,
     private readonly authService: AuthService,
-  ) { }
+  ) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -51,7 +46,10 @@ export class AuthController {
   @Post('updateEmail')
   async updateEmail(@Request() req, @Body() dto: UpdateEmailDTO) {
     console.log('req', req.user);
-    const command = new UpdateEmailCommand({ email: dto.email, userId: req.user.userId });
+    const command = new UpdateEmailCommand({
+      email: dto.email,
+      userId: req.user.userId,
+    });
     const results = await this.commandBus.request(command);
     if (results.isOk) return results.data;
     else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
@@ -61,7 +59,10 @@ export class AuthController {
   @Post('register')
   async register(@Request() req, @Body() body: RegisterDTO) {
     console.log('req', req.user);
-    const command = new RegisterCommand({ email: body.email, password: body.password });
+    const command = new RegisterCommand({
+      email: body.email,
+      password: body.password,
+    });
     const results = await this.commandBus.request(command);
     if (results.isOk) return results.data;
     else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);

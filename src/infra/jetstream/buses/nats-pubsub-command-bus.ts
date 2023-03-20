@@ -14,8 +14,6 @@ export interface PubSubCommandBus {
   ): Promise<void>;
 }
 
-export const PubSubCommandBusToken = Symbol('PubSubCommandBus');
-
 @Injectable()
 export class NatsPubSubCommandBus implements PubSubCommandBus {
   private nc: NatsConnection;

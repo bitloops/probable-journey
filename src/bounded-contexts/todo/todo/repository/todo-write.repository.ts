@@ -6,6 +6,7 @@ import { TodoWriteRepoPort } from 'src/lib/bounded-contexts/todo/todo/ports/Todo
 import { TodoEntity } from 'src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 import { StreamingDomainEventBus } from '@src/infra/jetstream/buses/nats-streaming-domain-event-bus';
 import { BUSES_TOKENS } from '@src/infra/jetstream/buses/constants';
+import { TContext } from '@src/lib/bounded-contexts/todo/todo/types';
 
 const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
 
@@ -29,7 +30,7 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
       .collection(this.collectionName);
   }
 
-  async getById(id: Domain.UUIDv4, ctx?: any): Promise<TodoEntity | null> {
+  async getById(id: Domain.UUIDv4, ctx: TContext): Promise<TodoEntity | null> {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -45,7 +46,7 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
       return null;
     }
 
-    if (result.userId !== jwtPayload.userId) {
+    if (result.userId !== jwtPayload.sub) {
       throw new Error('Invalid userId');
     }
 
@@ -72,7 +73,7 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
     throw new Error('Method not implemented.');
   }
 
-  async save(todo: TodoEntity, ctx?: any): Promise<void> {
+  async save(todo: TodoEntity, ctx: TContext): Promise<void> {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -81,7 +82,7 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
       throw new Error('Invalid JWT!');
     }
     const createdTodo = todo.toPrimitives();
-    if (createdTodo.userId !== jwtPayload.userId) {
+    if (createdTodo.userId !== jwtPayload.sub) {
       throw new Error('Invalid userId');
     }
     const { id, ...todoInfo } = createdTodo;

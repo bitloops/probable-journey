@@ -19,6 +19,7 @@ import {
   TodoWriteRepoPortToken,
 } from '../../ports/TodoWriteRepoPort';
 import { UserIdVO } from '../../domain/UserIdVO';
+import { TContext } from '../../types';
 
 type AddTodoUseCaseResponse = Either<
   string,
@@ -32,7 +33,7 @@ export class AddTodoHandler
       Promise<AddTodoUseCaseResponse>
     >
 {
-  private ctx: any;
+  private ctx: TContext;
   constructor(
     @Inject(TodoWriteRepoPortToken)
     private readonly todoRepo: TodoWriteRepoPort,
@@ -54,7 +55,7 @@ export class AddTodoHandler
     if (title.isFail()) {
       return fail(title.value);
     }
-    const userId = UserIdVO.create({ id: new Domain.UUIDv4(command.userId) });
+    const userId = UserIdVO.create({ id: new Domain.UUIDv4(this.ctx.userId) });
     const todo = TodoEntity.create({
       title: title.value,
       completed: false,

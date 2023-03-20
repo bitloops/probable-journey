@@ -7,9 +7,10 @@ import {
   Inject,
   Injectable,
   Post,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as jwtwebtoken from 'jsonwebtoken';
 import { TodoReadModel } from '../lib/bounded-contexts/todo/todo/domain/TodoReadModel';
 import { AddTodoCommand } from '../lib/bounded-contexts/todo/todo/commands/add-todo.command';
 import { AddTodoDto } from './dto/add-todo.dto';
@@ -18,6 +19,7 @@ import { GetTodosQuery } from '../lib/bounded-contexts/todo/todo/queries/get-tod
 import { PubSubCommandBus } from '@src/infra/jetstream/buses/nats-pubsub-command-bus';
 import { PubSubQueryBus } from '@src/infra/jetstream/buses/nats-pubsub-query-bus';
 import { BUSES_TOKENS } from '@src/infra/jetstream/buses/constants';
+import { JwtAuthGuard } from '@src/bounded-contexts/iam/authentication/jwt-auth.guard';
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
 @Injectable()
@@ -38,11 +40,14 @@ export class TodoController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  async addTodo(@Body() dto: AddTodoDto) {
-    // userId get from context
-    const jwt = jwtwebtoken.sign({ userId: dto.userId }, this.JWT_SECRET);
-    const command = new AddTodoCommand(dto.title, dto.userId, { jwt });
+  async addTodo(@Request() req, @Body() dto: AddTodoDto) {
+    // const jwt = jwtwebtoken.sign({ userId: dto.userId }, this.JWT_SECRET);
+    const command = new AddTodoCommand(dto.title, {
+      jwt: this.getJWTToken(req),
+      userId: req.user.userId,
+    });
     const results = await this.commandBus.request(command);
     if (results.isOk) return results.data;
     else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
@@ -56,11 +61,23 @@ export class TodoController {
     // );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
-  async findAll(): Promise<TodoReadModel[]> {
-    const jwt = jwtwebtoken.sign({ userId: 'vasilis' }, this.JWT_SECRET);
-    const results = await this.queryBus.request(new GetTodosQuery({ jwt }));
+  async findAll(@Request() req): Promise<TodoReadModel[]> {
+    // const jwt = jwtwebtoken.sign({ userId: 'vasilis' }, this.JWT_SECRET);
+    const results = await this.queryBus.request(
+      new GetTodosQuery({ jwt: this.getJWTToken(req) }),
+    );
     if (results.isOk) return results.data;
     else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+  }
+
+  private getJWTToken(req: any): string {
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.split('Bearer ')[1];
+      return token;
+    }
+    return '';
   }
 }

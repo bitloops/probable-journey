@@ -4,7 +4,7 @@ import { UserIdVO } from './UserIdVO';
 import { DomainErrors } from './errors';
 import { TodoAddedDomainEvent } from './events/todo-added.event';
 import { TodoTitleModifiedDomainEvent } from './events/todo-title-modified.event';
-import { TodoCompletedDomainEvent } from './events/todo-completed.Event';
+import { TodoCompletedDomainEvent } from './events/todo-completed.event';
 import { TodoUncompletedDomainEvent } from './events/todo-uncompleted.event';
 
 export interface TodoProps {

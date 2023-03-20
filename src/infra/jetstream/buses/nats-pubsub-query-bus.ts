@@ -62,7 +62,7 @@ export class NatsPubSubQueryBus implements PubSubQueryBus {
     handler: Application.IQueryHandler<any, any>,
   ) {
     try {
-      console.log('Subscribing query to:', subject, handler);
+      console.log('Subscribing query to:', subject);
       // this.logger.log(`
       //   Subscribing ${subject}!
       // `);
@@ -88,6 +88,8 @@ export class NatsPubSubQueryBus implements PubSubQueryBus {
         }
         console.log('subscription closed');
       })();
-    } catch (err) {}
+    } catch (err) {
+      console.log('Error in query subscription:', err);
+    }
   }
 }

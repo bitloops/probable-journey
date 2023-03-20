@@ -36,18 +36,18 @@ const streamingDomainEventBus = {
 @Global()
 @Module({})
 export class JetstreamModule {
-  static forRoot(option: ConnectionOptions): DynamicModule {
+  static forRoot(connectionOptions: ConnectionOptions): DynamicModule {
     const jetstreamProviders = {
       provide: ProvidersConstants.JETSTREAM_PROVIDER,
       useFactory: (): any => {
-        return new NestjsJetstream().connect(option);
+        return new NestjsJetstream().connect(connectionOptions);
       },
     };
 
     const configProv = {
       provide: ProvidersConstants.JETSTREAM_CONNECTION_CONFIG_PROVIDER,
       useValue: {
-        ...option,
+        ...connectionOptions,
       },
     };
 

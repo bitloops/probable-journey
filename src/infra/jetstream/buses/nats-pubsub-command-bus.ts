@@ -87,6 +87,8 @@ export class NatsPubSubCommandBus implements PubSubCommandBus {
         }
         console.log('subscription closed');
       })();
-    } catch (err) {}
+    } catch (err) {
+      console.log('Error in command-bus subscribe:', err);
+    }
   }
 }

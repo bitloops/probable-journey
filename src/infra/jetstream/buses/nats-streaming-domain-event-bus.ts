@@ -9,6 +9,7 @@ import {
   createInbox,
 } from 'nats';
 import { Application, Domain } from '@src/bitloops/bl-boilerplate-core';
+import { NestjsJetstream } from '../nestjs-jetstream.class';
 
 const jsonCodec = JSONCodec();
 
@@ -27,9 +28,9 @@ export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
   private js: JetStreamClient;
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER)
-    private readonly nats: any,
+    private readonly jetStreamProvider: NestjsJetstream,
   ) {
-    this.nc = this.nats.getConnection();
+    this.nc = this.jetStreamProvider.getConnection();
     this.js = this.nc.jetstream();
   }
 
@@ -64,14 +65,19 @@ export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
 
   async subscribe(subject: string, handler: Application.IHandle) {
     // Durable name cannot contain a dot
-    const durableName = `${subject.replace('.', '-')}-${
-      handler.constructor.name
-    }`;
+    const subjectWithoutDots = subject.replace('.', '-');
+    const durableName = `${subjectWithoutDots}-${handler.constructor.name}`;
     const opts = consumerOpts();
     opts.durable(durableName);
     opts.manualAck();
     opts.ackExplicit();
     opts.deliverTo(createInbox());
+
+    // console.log('all streams');
+    // await this.jetStreamProvider.listAllStreams();
+    const stream = subject.split('.')[0];
+    console.log('Checking if stream exists:', { stream, subject });
+    await this.jetStreamProvider.createStreamIfNotExists(stream, subject);
     // const jsm = await this.nc.jetstreamManager();
     // add a stream
     // const stream = subject.split('.')[0];
@@ -79,7 +85,7 @@ export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
     //   await jsm.streams.add({ name: stream, subjects: [subject] });
     // } catch (err) {
     //   // retrieve info about the stream by its name
-    //   try {
+    // try {
     //     const si = await jsm.streams.info(stream);
 
     //     // update a stream configuration
@@ -91,7 +97,7 @@ export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
     // }
 
     try {
-      console.log('Subscribing domain event to:', subject, handler);
+      console.log('Subscribing domain event to:', subject);
       // this.logger.log(`
       //   Subscribing ${subject}!
       // `);
@@ -99,7 +105,7 @@ export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
       (async () => {
         console.log('Starting domain event loop...');
         for await (const m of sub) {
-          console.log('DomainEvent:::::::::::::::::;;;');
+          console.log('Received domainEvent::');
           const domainEvent = jsonCodec.decode(m.data) as any;
 
           const reply = await handler.handle(domainEvent);
@@ -115,6 +121,7 @@ export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
       })();
     } catch (err) {
       console.log('Error subscribing to domain event:', err);
+      console.log({ subject });
     }
   }
 }

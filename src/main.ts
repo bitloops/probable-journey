@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
+import { otelSDK } from './tracing';
 // import { CustomStrategy } from '@nestjs/microservices';
 // import { NatsJetStreamServer } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
@@ -24,7 +25,7 @@ async function bootstrap() {
   //     },
   //   }),
   // };
-
+  await otelSDK.start();
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, {
     abortOnError: false,
   });

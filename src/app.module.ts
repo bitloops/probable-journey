@@ -10,6 +10,9 @@ import { AuthModule } from './bounded-contexts/iam/authentication/auth.module';
 import { UsersModule } from './bounded-contexts/iam/users/users.module';
 import { MarketingModule } from './bounded-contexts/marketing/marketing/marketing.module';
 import { IamModule } from './bounded-contexts/iam/iam.module';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './logging.interceptor';
 
 @Module({
   imports: [
@@ -17,6 +20,7 @@ import { IamModule } from './bounded-contexts/iam/iam.module';
       isGlobal: true,
       envFilePath: '.development.env',
     }),
+    PrometheusModule.register(),
     JetstreamModule.forRoot({}),
     MongooseModule.forRoot('mongodb://localhost/todo'),
     TypeOrmModule.forRoot({
@@ -37,8 +41,13 @@ import { IamModule } from './bounded-contexts/iam/iam.module';
     IamModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+  ],
 })
 export class AppModule {
-  constructor(private dataSource: DataSource) { }
+  constructor(private dataSource: DataSource) {}
 }

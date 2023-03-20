@@ -7,6 +7,7 @@ import {
   JetStreamPublishOptions,
   consumerOpts,
   createInbox,
+  AckPolicy,
 } from 'nats';
 import { Application, Domain } from '@src/bitloops/bl-boilerplate-core';
 
@@ -114,7 +115,31 @@ export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
         console.log('Exiting domain event loop...');
       })();
     } catch (err) {
-      console.log('Error subscribing to domain event:', err);
+      try {
+        const jsm = await this.nc.jetstreamManager();
+        const stream = subject.split('.')[0];
+        await await jsm.streams.add({ name: stream, subjects: [subject] });
+        const sub = await this.js.subscribe(subject, opts);
+        (async () => {
+          console.log('Starting domain event loop...');
+          for await (const m of sub) {
+            console.log('DomainEvent:::::::::::::::::;;;');
+            const domainEvent = jsonCodec.decode(m.data) as any;
+
+            const reply = await handler.handle(domainEvent);
+            m.ack();
+
+            console.log(
+              `[Domain Event ${sub.getProcessed()}]: ${JSON.stringify(
+                jsonCodec.decode(m.data),
+              )}`,
+            );
+          }
+          console.log('Exiting domain event loop...');
+        })();
+      } catch (err) {
+        console.log('Error subscribing to domain event:', err);
+      }
     }
   }
 }

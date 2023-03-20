@@ -7,7 +7,6 @@ import { TodoModule as LibTodoModule } from 'src/lib/bounded-contexts/todo/todo/
 import { TodoWriteRepoPortToken } from '@src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 import { TodoReadRepoPortToken } from '@src/lib/bounded-contexts/todo/todo/ports/TodoReadRepoPort';
 import { MongoModule } from '@src/infra/db/mongo/mongo.module';
-import { JetstreamModule } from '@src/infra/jetstream/jetstream.module';
 import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers';
 import { PubSubQueryHandlers } from '@src/lib/bounded-contexts/todo/todo/application/query-handlers';
 import {
@@ -15,7 +14,8 @@ import {
   StreamingIntegrationEventHandlers,
 } from '@src/lib/bounded-contexts/todo/todo/application/event-handlers';
 import { StreamingIntegrationEventBusToken } from '@src/lib/bounded-contexts/todo/todo/constants';
-import { NatsStreamingIntegrationEventBus } from '@src/infra/jetstream/buses/nats-streaming-integration-event-bus';
+import { NatsStreamingIntegrationEventBus } from '@src/bitloops/nest-jetstream/buses/nats-streaming-integration-event-bus';
+import { JetstreamModule } from '@src/bitloops/nest-jetstream';
 
 const RepoProviders = [
   {

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ProvidersConstants } from '../';
+import { ProvidersConstants } from '../contract';
 import { NatsConnection, JSONCodec } from 'nats';
 import { Application } from '@src/bitloops/bl-boilerplate-core';
 

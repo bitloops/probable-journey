@@ -14,13 +14,13 @@ import { AuthService } from '@src/bounded-contexts/iam/authentication/auth.servi
 import { LogInCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/log-in.command';
 import { JwtAuthGuard } from '@src/bounded-contexts/iam/authentication/jwt-auth.guard';
 
-import { PubSubCommandBus } from '@src/infra/jetstream/buses/nats-pubsub-command-bus';
-import { PubSubQueryBus } from '@src/infra/jetstream/buses/nats-pubsub-query-bus';
 import { RegisterCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/register.command';
 import { UpdateEmailCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/update-email.command';
 import { UpdateEmailDTO } from './dto/update-email.dto';
 import { RegisterDTO } from './dto/register.dto';
-import { BUSES_TOKENS } from '@src/infra/jetstream/buses/constants';
+import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
+import { PubSubCommandBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-command-bus';
+import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
 
 @Controller('auth')
 export class AuthController {

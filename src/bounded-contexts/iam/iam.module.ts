@@ -4,10 +4,10 @@ import { IamModule as LibIamModule } from 'src/lib/bounded-contexts/iam/authenti
 import { MongoModule } from '@src/infra/db/mongo/mongo.module';
 import { UserWriteRepoPortToken } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
 import { UserWriteRepository } from './repository/user-write.repository';
-import { NatsStreamingIntegrationEventBus } from '@src/infra/jetstream/buses/nats-streaming-integration-event-bus';
 import { StreamingIntegrationEventBusToken } from '@src/lib/bounded-contexts/iam/authentication/constants';
-import { JetstreamModule } from '@src/infra/jetstream/jetstream.module';
 import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/iam/authentication/application/command-handlers';
+import { NatsStreamingIntegrationEventBus } from '@src/bitloops/nest-jetstream/buses/nats-streaming-integration-event-bus';
+import { JetstreamModule } from '@src/bitloops/nest-jetstream';
 
 const RepoProviders = [
   {

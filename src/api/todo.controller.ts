@@ -17,10 +17,10 @@ import { AddTodoDto } from './dto/add-todo.dto';
 import { CompleteTodoDto } from './dto/complete-todo.dto';
 import { GetTodosQuery } from '../lib/bounded-contexts/todo/todo/queries/get-todos.query';
 
-import { JwtAuthGuard } from '@src/bounded-contexts/iam/authentication/jwt-auth.guard';
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 import { PubSubCommandBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-command-bus';
 import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
+import { JwtAuthGuard } from '@src/infra/auth/jwt-auth.guard';
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
 @Injectable()

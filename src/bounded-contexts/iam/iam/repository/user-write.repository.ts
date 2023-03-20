@@ -1,10 +1,11 @@
-import { Domain } from '@bitloops/bl-boilerplate-core';
+import { Domain, Infra } from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
 import { UserWriteRepoPort } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
 import { UserEntity } from '@src/lib/bounded-contexts/iam/authentication/domain/UserEntity';
 import { TContext } from '@src/lib/bounded-contexts/todo/todo/types';
+import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses';
 
 const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'iam';
@@ -16,7 +17,11 @@ export class UserWriteRepository implements UserWriteRepoPort {
   private collectionName = MONGO_DB_TODO_COLLECTION;
   private dbName = MONGO_DB_DATABASE;
   private collection: Collection;
-  constructor(@Inject('MONGO_DB_CONNECTION') private client: MongoClient) {
+  constructor(
+    @Inject('MONGO_DB_CONNECTION') private client: MongoClient,
+    @Inject(BUSES_TOKENS.STREAMING_DOMAIN_EVENT_BUS)
+    private readonly domainEventBus: Infra.EventBus.IEventBus,
+  ) {
     this.collection = this.client
       .db(this.dbName)
       .collection(this.collectionName);
@@ -78,5 +83,6 @@ export class UserWriteRepository implements UserWriteRepoPort {
       _id: createdUser.id as any,
       ...createdUser,
     });
+    this.domainEventBus.publish(user.domainEvents);
   }
 }

@@ -5,10 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { ApiModule } from './api/api.module';
 import { TodoModule } from './bounded-contexts/todo/todo/todo.module';
-import { AuthModule } from './bounded-contexts/iam/authentication/auth.module';
-import { UsersModule } from './bounded-contexts/iam/users/users.module';
+import { AuthModule } from './infra/auth/auth.module';
 import { MarketingModule } from './bounded-contexts/marketing/marketing/marketing.module';
-import { IamModule } from './bounded-contexts/iam/iam.module';
+import { IamModule } from './bounded-contexts/iam/iam/iam.module';
 import { JetstreamModule } from '@src/bitloops/nest-jetstream';
 
 @Module({
@@ -32,7 +31,6 @@ import { JetstreamModule } from '@src/bitloops/nest-jetstream';
     TodoModule,
     ApiModule,
     AuthModule,
-    UsersModule,
     MarketingModule,
     IamModule,
   ],

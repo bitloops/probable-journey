@@ -10,11 +10,6 @@ import {
   HttpException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { LocalAuthGuard } from '@src/bounded-contexts/iam/authentication/local-auth.guard';
-import { AuthService } from '@src/bounded-contexts/iam/authentication/auth.service';
-import { LogInCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/log-in.command';
-import { JwtAuthGuard } from '@src/bounded-contexts/iam/authentication/jwt-auth.guard';
-
 import { RegisterCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/register.command';
 import { UpdateEmailCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/update-email.command';
 import { UpdateEmailDTO } from './dto/update-email.dto';
@@ -22,6 +17,9 @@ import { RegisterDTO } from './dto/register.dto';
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 import { PubSubCommandBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-command-bus';
 import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
+import { JwtAuthGuard } from '@src/infra/auth/jwt-auth.guard';
+import { LocalAuthGuard } from '@src/infra/auth/local-auth.guard';
+import { AuthService } from '@src/infra/auth/auth.service';
 
 @Controller('auth')
 export class AuthController {

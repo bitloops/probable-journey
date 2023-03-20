@@ -12,7 +12,6 @@ export class UsersService {
     private readonly userRepo: UserWriteRepoPort,
   ) {}
 
-  // TODO maybe return primitives and specific fields of UserEntity
   async findOne(email: string): Promise<UserEntity | null> {
     const user = await this.userRepo.getByEmail(email);
     return user;

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from '@src/bounded-contexts/iam/authentication/auth.module';
+import { AuthModule } from '@src/infra/auth/auth.module';
 import { AuthController } from './authentication.controller';
 import { TodoController } from './todo.controller';
 import { JetstreamModule } from '@src/bitloops/nest-jetstream';

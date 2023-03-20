@@ -1,4 +1,11 @@
-import { Application, Domain, Infra } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Domain,
+  Either,
+  Infra,
+  ok,
+  fail,
+} from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import {
   Collection,
@@ -106,7 +113,7 @@ export class UserWriteRepository implements UserWriteRepoPort {
 
   async checkDoesNotExistAndCreate(
     user: UserEntity,
-  ): Promise<void | Application.Repo.Errors.NotFound> {
+  ): Promise<Either<void, Application.Repo.Errors.Conflict>> {
     const session = this.client.startSession();
     try {
       // Lock write
@@ -118,7 +125,7 @@ export class UserWriteRepository implements UserWriteRepoPort {
 
       const alreadyExistedUser = await this.getByEmail(user.email, session);
       if (alreadyExistedUser)
-        return new Application.Repo.Errors.Conflict(user.email.email);
+        return fail(new Application.Repo.Errors.Conflict(user.email.email));
 
       await this.save(user, session);
 
@@ -131,6 +138,7 @@ export class UserWriteRepository implements UserWriteRepoPort {
       session.endSession();
     }
 
-    this.domainEventBus.publish(user.domainEvents);
+    // this.domainEventBus.publish(user.domainEvents);
+    return ok();
   }
 }

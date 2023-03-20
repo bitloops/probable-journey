@@ -59,6 +59,7 @@ export class AuthController {
     const hashedPassword = await this.hashPassword(body.password);
     const command = new RegisterCommand(body.email, hashedPassword);
     const results = await this.commandBus.request(command);
+    console.log({ results });
     if (results.isOk) return results.data;
     else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }

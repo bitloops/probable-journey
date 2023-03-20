@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ProvidersConstants } from '..';
+import { ProvidersConstants } from '../contract';
 import {
   NatsConnection,
   JSONCodec,
@@ -7,19 +7,16 @@ import {
   JetStreamPublishOptions,
   consumerOpts,
 } from 'nats';
-import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
+import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
+import { EventHandler } from '@src/bitloops/bl-boilerplate-core/domain/events/IEventBus';
 
 const jsonCodec = JSONCodec();
 
-export interface StreamingIntegrationEventBus {
-  publish(integrationEvent: any): Promise<void>;
-  subscribe(subject: string, handler: Application.IHandle): Promise<void>;
-}
-
 @Injectable()
 export class NatsStreamingIntegrationEventBus
-  implements StreamingIntegrationEventBus
+  implements Infra.EventBus.IEventBus
 {
   private nc: NatsConnection;
   private js: JetStreamClient;
@@ -105,5 +102,12 @@ export class NatsStreamingIntegrationEventBus
     } catch (err) {
       console.error('Error subscribing to integration event:', err);
     }
+  }
+
+  unsubscribe<T extends IEvent<any>>(
+    topic: string,
+    eventHandler: EventHandler<T>,
+  ): Promise<void> {
+    throw new Error('Method not implemented.');
   }
 }

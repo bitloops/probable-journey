@@ -8,18 +8,15 @@ import {
   consumerOpts,
   createInbox,
 } from 'nats';
-import { Application, Domain } from '@src/bitloops/bl-boilerplate-core';
+import { Application, Domain, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
+import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
+import { EventHandler } from '@src/bitloops/bl-boilerplate-core/domain/events/IEventBus';
 
 const jsonCodec = JSONCodec();
 
-export interface StreamingDomainEventBus {
-  publish(domainEvent: any): Promise<void>;
-  subscribe(subject: string, handler: Application.IHandle): Promise<void>;
-}
-
 @Injectable()
-export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
+export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
   private nc: NatsConnection;
   private js: JetStreamClient;
   constructor(
@@ -110,5 +107,12 @@ export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
       console.log('Error subscribing to domain event:', err);
       console.log({ subject });
     }
+  }
+
+  unsubscribe<T extends IEvent<any>>(
+    topic: string,
+    eventHandler: EventHandler<T>,
+  ): Promise<void> {
+    throw new Error('Method not implemented.');
   }
 }

@@ -11,36 +11,21 @@ import {
  * @description NATS setup from https://github.com/nats-io/nats.js
  */
 export class NestjsJetstream {
-  [x: string]: any;
   private logger: Logger = new Logger(this.constructor.name);
   private nc: NatsConnection;
   private jsm: JetStreamManager;
   private mutex: Mutex;
 
   constructor() {
-    this.type = 'nats-jetstream';
+    // this.type = 'nats-jetstream';
     this.mutex = new Mutex();
   }
 
   async connect(options: ConnectionOptions) {
     try {
       this.nc = await connect(options);
-      console.log('options', options);
       this.jsm = await this.nc.jetstreamManager();
-      console.log(`connected to ${this.nc.getServer()}`);
-      // // add a stream
-      // const stream = options.name || 'test';
-      // const subj = 'test.*';
-      // await this.jsm.streams.add({ name: stream, subjects: [subj] });
-      // this.connection.on('connect', () => {
-      //   this.isConnected = true;
-      //   this.logger.log('NATS connected!');
-      // });
-      // this.connection.on('closed', () => {
-      //   this.isConnected = false;
-      //   this.logger.error('NATS closed!');
-      //   this.connect(options);
-      // });
+      this.logger.log(`connected to ${this.nc.getServer()}`);
 
       return this;
     } catch (e: any) {

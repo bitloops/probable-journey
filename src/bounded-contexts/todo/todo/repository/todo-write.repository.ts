@@ -1,11 +1,10 @@
-import { Domain } from '@bitloops/bl-boilerplate-core';
+import { Domain, Infra } from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
 import { TodoWriteRepoPort } from 'src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 import { TodoEntity } from 'src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 import { TContext } from '@src/lib/bounded-contexts/todo/todo/types';
-import { StreamingDomainEventBus } from '@src/bitloops/nest-jetstream/buses/nats-streaming-domain-event-bus';
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 
 const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
@@ -22,8 +21,8 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
 
   constructor(
     @Inject('MONGO_DB_CONNECTION') private client: MongoClient,
-    @Inject(BUSES_TOKENS.STREAMING_DOMAIN_EVENS_BUS)
-    private readonly domainEventBus: StreamingDomainEventBus,
+    @Inject(BUSES_TOKENS.STREAMING_DOMAIN_EVENT_BUS)
+    private readonly domainEventBus: Infra.EventBus.IEventBus,
   ) {
     this.collection = this.client
       .db(this.dbName)

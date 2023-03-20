@@ -19,14 +19,12 @@
  */
 import { IEvent } from './IEvent';
 import { GenericMessageHandler } from '../messages/IMessageBus';
+import { Application } from '../..';
 
 export type EventHandler<T extends IEvent<any>> = GenericMessageHandler<T>;
 
 export interface IEventBus {
-  subscribe<T extends IEvent<any>>(
-    topic: string,
-    eventHandler: EventHandler<T>,
-  ): Promise<void>;
+  subscribe(topic: string, eventHandler: Application.IHandle): Promise<void>;
   unsubscribe<T extends IEvent<any>>(
     topic: string,
     eventHandler: EventHandler<T>,

@@ -14,6 +14,8 @@ import {
 import { NatsStreamingDomainEventBus } from './buses/nats-streaming-domain-event-bus';
 import { JetstreamModuleFeatureConfig } from './interfaces/module-feature-input.interface';
 import { BUSES_TOKENS } from './buses/constants';
+import { NatsStreamingIntegrationEventBus } from './buses';
+import { Application } from '../bl-boilerplate-core';
 
 const pubSubCommandBus = {
   provide: BUSES_TOKENS.PUBSUB_COMMAND_BUS,
@@ -25,8 +27,13 @@ const pubSubQueryBus = {
 };
 
 const streamingDomainEventBus = {
-  provide: BUSES_TOKENS.STREAMING_DOMAIN_EVENS_BUS,
+  provide: BUSES_TOKENS.STREAMING_DOMAIN_EVENT_BUS,
   useClass: NatsStreamingDomainEventBus,
+};
+
+const streamingIntegrationEventBus = {
+  provide: BUSES_TOKENS.STREAMING_INTEGRATION_EVENT_BUS,
+  useClass: NatsStreamingIntegrationEventBus,
 };
 
 @Global()
@@ -55,6 +62,7 @@ export class JetstreamCoreModule {
         pubSubCommandBus,
         pubSubQueryBus,
         streamingDomainEventBus,
+        streamingIntegrationEventBus,
       ],
       exports: [
         jetstreamProviders,
@@ -62,6 +70,7 @@ export class JetstreamCoreModule {
         pubSubCommandBus,
         pubSubQueryBus,
         streamingDomainEventBus,
+        streamingIntegrationEventBus,
       ],
     };
   }
@@ -75,10 +84,13 @@ export class JetstreamCoreModule {
       pubSubCommandHandlers,
       pubSubQueryHandlers,
       streamingDomainEventHandlers,
+      streamingIntegrationEventHandlers,
     } = config;
     if (!pubSubCommandHandlers) pubSubCommandHandlers = [];
     if (!pubSubQueryHandlers) pubSubQueryHandlers = [];
     if (!streamingDomainEventHandlers) streamingDomainEventHandlers = [];
+    if (!streamingIntegrationEventHandlers)
+      streamingIntegrationEventHandlers = [];
 
     const PubSubCommandHandlersSubscriptions: Provider<any>[] = [
       {
@@ -123,7 +135,7 @@ export class JetstreamCoreModule {
         provide: 'StreamingDomainEventHandlers',
         useFactory: (
           eventBus: NatsStreamingDomainEventBus,
-          ...domainEventHandlers
+          ...domainEventHandlers: Application.IHandle[]
         ) => {
           domainEventHandlers.forEach((handler) => {
             const event = handler.event;
@@ -136,8 +148,35 @@ export class JetstreamCoreModule {
           return;
         },
         inject: [
-          { token: BUSES_TOKENS.STREAMING_DOMAIN_EVENS_BUS, optional: false },
+          { token: BUSES_TOKENS.STREAMING_DOMAIN_EVENT_BUS, optional: false },
           ...streamingDomainEventHandlers,
+        ],
+      },
+    ];
+
+    const StreamingIntegrationEventHandlersSubscriptions: Provider<any>[] = [
+      {
+        provide: 'StreamingIntegrationEventHandlers',
+        useFactory: (
+          eventBus: NatsStreamingIntegrationEventBus,
+          ...integrationEventHandlers: Application.IHandle[]
+        ) => {
+          integrationEventHandlers.forEach((handler) => {
+            const event = handler.event;
+            const boundedContext = handler.boundedContext;
+            const stream =
+              NatsStreamingIntegrationEventBus.getStreamName(boundedContext);
+            const subject = `${stream}.${event.name}`;
+            eventBus.subscribe(subject, handler);
+          });
+          return;
+        },
+        inject: [
+          {
+            token: BUSES_TOKENS.STREAMING_INTEGRATION_EVENT_BUS,
+            optional: false,
+          },
+          ...streamingIntegrationEventHandlers,
         ],
       },
     ];
@@ -155,6 +194,7 @@ export class JetstreamCoreModule {
         ...PubSubCommandHandlersSubscriptions,
         ...PubSubQueryHandlersSubscriptions,
         ...StreamingDomainEventHandlersSubscriptions,
+        ...StreamingIntegrationEventHandlersSubscriptions,
         Jetstream,
         pubSubCommandBus,
         pubSubQueryBus,

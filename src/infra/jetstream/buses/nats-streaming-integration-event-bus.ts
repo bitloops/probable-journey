@@ -8,6 +8,7 @@ import {
   consumerOpts,
 } from 'nats';
 import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { NestjsJetstream } from '../nestjs-jetstream.class';
 
 const jsonCodec = JSONCodec();
 
@@ -28,9 +29,9 @@ export class NatsStreamingIntegrationEventBus
   private js: JetStreamClient;
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER)
-    private readonly nats: any,
+    private readonly jetStreamProvider: NestjsJetstream,
   ) {
-    this.nc = this.nats.getConnection();
+    this.nc = this.jetStreamProvider.getConnection();
     this.js = this.nc.jetstream();
   }
 
@@ -76,9 +77,12 @@ export class NatsStreamingIntegrationEventBus
 
   async subscribe(subject: string, handler: Application.IHandle) {
     // Durable name cannot contain a dot
-    const durableName = `${subject.replace('.', '-')}-${
-      handler.constructor.name
-    }`;
+    const subjectWithoutDots = subject.replace('.', '-');
+    const durableName = `${subjectWithoutDots}-${handler.constructor.name}`;
+
+    const stream = subject.split('.')[0];
+    // console.log('Checking if stream exists:', { stream, subject });
+    await this.jetStreamProvider.createStreamIfNotExists(stream, subject);
     const opts = consumerOpts();
     opts.durable(durableName);
     opts.manualAck();

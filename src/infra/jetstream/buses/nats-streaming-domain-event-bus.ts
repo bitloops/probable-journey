@@ -76,7 +76,7 @@ export class NatsStreamingDomainEventBus implements StreamingDomainEventBus {
     // console.log('all streams');
     // await this.jetStreamProvider.listAllStreams();
     const stream = subject.split('.')[0];
-    console.log('Checking if stream exists:', { stream, subject });
+    // console.log('Checking if stream exists:', { stream, subject });
     await this.jetStreamProvider.createStreamIfNotExists(stream, subject);
     // const jsm = await this.nc.jetstreamManager();
     // add a stream

@@ -1,35 +1,50 @@
 import { NestFactory } from '@nestjs/core';
-import { NestFastifyApplication } from '@nestjs/platform-fastify';
-// import { CustomStrategy } from '@nestjs/microservices';
-// import { NatsJetStreamServer } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
+import { GrpcOptions, Transport } from '@nestjs/microservices';
 
 import { AppModule } from './app.module';
 
-async function bootstrap() {
-  // const options: CustomStrategy = {
-  //   strategy: new NatsJetStreamServer({
-  //     connectionOptions: {
-  //       servers: 'localhost:4222',
-  //       name: 'messages-listener',
-  //     },
-  //     consumerOptions: {
-  //       deliverGroup: 'messages-group',
-  //       durable: 'messages-durable',
-  //       deliverTo: 'messages',
-  //       manualAck: true,
-  //     },
-  //     streamConfig: {
-  //       name: 'mystream',
-  //       subjects: ['*'],
-  //     },
-  //   }),
-  // };
+const HTTP_PORT = 3000;
+const HTTP_IP = '0.0.0.0';
+const GRPC_PORT = 3001;
+const GRPC_IP = '0.0.0.0';
+const GRPC_PACKAGE_NAME = 'todo';
+const GRPC_PROTO_PATH = 'src/proto/todo.proto';
 
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, {
-    abortOnError: false,
+// gRPC microservice configuration
+const grpcMicroserviceOptions: GrpcOptions = {
+  transport: Transport.GRPC,
+  options: {
+    url: `${GRPC_IP}:${GRPC_PORT}`,
+    package: GRPC_PACKAGE_NAME,
+    protoPath: GRPC_PROTO_PATH,
+  },
+};
+
+async function bootstrap() {
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter({
+      logger: true,
+    }),
+    { abortOnError: false },
+  );
+  await app.listen(HTTP_PORT, HTTP_IP, () => {
+    console.log(`HTTP server is listening on ${HTTP_IP}:${HTTP_PORT}`);
   });
-  // const microService = app.connectMicroservice(options);
-  // microService.listen();
-  await app.listen(3000);
+
+  // Initialize the gRPC server
+  const grpcApp = await NestFactory.createMicroservice(
+    AppModule,
+    grpcMicroserviceOptions,
+  );
+
+  // Start the gRPC server
+  grpcApp.listen().then(() => {
+    console.log(`gRPC server is listening on ${GRPC_IP}:${GRPC_PORT}`);
+  });
 }
 bootstrap();

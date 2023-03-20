@@ -1,3 +1,3 @@
 export interface CompleteTodoDto {
-    todoId: string;
+  todoId: string;
 }

@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package todo;
+
+service Authentication {
+  // rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc UpdateEmail(UpdateEmailRequest) returns (UpdateEmailResponse);
+}
+
+service TodoApp {
+	rpc AddTodo(AddTodoRequest) returns (AddTodoResponse);
+  rpc CompleteTodo (CompleteTodoRequest) returns (CompleteTodoResponse);
+	rpc GetAllMyTodos(GetAllMyTodosRequest) returns (GetAllMyTodosResponse);
+}
+
+message AddTodoRequest {
+	string title = 2;
+}
+
+message AddTodoResponse {
+  string id = 1;
+}
+
+message CompleteTodoRequest {
+  string id = 1;
+}
+
+message CompleteTodoResponse {}
+
+message GetAllMyTodosRequest {}
+
+message GetAllMyTodosResponse {
+  repeated Todo todos = 1;
+}
+
+// message LoginRequest {
+//   string email = 1;
+//   string password = 2;
+// }
+
+// message LoginResponse {
+//   string token = 1;
+// }
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message RegisterResponse {}
+
+message Todo {
+  string id = 1;
+  string text = 2;
+  bool completed = 3;
+}
+
+message UpdateEmailRequest {
+  string email = 1;
+}
+
+message UpdateEmailResponse {}

@@ -1,4 +1,9 @@
-import { Domain, Infra } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Domain,
+  Either,
+  Infra,
+} from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import * as jwtwebtoken from 'jsonwebtoken';
 import { UserWriteRepoPort } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
@@ -80,5 +85,11 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
     const { id, email, password, lastLogin } = userPrimitives;
     await this.connection.query(sqlStatement, [id, email, password, lastLogin]);
     this.domainEventBus.publish(user.domainEvents);
+  }
+
+  async checkDoesNotExistAndCreate(
+    user: UserEntity,
+  ): Promise<Either<void, Application.Repo.Errors.Conflict>> {
+    throw new Error('Method not implemented.');
   }
 }

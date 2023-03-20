@@ -55,8 +55,10 @@ export class RegisterHandler
       return fail(user.value);
     }
 
-    // TODO checkDoesNotExistAndCreate
-    await this.userRepo.save(user.value);
+    const result = await this.userRepo.checkDoesNotExistAndCreate(user.value);
+    if (result.isFail()) {
+      return fail(result.value);
+    }
     return ok();
   }
 }

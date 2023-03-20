@@ -6,6 +6,7 @@ import {
   JetStreamClient,
   JetStreamPublishOptions,
   consumerOpts,
+  createInbox,
 } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
@@ -77,7 +78,7 @@ export class NatsStreamingIntegrationEventBus
     opts.durable(durableName);
     opts.manualAck();
     opts.ackExplicit();
-    // opts.deliverTo(createInbox());
+    opts.deliverTo(createInbox());
 
     try {
       console.log('Subscribing integration event to:', subject, handler);

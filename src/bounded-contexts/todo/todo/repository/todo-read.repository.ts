@@ -40,7 +40,7 @@ export class TodoReadRepository implements TodoReadRepoPort {
     } catch (err) {
       throw new Error('Invalid JWT!');
     }
-    const userId = jwtPayload.userId;
+    const userId = jwtPayload.sub;
     if (!userId) {
       throw new Error('Invalid userId');
     }

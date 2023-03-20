@@ -1,4 +1,5 @@
 import { Application } from '@bitloops/bl-boilerplate-core';
+import { TContext } from '../types';
 export type TAddTodoCommand = {
   title: string;
   userId: string;
@@ -20,9 +21,5 @@ export class AddTodoCommandLegacy extends Application.Command {
 export class AddTodoCommand {
   public readonly boundedContext = 'Todo';
   public readonly createdAt = Date.now();
-  constructor(
-    public readonly title: string,
-    public readonly userId: string,
-    public readonly ctx: any,
-  ) {}
+  constructor(public readonly title: string, public readonly ctx: TContext) {}
 }

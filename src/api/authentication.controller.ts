@@ -20,6 +20,7 @@ import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-q
 import { JwtAuthGuard } from '@src/infra/auth/jwt-auth.guard';
 import { LocalAuthGuard } from '@src/infra/auth/local-auth.guard';
 import { AuthService } from '@src/infra/auth/auth.service';
+import { Application } from '@src/bitloops/bl-boilerplate-core';
 
 @Controller('auth')
 export class AuthController {
@@ -59,9 +60,18 @@ export class AuthController {
     const hashedPassword = await this.hashPassword(body.password);
     const command = new RegisterCommand(body.email, hashedPassword);
     const results = await this.commandBus.request(command);
-    console.log({ results });
     if (results.isOk) return results.data;
-    else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    else {
+      switch (results.error.errorId) {
+        case Application.Repo.Errors.Conflict.errorId:
+          throw new HttpException(results.error.message, HttpStatus.CONFLICT);
+        default:
+          throw new HttpException(
+            'Server error',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+      }
+    }
   }
 
   private hashPassword(password: string) {

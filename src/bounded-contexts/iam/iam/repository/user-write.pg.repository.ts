@@ -3,6 +3,8 @@ import {
   Domain,
   Either,
   Infra,
+  ok,
+  fail,
 } from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import * as jwtwebtoken from 'jsonwebtoken';
@@ -27,7 +29,7 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
     const userPrimitives = aggregate.toPrimitives();
     const { id, email, password, lastLogin } = userPrimitives;
     const sqlStatement = `UPDATE ${this.tableName}
-    SET email = $2, password = $3, lastLogin = $4
+    SET email = $2, password = $3, last_login = $4
     WHERE id = $1`;
     await this.connection.query(sqlStatement, [id, email, password, lastLogin]);
     this.domainEventBus.publish(aggregate.domainEvents);
@@ -63,8 +65,12 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
     if (userPrimitives.id !== jwtPayload.sub) {
       throw new Error('Invalid userId');
     }
+    const { last_login, ...user } = userPrimitives;
 
-    return UserEntity.fromPrimitives(userPrimitives);
+    return UserEntity.fromPrimitives({
+      ...user,
+      lastLogin: new Date(last_login),
+    });
   }
 
   async getByEmail(email: EmailVO): Promise<UserEntity | null> {
@@ -78,11 +84,16 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
     }
 
     const userPrimitives = result.rows[0];
-    return UserEntity.fromPrimitives(userPrimitives);
+    const { last_login, ...user } = userPrimitives;
+
+    return UserEntity.fromPrimitives({
+      ...user,
+      lastLogin: new Date(last_login),
+    });
   }
 
   async save(user: UserEntity): Promise<void> {
-    const sqlStatement = `INSERT INTO ${this.tableName} (id, email, password, lastLogin) VALUES ($1, $2, $3, $4);`;
+    const sqlStatement = `INSERT INTO ${this.tableName} (id, email, password, last_login) VALUES ($1, $2, $3, $4);`;
     const userPrimitives = user.toPrimitives();
     const { id, email, password, lastLogin } = userPrimitives;
     await this.connection.query(sqlStatement, [id, email, password, lastLogin]);
@@ -92,6 +103,32 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
   async checkDoesNotExistAndCreate(
     user: UserEntity,
   ): Promise<Either<void, Application.Repo.Errors.Conflict>> {
-    throw new Error('Method not implemented.');
+    // note: we don't try/catch this because if connecting throws an exception
+    // we don't need to dispose of the client (it will be undefined)
+    const client = await this.connection.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      const userExistsQuery = `SELECT * FROM ${this.tableName} WHERE email = $1`;
+      const res = await client.query(userExistsQuery, [user.email.email]);
+      if (res.rows.length > 0) {
+        throw new Error('User already exists');
+      }
+
+      const insertUserText = `INSERT INTO ${this.tableName} (id, email, password, last_login) VALUES ($1, $2, $3, $4);`;
+
+      const { id, email, password, lastLogin } = user.toPrimitives();
+      const insertUserValues = [id, email, password, lastLogin];
+      await this.connection.query(insertUserText, insertUserValues);
+      await client.query('COMMIT');
+      return ok();
+    } catch (e) {
+      await client.query('ROLLBACK');
+      console.log('Error in transaction', e);
+      return fail(new Application.Repo.Errors.Conflict(user.email.email));
+    } finally {
+      client.release();
+    }
   }
 }

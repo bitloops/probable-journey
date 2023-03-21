@@ -1,18 +1,16 @@
-export type TUserEmailReadModelSnapshot = {
+export type TUserReadModelSnapshot = {
   userId: string;
   email: string;
 };
 
-export class UserEmailReadModel {
+export class UserReadModel {
   constructor(public readonly userId: string, public readonly email: string) {}
 
-  static fromPrimitives(
-    primitives: TUserEmailReadModelSnapshot,
-  ): UserEmailReadModel {
-    return new UserEmailReadModel(primitives.userId, primitives.email);
+  static fromPrimitives(primitives: TUserReadModelSnapshot): UserReadModel {
+    return new UserReadModel(primitives.userId, primitives.email);
   }
 
-  toPrimitives(): TUserEmailReadModelSnapshot {
+  toPrimitives(): TUserReadModelSnapshot {
     return {
       userId: this.userId,
       email: this.email,

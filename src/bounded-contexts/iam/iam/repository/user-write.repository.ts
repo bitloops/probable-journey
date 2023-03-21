@@ -140,7 +140,7 @@ export class UserWriteRepository implements UserWriteRepoPort {
       session.endSession();
     }
 
-    // this.domainEventBus.publish(user.domainEvents);
+    this.domainEventBus.publish(user.domainEvents);
     return ok();
   }
 }

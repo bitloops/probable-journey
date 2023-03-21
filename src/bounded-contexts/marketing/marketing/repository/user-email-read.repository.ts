@@ -3,7 +3,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
 import { UserEmailReadRepoPort } from '@src/lib/bounded-contexts/marketing/marketing/ports/user-email-read.repo-port';
-import { UserEmailReadModel } from '@src/lib/bounded-contexts/marketing/marketing/domain/read-models/user-email.read-model';
+import { UserReadModel } from '@src/lib/bounded-contexts/marketing/marketing/domain/read-models/user-email.read-model';
 
 const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'marketing';
@@ -24,7 +24,7 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
   async getUserEmail(
     userid: Domain.UUIDv4,
     ctx?: any,
-  ): Promise<UserEmailReadModel | null> {
+  ): Promise<UserReadModel | null> {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -45,21 +45,21 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
     }
 
     const { _id, ...todo } = result as any;
-    return UserEmailReadModel.fromPrimitives({
+    return UserReadModel.fromPrimitives({
       ...todo,
       id: _id.toString(),
     });
   }
 
-  async getById(id: string): Promise<UserEmailReadModel | null> {
+  async getById(id: string): Promise<UserReadModel | null> {
     throw new Error('Method not implemented.');
   }
 
-  async getAll(): Promise<UserEmailReadModel[]> {
+  async getAll(): Promise<UserReadModel[]> {
     throw new Error('Method not implemented.');
   }
 
-  async save(userEmailReadModel: UserEmailReadModel, ctx?: any): Promise<void> {
+  async save(userEmailReadModel: UserReadModel, ctx?: any): Promise<void> {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -71,6 +71,14 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
     if (userEmail.userId !== jwtPayload.userId) {
       throw new Error('Invalid userId');
     }
+    await this.collection.insertOne({
+      _id: userEmail.userId as any,
+      ...userEmail,
+    });
+  }
+
+  async create(userReadModel: UserReadModel): Promise<void> {
+    const userEmail = userReadModel.toPrimitives();
     await this.collection.insertOne({
       _id: userEmail.userId as any,
       ...userEmail,

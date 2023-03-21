@@ -44,6 +44,7 @@
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "google-protobuf": "^3.21.2",
+    "class-validator": "^0.14.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.1",
     "nats": "^2.13.1",

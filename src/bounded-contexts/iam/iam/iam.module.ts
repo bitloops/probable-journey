@@ -26,13 +26,16 @@ const RepoProviders = [
       inject: [...RepoProviders],
       imports: [
         MongoModule,
-        PostgresModule.forRoot({
-          database: process.env.PG_IAM_DATABASE ?? 'iam',
-          host: process.env.PG_IAM_HOST ?? 'localhost',
-          port: process.env.PG_IAM_PORT ? +process.env.PG_IAM_PORT : 5432,
-          // user && password
-          max: 20,
-        }),
+        PostgresModule.forFeature(
+          // `DROP TABLE IF EXISTS users;`,
+          `CREATE TABLE IF NOT EXISTS users (
+            "id" SERIAL,
+            "email" VARCHAR(100) NOT NULL,
+            "password" VARCHAR(100) NOT NULL,
+            "lastLogin" TIMESTAMP,
+            PRIMARY KEY ("id")
+          );`,
+        ),
       ],
     }),
     JetstreamModule.forFeature({

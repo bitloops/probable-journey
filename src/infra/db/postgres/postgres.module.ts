@@ -1,5 +1,6 @@
-import { Module, DynamicModule } from '@nestjs/common';
+import { Module, DynamicModule, Inject } from '@nestjs/common';
 import { Pool, PoolConfig } from 'pg';
+import { PostgresCoreModule } from './postgres-core.module';
 
 export const constants = {
   pg_connection: 'POSTGRES_DB_CONNECTION',
@@ -7,15 +8,18 @@ export const constants = {
 
 @Module({})
 export class PostgresModule {
+  constructor(@Inject(constants.pg_connection) private pool: Pool) {}
   static forRoot(options: PoolConfig): DynamicModule {
-    const poolProvider = {
-      provide: constants.pg_connection,
-      useValue: new Pool(options),
-    };
     return {
       module: PostgresModule,
-      providers: [poolProvider],
-      exports: [poolProvider],
+      imports: [PostgresCoreModule.forRoot(options)],
     };
+  }
+
+  static forFeature(sqlStatement: string): DynamicModule {
+    return PostgresCoreModule.forFeature(sqlStatement);
+    // return {
+    //   module: PostgresModule,
+    // };
   }
 }

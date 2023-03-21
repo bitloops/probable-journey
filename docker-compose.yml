@@ -56,8 +56,8 @@ services:
     image: postgres:latest
     environment:
       POSTGRES_PASSWORD: postgres
-      # POSTGRES_DB: yourdbname
-      # POSTGRES_USER: yourusername
+      POSTGRES_DB: iam
+      POSTGRES_USER: user
     ports:
       - '5432:5432'
     volumes:

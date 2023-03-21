@@ -35,8 +35,8 @@ export class NatsPubSubCommandBus implements PubSubCommandBus {
     this.nc.publish(topic, jsonCodec.encode(command));
   }
 
-  async request(command: any): Promise<any> {
-    const boundedContext = command.boundedContext;
+  async request(command: Application.Command): Promise<any> {
+    const boundedContext = command.metadata.toContextId;
     const topic = `${boundedContext}.${command.constructor.name}`;
     console.log(
       'Publishing in server:',

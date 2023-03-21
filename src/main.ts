@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -6,6 +7,7 @@ import {
 import { GrpcOptions, Transport } from '@nestjs/microservices';
 
 import { AppModule } from './app.module';
+import { ApiModule } from './api/api.module';
 
 const HTTP_PORT = 3000;
 const HTTP_IP = '0.0.0.0';
@@ -26,19 +28,20 @@ const grpcMicroserviceOptions: GrpcOptions = {
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
+    ApiModule,
     new FastifyAdapter({
       logger: true,
     }),
     { abortOnError: false },
   );
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(HTTP_PORT, HTTP_IP, () => {
     console.log(`HTTP server is listening on ${HTTP_IP}:${HTTP_PORT}`);
   });
 
   // Initialize the gRPC server
   const grpcApp = await NestFactory.createMicroservice(
-    AppModule,
+    ApiModule,
     grpcMicroserviceOptions,
   );
 
@@ -46,5 +49,7 @@ async function bootstrap() {
   grpcApp.listen().then(() => {
     console.log(`gRPC server is listening on ${GRPC_IP}:${GRPC_PORT}`);
   });
+
+  await NestFactory.createMicroservice(AppModule);
 }
 bootstrap();

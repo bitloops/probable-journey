@@ -1,5 +1,4 @@
 import { Module, Provider } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
 import { StreamingCommandHandlers } from './application/command-handlers';
 import { EventHandlers } from './application/event-handlers';
 // import { QueryHandlers } from './application/query-handlers';
@@ -10,7 +9,7 @@ export class MarketingModule {
     const InjectedProviders = options.inject || [];
     return {
       module: MarketingModule,
-      imports: [CqrsModule, ...options.imports],
+      imports: [...options.imports],
       providers: [
         ...StreamingCommandHandlers,
         ...EventHandlers,

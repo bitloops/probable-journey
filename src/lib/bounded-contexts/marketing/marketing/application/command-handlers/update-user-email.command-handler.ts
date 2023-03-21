@@ -1,6 +1,5 @@
 import { Application, ok, Either, Domain } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
-import { CommandHandler } from '@nestjs/cqrs';
 import { UpdateUserEmailCommand } from '../../commands/update-user-email.command';
 import { UserEmailReadModel } from '../../domain/read-models/user-email.read-model';
 import {
@@ -10,7 +9,6 @@ import {
 
 type UpdateUserEmailCommandHandlerResponse = Either<void, never>;
 
-@CommandHandler(UpdateUserEmailCommand)
 export class UpdateUserEmailCommandHandler
   implements
     Application.ICommandHandler<

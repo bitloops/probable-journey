@@ -1,5 +1,4 @@
 import { Application, Either, ok } from '@bitloops/bl-boilerplate-core';
-import { CommandHandler } from '@nestjs/cqrs';
 import { SendEmailCommand } from '../../commands/send-email.command';
 import { Inject } from '@nestjs/common';
 import { EmailServicePort } from '../../ports/email-service-port';
@@ -7,7 +6,6 @@ import { EmailServicePortToken } from '../../constants';
 
 type SendEmailCommandHandlerResponse = Either<void, void>;
 
-@CommandHandler(SendEmailCommand)
 export class SendEmailCommandHandler
   implements
     Application.ICommandHandler<

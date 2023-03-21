@@ -1,6 +1,5 @@
 import { Application, ok, Either, Domain } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
-import { CommandHandler } from '@nestjs/cqrs';
 import { IncrementTodosCommand } from '../../commands/Increment-todos.command';
 import { CompletedTodosVO } from '../../domain/completed-todos.vo';
 import { DomainErrors } from '../../domain/errors';
@@ -16,7 +15,6 @@ type IncrementDepositsCommandHandlerResponse = Either<
   DomainErrors.InvalidTodosCounterError
 >;
 
-@CommandHandler(IncrementTodosCommand)
 export class IncrementTodosCommandHandler
   implements
     Application.IUseCase<

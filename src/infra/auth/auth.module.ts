@@ -4,7 +4,6 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
-import { jwtConstants } from './constants';
 import { UsersService } from './users/users.service';
 import { UserWriteRepoPortToken } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
 import { MongoModule } from '@src/infra/db/mongo/mongo.module';
@@ -28,7 +27,7 @@ export class JwtAuthModule {
     PassportModule,
     MongoModule,
     JwtAuthModule.register({
-      secret: jwtConstants.secret,
+      secret: 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B',
       signOptions: { expiresIn: '3600s' },
     }),
   ],

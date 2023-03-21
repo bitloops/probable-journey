@@ -85,7 +85,6 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
       throw new Error('Invalid userId');
     }
     const { id, ...todoInfo } = createdTodo;
-    console.log('id', id);
     await this.collection.insertOne({
       _id: id as any,
       id: id,

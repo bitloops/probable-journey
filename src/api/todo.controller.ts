@@ -45,10 +45,13 @@ export class TodoController {
   @Post()
   async addTodo(@Request() req, @Body() dto: AddTodoDto) {
     // const jwt = jwtwebtoken.sign({ userId: dto.userId }, this.JWT_SECRET);
-    const command = new AddTodoCommand(dto.title, {
-      jwt: this.getJWTToken(req),
-      userId: req.user.userId,
-    });
+    const command = new AddTodoCommand(
+      { title: dto.title },
+      {
+        jwt: this.getJWTToken(req),
+        userId: req.user.userId,
+      },
+    );
     const results = await this.commandBus.request(command);
     if (results.isOk) return results.data;
     else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);

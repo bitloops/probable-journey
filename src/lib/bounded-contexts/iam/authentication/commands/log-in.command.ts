@@ -4,12 +4,12 @@ export type TLogInCommand = {
 };
 export class LogInCommand extends Application.Command {
   public readonly userId: string;
-  public static readonly commandName = 'IAM.LOGIN_USER';
+  public metadata: Application.TCommandMetadata = {
+    toContextId: 'IAM',
+    createdTimestamp: Date.now(),
+  };
   constructor(loginCommand: LogInCommand) {
-    super(LogInCommand.commandName, 'IAM');
+    super();
     this.userId = loginCommand.userId;
-  }
-  static getCommandTopic(): string {
-    return super.getCommandTopic(LogInCommand.commandName, 'IAM');
   }
 }

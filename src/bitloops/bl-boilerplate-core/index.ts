@@ -10,7 +10,10 @@ import { IMQ as IMQImport } from './application/mq/IMQ';
 import { CommandHandler, UseCase, QueryHandler } from './application/UseCase';
 import { AggregateRoot } from './domain/AggregateRoot';
 import { applyRules as applyRulesImport } from './domain/applyRule';
-import { IPubSubCommandBus as IPubSubCommandBusImport } from './domain/commands/ICommandBus';
+import {
+  IPubSubCommandBus as IPubSubCommandBusImport,
+  IStreamCommandBus as IStreamCommandBusImport,
+} from './domain/commands/ICommandBus';
 import { DomainError } from './domain/DomainError';
 import { Entity as EntityImport } from './domain/Entity';
 import { IEventBus as IEventBusImport } from './domain/events/IEventBus';
@@ -24,7 +27,11 @@ import {
   ValueObjectProps,
 } from './domain/ValueObject';
 import { Either, fail, ok } from './Either';
-import { Command as CommandImport } from './domain/commands/Command';
+import {
+  Command as CommandImport,
+  CommandMetadata as CommandMetadataImport,
+} from './domain/commands/Command';
+import { TContext as TContextImport } from './domain/context';
 import { IDomainEvent as IDomainEventImport } from './domain/events/IDomainEvent';
 import { Query as QueryImport } from './domain/queries/Query';
 
@@ -79,7 +86,11 @@ namespace Application {
     IResponse
   >;
   export type IHandle = IHandleImport;
-  export class Command extends CommandImport {}
+
+  export abstract class Command extends CommandImport {}
+  export type TCommandMetadata = CommandMetadataImport;
+  export type TContext = TContextImport;
+
   export class Query extends QueryImport {}
 
   export namespace Repo {
@@ -117,6 +128,7 @@ namespace Infra {
   }
   export namespace CommandBus {
     export type IPubSubCommandBus = IPubSubCommandBusImport;
+    export type IStreamCommandBus = IStreamCommandBusImport;
   }
 
   export namespace QueryBus {

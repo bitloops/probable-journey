@@ -8,71 +8,72 @@ import { UserEmailReadModel } from '@src/lib/bounded-contexts/marketing/marketin
 const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'marketing';
 const MONGO_DB_TODO_COLLECTION =
-    process.env.MONGO_DB_TODO_COLLECTION || 'userEmail';
-
+  process.env.MONGO_DB_TODO_COLLECTION || 'userEmail';
 
 @Injectable()
 export class UserEmailReadRepository implements UserEmailReadRepoPort {
-    private collectionName = MONGO_DB_TODO_COLLECTION;
-    private dbName = MONGO_DB_DATABASE;
-    private collection: Collection;
-    constructor(@Inject('MONGO_DB_CONNECTION') private client: MongoClient) {
-        this.collection = this.client
-            .db(this.dbName)
-            .collection(this.collectionName);
+  private collectionName = MONGO_DB_TODO_COLLECTION;
+  private dbName = MONGO_DB_DATABASE;
+  private collection: Collection;
+  constructor(@Inject('MONGO_DB_CONNECTION') private client: MongoClient) {
+    this.collection = this.client
+      .db(this.dbName)
+      .collection(this.collectionName);
+  }
+
+  async getUserEmail(
+    userid: Domain.UUIDv4,
+    ctx?: any,
+  ): Promise<UserEmailReadModel | null> {
+    const { jwt } = ctx;
+    let jwtPayload: null | any = null;
+    try {
+      jwtPayload = jwtwebtoken.verify(jwt, JWT_SECRET);
+    } catch (err) {
+      throw new Error('Invalid JWT!');
+    }
+    const result = await this.collection.findOne({
+      _id: userid.toString() as any,
+    });
+
+    if (!result) {
+      return null;
     }
 
-    async getUserEmail(userid: Domain.UUIDv4, ctx?: any): Promise<UserEmailReadModel | null> {
-        const { jwt } = ctx;
-        let jwtPayload: null | any = null;
-        try {
-            jwtPayload = jwtwebtoken.verify(jwt, JWT_SECRET);
-        } catch (err) {
-            throw new Error('Invalid JWT!');
-        }
-        const result = await this.collection.findOne({
-            _id: userid.toString() as any,
-        });
-
-        if (!result) {
-            return null;
-        }
-
-        if (result.userId !== jwtPayload.userId) {
-            throw new Error('Invalid userId');
-        }
-
-        const { _id, ...todo } = result as any;
-        return UserEmailReadModel.fromPrimitives({
-            ...todo,
-            id: _id.toString(),
-        });
+    if (result.userId !== jwtPayload.userId) {
+      throw new Error('Invalid userId');
     }
 
-    async getById(id: string): Promise<UserEmailReadModel | null> {
-        throw new Error('Method not implemented.');
-    }
+    const { _id, ...todo } = result as any;
+    return UserEmailReadModel.fromPrimitives({
+      ...todo,
+      id: _id.toString(),
+    });
+  }
 
-    async getAll(): Promise<UserEmailReadModel[]> {
-        throw new Error('Method not implemented.');
-    }
+  async getById(id: string): Promise<UserEmailReadModel | null> {
+    throw new Error('Method not implemented.');
+  }
 
-    async save(userEmailReadModel: UserEmailReadModel, ctx?: any): Promise<void> {
-        const { jwt } = ctx;
-        let jwtPayload: null | any = null;
-        try {
-            jwtPayload = jwtwebtoken.verify(jwt, JWT_SECRET);
-        } catch (err) {
-            throw new Error('Invalid JWT!');
-        }
-        const userEmail = userEmailReadModel.toPrimitives();
-        if (userEmail.userId !== jwtPayload.userId) {
-            throw new Error('Invalid userId');
-        }
-        await this.collection.insertOne({
-            _id: userEmail.userId as any,
-            ...userEmail,
-        });
-    }
+  async getAll(): Promise<UserEmailReadModel[]> {
+    throw new Error('Method not implemented.');
+  }
 
+  async save(userEmailReadModel: UserEmailReadModel, ctx?: any): Promise<void> {
+    const { jwt } = ctx;
+    let jwtPayload: null | any = null;
+    try {
+      jwtPayload = jwtwebtoken.verify(jwt, JWT_SECRET);
+    } catch (err) {
+      throw new Error('Invalid JWT!');
+    }
+    const userEmail = userEmailReadModel.toPrimitives();
+    if (userEmail.userId !== jwtPayload.userId) {
+      throw new Error('Invalid userId');
+    }
+    await this.collection.insertOne({
+      _id: userEmail.userId as any,
+      ...userEmail,
+    });
+  }
 }

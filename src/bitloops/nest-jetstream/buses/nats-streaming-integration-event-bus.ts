@@ -29,41 +29,39 @@ export class NatsStreamingIntegrationEventBus
     this.js = this.nc.jetstream();
   }
 
-  static getStreamName(boundedContext: string) {
-    return `IntegrationEvents_${boundedContext}`;
-  }
+  async publish(
+    domainEventsInput:
+      | Infra.EventBus.IntegrationEvent<any>
+      | Infra.EventBus.IntegrationEvent<any>[],
+  ): Promise<void> {
+    let integrationEvents: Infra.EventBus.IntegrationEvent<any>[];
+    Array.isArray(domainEventsInput)
+      ? (integrationEvents = domainEventsInput)
+      : (integrationEvents = [domainEventsInput]);
+    integrationEvents.forEach(async (integrationEvent) => {
+      const options: Partial<JetStreamPublishOptions> = { msgID: '' };
 
-  static getDurableName(subject: string, handler: Application.IHandle) {
-    // Durable name cannot contain a dot
-    const subjectWithoutDots = subject.replace('.', '-');
-    return `${subjectWithoutDots}-${handler.constructor.name}`;
-  }
+      const message = jsonCodec.encode(integrationEvent);
+      const subject =
+        NatsStreamingIntegrationEventBus.getSubjectFromEventInstance(
+          integrationEvent,
+        );
+      console.log('publishing integration event to:', subject);
 
-  async publish(integrationEvent: any): Promise<void> {
-    const boundedContext = integrationEvent.boundedContext;
-    const stream =
-      NatsStreamingIntegrationEventBus.getStreamName(boundedContext);
-    const subject = `${stream}.${integrationEvent.constructor.name}`;
-    // TODO Replace msgID with instanceId
-    const options: Partial<JetStreamPublishOptions> = { msgID: '' };
-    // const pubAck =
-    try {
-      await this.js.publish(
-        subject,
-        jsonCodec.encode(integrationEvent),
-        options,
-      );
-    } catch (err) {
-      // NatsError: 503
-      console.error('Error publishing integration event:', err);
-    }
+      try {
+        await this.js.publish(subject, message, options);
+      } catch (err) {
+        // NatsError: 503
+        console.error('Error publishing integration event to:', subject, err);
+      }
 
-    // the jetstream returns an acknowledgement with the
-    // stream that captured the message, it's assigned sequence
-    // and whether the message is a duplicate.
-    // const stream = pubAck.stream;
-    // const seq = pubAck.seq;
-    // const duplicate = pubAck.duplicate;
+      // the jetstream returns an acknowledgement with the
+      // stream that captured the message, it's assigned sequence
+      // and whether the message is a duplicate.
+      // const stream = pubAck.stream;
+      // const seq = pubAck.seq;
+      // const duplicate = pubAck.duplicate;
+    });
   }
 
   async subscribe(subject: string, handler: Application.IHandle) {
@@ -110,5 +108,34 @@ export class NatsStreamingIntegrationEventBus
     eventHandler: EventHandler<T>,
   ): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  static getSubjectFromHandler(handler: Application.IHandle): string {
+    const event = handler.event;
+    const boundedContext = handler.boundedContext;
+    const stream =
+      NatsStreamingIntegrationEventBus.getStreamName(boundedContext);
+    const subject = `${stream}.${event.name}`;
+    return subject;
+  }
+
+  static getSubjectFromEventInstance(
+    integrationEvent: Infra.EventBus.IntegrationEvent<any>,
+  ): string {
+    const boundedContext = integrationEvent.metadata.fromContextId;
+    const stream =
+      NatsStreamingIntegrationEventBus.getStreamName(boundedContext);
+    const subject = `${stream}.${integrationEvent.constructor.name}`;
+    return subject;
+  }
+
+  static getStreamName(boundedContext: string) {
+    return `IntegrationEvents_${boundedContext}`;
+  }
+
+  static getDurableName(subject: string, handler: Application.IHandle) {
+    // Durable name cannot contain a dot
+    const subjectWithoutDots = subject.replace('.', '-');
+    return `${subjectWithoutDots}-${handler.constructor.name}`;
   }
 }

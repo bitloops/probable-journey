@@ -11,7 +11,7 @@ export class EmailNotFoundIntegrationErrorEventHandler
   }
 
   get boundedContext() {
-    return 'Marketing';
+    return 'IAM';
   }
 
   public async handle(

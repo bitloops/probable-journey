@@ -8,7 +8,6 @@ import { Injectable, Inject } from '@nestjs/common';
 import * as jwtwebtoken from 'jsonwebtoken';
 import { UserWriteRepoPort } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
 import { UserEntity } from '@src/lib/bounded-contexts/iam/authentication/domain/UserEntity';
-import { TContext } from '@src/lib/bounded-contexts/todo/todo/types';
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses';
 import { constants } from '@src/infra/db/postgres/postgres.module';
 import { EmailVO } from '@src/lib/bounded-contexts/iam/authentication/domain/EmailVO';
@@ -40,7 +39,10 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
     await this.connection.query(sqlStatement, [aggregateRootId.toString()]);
   }
 
-  async getById(id: Domain.UUIDv4, ctx: TContext): Promise<UserEntity | null> {
+  async getById(
+    id: Domain.UUIDv4,
+    ctx: Application.TContext,
+  ): Promise<UserEntity | null> {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {

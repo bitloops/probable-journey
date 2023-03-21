@@ -17,12 +17,9 @@
  *
  *  For further information you can contact legal(at)bitloops.com.
  */
-import { ICommand } from './ICommand';
 import { GenericMessageHandler } from '../messages/IMessageBus';
 // import { TErrors } from '../../infra/command-bus/externalCommandBus';
 import { CommandHandler } from '../../application/UseCase';
-
-export type RegisterHandler<T extends ICommand> = GenericMessageHandler<T>;
 
 // export interface IPubSubCommandBus {
 //   register<T extends ICommand>(
@@ -33,6 +30,7 @@ export type RegisterHandler<T extends ICommand> = GenericMessageHandler<T>;
 //   send(command: ICommand): Promise<void>;
 //   request<T = any>(command: ICommand, errorTypes?: TErrors): Promise<T>;
 // }
+import { Command } from './Command';
 
 export interface IPubSubCommandBus {
   publish(command: any): Promise<void>;
@@ -41,4 +39,9 @@ export interface IPubSubCommandBus {
     subject: string,
     handler: CommandHandler<any, any>,
   ): Promise<void>;
+}
+
+export interface IStreamCommandBus {
+  publish(command: Command): Promise<void>;
+  subscribe(subject: string, handler: CommandHandler<any, any>): Promise<void>;
 }

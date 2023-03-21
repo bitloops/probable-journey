@@ -7,8 +7,9 @@ import { UserWriteRepoPortToken } from '@src/lib/bounded-contexts/iam/authentica
 import { UserWriteRepository } from './repository/user-write.repository';
 import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/iam/authentication/application/command-handlers';
 import { NatsStreamingIntegrationEventBus } from '@src/bitloops/nest-jetstream/buses/nats-streaming-integration-event-bus';
-import { BUSES_TOKENS, JetstreamModule } from '@src/bitloops/nest-jetstream';
+import { JetstreamModule } from '@src/bitloops/nest-jetstream';
 import { StreamingDomainEventHandlers } from '@src/lib/bounded-contexts/iam/authentication/application/event-handlers';
+import { StreamingIntegrationEventBusToken } from '@src/lib/bounded-contexts/iam/authentication/constants';
 
 const RepoProviders = [
   {
@@ -16,7 +17,7 @@ const RepoProviders = [
     useClass: UserWriteRepository,
   },
   {
-    provide: BUSES_TOKENS.STREAMING_INTEGRATION_EVENT_BUS,
+    provide: StreamingIntegrationEventBusToken,
     useClass: NatsStreamingIntegrationEventBus,
   },
 ];

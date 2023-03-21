@@ -1,10 +1,9 @@
-import { Domain, Infra } from '@bitloops/bl-boilerplate-core';
+import { Application, Domain, Infra } from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
 import { TodoWriteRepoPort } from 'src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 import { TodoEntity } from 'src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
-import { TContext } from '@src/lib/bounded-contexts/todo/todo/types';
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 
 const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
@@ -29,7 +28,10 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
       .collection(this.collectionName);
   }
 
-  async getById(id: Domain.UUIDv4, ctx: TContext): Promise<TodoEntity | null> {
+  async getById(
+    id: Domain.UUIDv4,
+    ctx: Application.TContext,
+  ): Promise<TodoEntity | null> {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -72,7 +74,7 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
     throw new Error('Method not implemented.');
   }
 
-  async save(todo: TodoEntity, ctx: TContext): Promise<void> {
+  async save(todo: TodoEntity, ctx: Application.TContext): Promise<void> {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {

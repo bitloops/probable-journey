@@ -6,14 +6,11 @@ export type TModifyTodoTitleCommand = {
 export class ModifyTodoTitleCommand extends Application.Command {
   public readonly id: string;
   public readonly title: string;
+  metadata: Application.TCommandMetadata;
 
-  public static readonly commandName = 'Todo.MODIFY_TODO_TITLE';
   constructor(modifyTitleTodo: TModifyTodoTitleCommand) {
-    super(ModifyTodoTitleCommand.commandName, 'Todo');
+    super();
     this.id = modifyTitleTodo.id;
     this.title = modifyTitleTodo.title;
-  }
-  static getCommandTopic(): string {
-    return super.getCommandTopic(ModifyTodoTitleCommand.commandName, 'Todo');
   }
 }

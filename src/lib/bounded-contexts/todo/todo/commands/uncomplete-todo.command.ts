@@ -1,15 +1,21 @@
 import { Application } from '@bitloops/bl-boilerplate-core';
+
 export type TUncompleteTodoCommand = {
   id: string;
 };
+
 export class UncompleteTodoCommand extends Application.Command {
-  public readonly id: string;
-  public static readonly commandName = 'Todo.UNCOMPLETE_TODO';
-  constructor(uncompleteTodo: TUncompleteTodoCommand) {
-    super(UncompleteTodoCommand.commandName, 'Todo');
-    this.id = uncompleteTodo.id;
-  }
-  static getCommandTopic(): string {
-    return super.getCommandTopic(UncompleteTodoCommand.commandName, 'Todo');
+  public readonly metadata: Application.TCommandMetadata = {
+    toContextId: 'Todo',
+    createdTimestamp: Date.now(),
+  };
+  public id: string;
+
+  constructor(
+    props: TUncompleteTodoCommand,
+    public readonly ctx: Application.TContext,
+  ) {
+    super();
+    this.id = props.id;
   }
 }

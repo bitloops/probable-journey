@@ -12,7 +12,7 @@ export class TodoCompletedIntegrationEventHandler
   }
 
   get boundedContext() {
-    return 'Marketing';
+    return 'IAM';
   }
 
   public async handle(event: TodoCompletedIntegrationEvent): Promise<void> {

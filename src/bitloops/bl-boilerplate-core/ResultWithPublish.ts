@@ -1,4 +1,4 @@
-import { CommandMetadata } from './domain/commands/ICommand';
+import { CommandMetadata } from './domain/commands/Command';
 import { QueryMetadata } from './domain/queries/IQuery';
 import { Fail, Ok, Either } from './Either';
 

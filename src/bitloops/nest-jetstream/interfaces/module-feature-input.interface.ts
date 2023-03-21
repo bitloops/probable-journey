@@ -4,4 +4,5 @@ export interface JetstreamModuleFeatureConfig {
   pubSubQueryHandlers?: any[];
   streamingDomainEventHandlers?: any[];
   streamingIntegrationEventHandlers?: any[];
+  streamingCommandHandlers?: any[];
 }

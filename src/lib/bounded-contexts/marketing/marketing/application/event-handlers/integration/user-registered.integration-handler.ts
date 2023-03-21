@@ -1,18 +1,23 @@
+import { Inject } from '@nestjs/common';
 import { Infra, Application } from '@src/bitloops/bl-boilerplate-core';
 import { UserRegisteredIntegrationEvent } from '@src/lib/bounded-contexts/iam/authentication/contracts/integration-events/user-registered.integration-event';
 import { UpdateUserEmailCommand } from '../../../commands/update-user-email.command';
+import { StreamingCommandBusToken } from '../../../constants';
 
 export class UserRegisteredIntegrationEventHandler
   implements Application.IHandle
 {
-  constructor(private commandBus: Infra.CommandBus.IPubSubCommandBus) {}
+  constructor(
+    @Inject(StreamingCommandBusToken)
+    private commandBus: Infra.CommandBus.IPubSubCommandBus,
+  ) {}
 
   get event() {
     return UserRegisteredIntegrationEvent;
   }
 
   get boundedContext() {
-    return 'Marketing';
+    return 'IAM';
   }
 
   public async handle(event: UserRegisteredIntegrationEvent): Promise<void> {

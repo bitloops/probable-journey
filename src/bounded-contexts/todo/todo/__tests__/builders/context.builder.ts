@@ -1,4 +1,4 @@
-import { TContext } from '@src/lib/bounded-contexts/todo/todo/types';
+import { Application } from '@src/bitloops/bl-boilerplate-core';
 
 export class ContextBuilder {
   private userId: string;
@@ -14,8 +14,8 @@ export class ContextBuilder {
     return this;
   }
 
-  build(): TContext {
-    const context: TContext = {
+  build(): Application.TContext {
+    const context: Application.TContext = {
       userId: this.userId,
       jwt: this.jwt,
     };

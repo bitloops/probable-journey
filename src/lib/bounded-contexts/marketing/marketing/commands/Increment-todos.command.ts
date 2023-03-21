@@ -1,19 +1,21 @@
 import { Application } from '@bitloops/bl-boilerplate-core';
-import { IncrementTodosDTO } from '../dtos/increment-todos.dto';
 
+export type TIncrementTodosCommand = {
+  userId: string;
+};
 
 export class IncrementTodosCommand extends Application.Command {
+  public readonly metadata: Application.TCommandMetadata = {
+    toContextId: 'Marketing',
+    createdTimestamp: Date.now(),
+  };
   public userId: string;
 
-  // Set static name so we can refer to them easily
-  public static readonly commandName = 'Marketing.INCREMENT_TODOS';
-
-  constructor(incrementTodosDTO: IncrementTodosDTO) {
-    super(IncrementTodosCommand.commandName, 'Marketing');
-    this.userId = incrementTodosDTO.userId;
-  }
-
-  static getCommandTopic(): string {
-    return super.getCommandTopic(IncrementTodosCommand.commandName, 'Marketing');
+  constructor(
+    props: TIncrementTodosCommand,
+    public readonly ctx?: Application.TContext,
+  ) {
+    super();
+    this.userId = props.userId;
   }
 }

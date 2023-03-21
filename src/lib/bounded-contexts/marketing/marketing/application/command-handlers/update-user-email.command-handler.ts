@@ -11,7 +11,7 @@ import {
 type UpdateUserEmailCommandHandlerResponse = Either<void, never>;
 
 @CommandHandler(UpdateUserEmailCommand)
-export class IncrementTodosCommandHandler
+export class UpdateUserEmailCommandHandler
   implements
     Application.ICommandHandler<
       UpdateUserEmailCommand,

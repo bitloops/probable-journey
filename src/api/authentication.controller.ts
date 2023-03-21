@@ -59,7 +59,10 @@ export class AuthController {
   @Post('register')
   async register(@Body() body: RegisterDTO) {
     const hashedPassword = await this.hashPassword(body.password);
-    const command = new RegisterCommand(body.email, hashedPassword);
+    const command = new RegisterCommand({
+      email: body.email,
+      password: hashedPassword,
+    });
     const results = await this.commandBus.request(command);
     if (results.isOk) return results.data;
     else {

@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -32,6 +33,7 @@ async function bootstrap() {
     }),
     { abortOnError: false },
   );
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(HTTP_PORT, HTTP_IP, () => {
     console.log(`HTTP server is listening on ${HTTP_IP}:${HTTP_PORT}`);
   });

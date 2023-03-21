@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
 import { ApiModule } from './api/api.module';
 import { TodoModule } from './bounded-contexts/todo/todo/todo.module';
 import { AuthModule } from './infra/auth/auth.module';
@@ -19,16 +17,6 @@ import { PostgresModule } from './infra/db/postgres/postgres.module';
     }),
     JetstreamModule.forRoot({}),
     MongooseModule.forRoot('mongodb://localhost/todo'),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'root',
-      database: 'test',
-      synchronize: true,
-      autoLoadEntities: true,
-    }),
     PostgresModule.forRoot({
       database: process.env.PG_IAM_DATABASE ?? 'iam',
       host: process.env.PG_IAM_HOST ?? 'localhost',
@@ -46,6 +34,4 @@ import { PostgresModule } from './infra/db/postgres/postgres.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {
-  constructor(private dataSource: DataSource) {}
-}
+export class AppModule {}

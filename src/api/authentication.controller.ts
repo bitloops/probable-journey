@@ -21,6 +21,7 @@ import { JwtAuthGuard } from '@src/infra/auth/jwt-auth.guard';
 import { LocalAuthGuard } from '@src/infra/auth/local-auth.guard';
 import { AuthService } from '@src/infra/auth/auth.service';
 import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { DomainErrors } from '@src/lib/bounded-contexts/iam/authentication/domain/errors';
 
 @Controller('auth')
 export class AuthController {
@@ -65,6 +66,11 @@ export class AuthController {
       switch (results.error.errorId) {
         case Application.Repo.Errors.Conflict.errorId:
           throw new HttpException(results.error.message, HttpStatus.CONFLICT);
+        case DomainErrors.InvalidEmailDomainError.errorId:
+          throw new HttpException(
+            results.error.message,
+            HttpStatus.BAD_REQUEST,
+          );
         default:
           throw new HttpException(
             'Server error',

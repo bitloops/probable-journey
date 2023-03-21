@@ -1,6 +1,6 @@
 import { Infra, Application } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
-import { StreamingIntegrationEventBusToken } from '../../constants';
+import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream';
 import { UserUpdatedEmailIntegrationEvent } from '../../contracts/integration-events/user-updated-email.integration-event';
 import { UserUpdatedEmailDomainEvent } from '../../domain/events/user-updated-email.event';
 
@@ -8,7 +8,7 @@ export class UserUpdatedEmailPublishIntegrationEventHandler
   implements Application.IHandle
 {
   constructor(
-    @Inject(StreamingIntegrationEventBusToken)
+    @Inject(BUSES_TOKENS.STREAMING_INTEGRATION_EVENT_BUS)
     private eventBus: Infra.EventBus.IEventBus,
   ) {}
 

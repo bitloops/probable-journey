@@ -50,10 +50,13 @@ export class TodoGrpcController {
   ): Promise<todo.AddTodoResponse> {
     // console.log('metadata', metadata);
     // console.log('call', call);
-    const command = new AddTodoCommand(data.title, {
-      jwt: authData.jwt,
-      userId: authData.user.id,
-    });
+    const command = new AddTodoCommand(
+      { title: data.title },
+      {
+        jwt: authData.jwt,
+        userId: authData.user.id,
+      },
+    );
     const results = await this.commandBus.request(command);
     if (results.isOk) {
       return new todo.AddTodoResponse({ id: results.data });

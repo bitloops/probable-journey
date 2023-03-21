@@ -31,7 +31,10 @@ import { Db, MongoClient } from 'mongodb';
       inject: ['MONGO_DB_CLIENT'],
       useFactory: async (mongoDbClient: null | MongoClient) => {
         try {
-          const client = new MongoClient('mongodb://localhost:27017');
+          // mongodb://localhost:27017
+          const client = new MongoClient(
+            'mongodb://localhost:30001/?directConnection=true&replicaSet=my-replica-set',
+          );
           const connection = await client.connect();
           console.log('*** After connect');
           return connection;

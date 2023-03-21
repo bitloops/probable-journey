@@ -1,24 +1,18 @@
-import {
-  Application,
-  Either,
-  fail,
-  ok,
-  Domain,
-} from '@bitloops/bl-boilerplate-core';
+import { Application, Either, fail, ok } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { RegisterCommand } from '../../commands/register.command';
 import { EmailVO } from '../../domain/EmailVO';
+import { DomainErrors } from '../../domain/errors';
 import { UserEntity } from '../../domain/UserEntity';
 import {
   UserWriteRepoPortToken,
   UserWriteRepoPort,
 } from '../../ports/UserWriteRepoPort';
-import { ApplicationErrors } from '../errors';
 
 type RegisterResponse = Either<
   void,
-  ApplicationErrors.UserNotFoundApplicationError
+  DomainErrors.InvalidEmailDomainError | Application.Repo.Errors.Conflict
 >;
 
 @CommandHandler(RegisterCommand)
@@ -55,7 +49,10 @@ export class RegisterHandler
       return fail(user.value);
     }
 
-    await this.userRepo.save(user.value);
+    const result = await this.userRepo.checkDoesNotExistAndCreate(user.value);
+    if (result.isFail()) {
+      return fail(result.value);
+    }
     return ok();
   }
 }

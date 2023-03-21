@@ -1,11 +1,24 @@
-import { Domain, Infra } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Domain,
+  Either,
+  Infra,
+  ok,
+  fail,
+} from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
-import { Collection, MongoClient } from 'mongodb';
+import {
+  Collection,
+  MongoClient,
+  TransactionOptions,
+  ClientSession,
+} from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
 import { UserWriteRepoPort } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
 import { UserEntity } from '@src/lib/bounded-contexts/iam/authentication/domain/UserEntity';
 import { TContext } from '@src/lib/bounded-contexts/todo/todo/types';
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses';
+import { EmailVO } from '@src/lib/bounded-contexts/iam/authentication/domain/EmailVO';
 
 const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'iam';
@@ -61,10 +74,18 @@ export class UserWriteRepository implements UserWriteRepoPort {
     });
   }
 
-  async getByEmail(email: string): Promise<UserEntity | null> {
-    const result = await this.collection.findOne({
-      email,
-    });
+  async getByEmail(
+    email: EmailVO,
+    session?: ClientSession,
+  ): Promise<UserEntity | null> {
+    const result = await this.collection.findOne(
+      {
+        email: email.email,
+      },
+      {
+        session,
+      },
+    );
 
     if (!result) {
       return null;
@@ -77,12 +98,47 @@ export class UserWriteRepository implements UserWriteRepoPort {
     });
   }
 
-  async save(user: UserEntity): Promise<void> {
+  async save(user: UserEntity, session?: ClientSession): Promise<void> {
     const createdUser = user.toPrimitives();
-    await this.collection.insertOne({
-      _id: createdUser.id as any,
-      ...createdUser,
-    });
-    this.domainEventBus.publish(user.domainEvents);
+    await this.collection.insertOne(
+      {
+        _id: createdUser.id as any,
+        ...createdUser,
+      },
+      {
+        session,
+      },
+    );
+  }
+
+  async checkDoesNotExistAndCreate(
+    user: UserEntity,
+  ): Promise<Either<void, Application.Repo.Errors.Conflict>> {
+    const session = this.client.startSession();
+    try {
+      // Lock write
+      const transactionOptions: TransactionOptions = {
+        readConcern: { level: 'snapshot' },
+        writeConcern: { w: 'majority' },
+      };
+      session.startTransaction(transactionOptions);
+
+      const alreadyExistedUser = await this.getByEmail(user.email, session);
+      if (alreadyExistedUser)
+        return fail(new Application.Repo.Errors.Conflict(user.email.email));
+
+      await this.save(user, session);
+
+      await session.commitTransaction();
+    } catch (e) {
+      console.log(e);
+      await session.abortTransaction();
+      //throw
+    } finally {
+      session.endSession();
+    }
+
+    // this.domainEventBus.publish(user.domainEvents);
+    return ok();
   }
 }

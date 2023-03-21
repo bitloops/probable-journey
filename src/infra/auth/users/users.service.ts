@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { EmailVO } from '@src/lib/bounded-contexts/iam/authentication/domain/EmailVO';
 import { UserEntity } from '@src/lib/bounded-contexts/iam/authentication/domain/UserEntity';
 import {
   UserWriteRepoPort,
@@ -13,7 +14,11 @@ export class UsersService {
   ) {}
 
   async findOne(email: string): Promise<UserEntity | null> {
-    const user = await this.userRepo.getByEmail(email);
+    const emailVO = EmailVO.create({ email });
+    if (emailVO.isFail()) {
+      return null;
+    }
+    const user = await this.userRepo.getByEmail(emailVO.value);
     return user;
   }
 }

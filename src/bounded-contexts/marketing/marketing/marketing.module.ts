@@ -10,6 +10,9 @@ import { NotificationTemplateReadRepository } from './repository/notification-te
 import { EmailServicePortToken } from '@src/lib/bounded-contexts/marketing/marketing/constants';
 import { MockEmailService } from './service';
 import { MongoModule } from '@src/infra/db/mongo/mongo.module';
+import { JetstreamModule } from '@src/bitloops/nest-jetstream/jetstream.module';
+import { StreamingIntegrationEventHandlers } from '@src/lib/bounded-contexts/marketing/marketing/application/event-handlers';
+
 const RepoProviders = [
   {
     provide: UserWriteRepoPortToken,
@@ -32,12 +35,14 @@ const RepoProviders = [
   imports: [
     LibMarketingModule.register({
       inject: [...RepoProviders],
-      imports: [
-        MongoModule
-      ],
+      imports: [MongoModule],
+    }),
+    JetstreamModule.forFeature({
+      moduleOfHandlers: MarketingModule,
+      streamingIntegrationEventHandlers: [...StreamingIntegrationEventHandlers],
     }),
   ],
   controllers: [],
   exports: [LibMarketingModule],
 })
-export class MarketingModule { }
+export class MarketingModule {}

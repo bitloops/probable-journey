@@ -68,12 +68,20 @@ export class NatsPubSubCommandBus implements PubSubCommandBus {
         for await (const m of sub) {
           const query = jsonCodec.decode(m.data);
           const reply = await handler.execute(query);
-          if (reply.isOk && m.reply) {
+          if (reply.isOk && reply.isOk() && m.reply) {
             this.nc.publish(
               m.reply,
               jsonCodec.encode({
                 isOk: true,
                 data: reply.value,
+              }),
+            );
+          } else if (reply.isFail && reply.isFail() && m.reply) {
+            this.nc.publish(
+              m.reply,
+              jsonCodec.encode({
+                isOk: false,
+                error: reply.value,
               }),
             );
           }

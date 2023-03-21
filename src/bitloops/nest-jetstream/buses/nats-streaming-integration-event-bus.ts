@@ -79,7 +79,10 @@ export class NatsStreamingIntegrationEventBus
     opts.deliverTo(createInbox());
 
     try {
-      console.log('Subscribing integration event to:', subject, handler);
+      console.log('---Subscribing integration event to:', {
+        subject,
+        durableName,
+      });
       // this.logger.log(`
       //   Subscribing ${subject}!
       // `);

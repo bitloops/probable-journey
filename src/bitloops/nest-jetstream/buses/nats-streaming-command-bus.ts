@@ -59,7 +59,7 @@ export class NatsStreamingCommandBus
     await this.jetStreamProvider.createStreamIfNotExists(stream, subject);
 
     try {
-      console.log('Subscribing command to:', subject);
+      console.log('---Subscribing command to:', { subject, durableName });
       // this.logger.log(`
       //   Subscribing ${subject}!
       // `);
@@ -68,9 +68,9 @@ export class NatsStreamingCommandBus
         // console.log('Starting domain event loop...');
         for await (const m of sub) {
           console.log('Received command::');
-          const commmand = jsonCodec.decode(m.data) as any;
+          const command = jsonCodec.decode(m.data) as any;
 
-          const reply = await handler.execute(commmand);
+          const reply = await handler.execute(command);
           m.ack();
 
           console.log(
@@ -81,9 +81,10 @@ export class NatsStreamingCommandBus
         }
         console.log('Exiting command loop...');
       })();
+      console.log('Subscribed to:', subject);
     } catch (err) {
-      console.log('Error subscribing to command:', err);
-      console.log({ subject });
+      console.log({ subject, durableName });
+      console.log('Error subscribing to streaming command:', err);
     }
   }
 

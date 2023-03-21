@@ -19,6 +19,10 @@ import {
   NatsStreamingCommandBus,
 } from './buses';
 import { Application } from '../bl-boilerplate-core';
+import {
+  HANDLERS_TOKENS,
+  SubscriptionsService,
+} from './jetstream.subscriptions.service';
 
 const pubSubCommandBus = {
   provide: BUSES_TOKENS.PUBSUB_COMMAND_BUS,
@@ -104,110 +108,45 @@ export class JetstreamCoreModule {
       streamingIntegrationEventHandlers = [];
     if (!streamingCommandHandlers) streamingCommandHandlers = [];
 
-    const PubSubCommandHandlersSubscriptions: Provider<any>[] = [
+    const handlers: Provider<any>[] = [
       {
-        provide: 'PubSubCommandHandlers',
-        useFactory: (commandBus: PubSubCommandBus, ...commandHandlers) => {
-          commandHandlers.forEach((handler) => {
-            const command = handler.command;
-            const boundedContext = handler.boundedContext;
-            commandBus.pubSubSubscribe(
-              `${boundedContext}.${command?.name}`,
-              handler,
-            );
-          });
+        provide: HANDLERS_TOKENS.PUBSUB_COMMAND_HANDLERS,
+        useFactory: (...commandHandlers) => {
+          return commandHandlers;
         },
-        inject: [
-          { token: BUSES_TOKENS.PUBSUB_COMMAND_BUS, optional: false },
-          ...pubSubCommandHandlers,
-        ],
+        inject: [...pubSubCommandHandlers],
       },
-    ];
-    const PubSubQueryHandlersSubscriptions: Provider<any>[] = [
       {
-        provide: 'PubSubQueryHandlers',
-        useFactory: (queryBus: PubSubQueryBus, ...queryHandlers) => {
-          queryHandlers.forEach((handler) => {
-            const query = handler.query;
-            const boundedContext = handler.boundedContext;
-            queryBus.pubSubSubscribe(
-              `${boundedContext}.${query?.name}`,
-              handler,
-            );
-          });
+        provide: HANDLERS_TOKENS.PUBSUB_QUERY_HANDLERS,
+        useFactory: (...queryHandlers) => {
+          return queryHandlers;
         },
-        inject: [
-          { token: BUSES_TOKENS.PUBSUB_QUERY_BYS, optional: false },
-          ...pubSubQueryHandlers,
-        ],
+        inject: [...pubSubQueryHandlers],
       },
-    ];
-    const StreamingDomainEventHandlersSubscriptions: Provider<any>[] = [
       {
-        provide: 'StreamingDomainEventHandlers',
-        useFactory: (
-          eventBus: NatsStreamingDomainEventBus,
-          ...domainEventHandlers: Application.IHandle[]
-        ) => {
-          domainEventHandlers.forEach((handler) => {
-            const event = handler.event;
-            const boundedContext = handler.boundedContext;
-            const stream =
-              NatsStreamingDomainEventBus.getStreamName(boundedContext);
-            const subject = `${stream}.${event.name}`;
-            eventBus.subscribe(subject, handler);
-          });
-          return;
+        provide: HANDLERS_TOKENS.STREAMING_DOMAIN_EVENT_HANDLERS,
+        useFactory: (...domainEventHandlers: Application.IHandle[]) => {
+          return domainEventHandlers;
         },
-        inject: [
-          { token: BUSES_TOKENS.STREAMING_DOMAIN_EVENT_BUS, optional: false },
-          ...streamingDomainEventHandlers,
-        ],
+        inject: [...streamingDomainEventHandlers],
       },
-    ];
 
-    const StreamingIntegrationEventHandlersSubscriptions: Provider<any>[] = [
       {
-        provide: 'StreamingIntegrationEventHandlers',
-        useFactory: (
-          eventBus: NatsStreamingIntegrationEventBus,
-          ...integrationEventHandlers: Application.IHandle[]
-        ) => {
-          integrationEventHandlers.forEach((handler) => {
-            const subject =
-              NatsStreamingIntegrationEventBus.getSubjectFromHandler(handler);
-            eventBus.subscribe(subject, handler);
-          });
-          return;
+        provide: HANDLERS_TOKENS.STREAMING_INTEGRATION_EVENT_HANDLERS,
+        useFactory: (...integrationEventHandlers: Application.IHandle[]) => {
+          return integrationEventHandlers;
         },
-        inject: [
-          {
-            token: BUSES_TOKENS.STREAMING_INTEGRATION_EVENT_BUS,
-            optional: false,
-          },
-          ...streamingIntegrationEventHandlers,
-        ],
+        inject: [...streamingIntegrationEventHandlers],
       },
-    ];
 
-    const StreamingCommandHandlersSubscriptions: Provider<any>[] = [
       {
-        provide: 'StreamingCommandHandlers',
+        provide: HANDLERS_TOKENS.STREAMING_COMMAND_HANDLERS,
         useFactory: (
-          commandBus: NatsStreamingCommandBus,
           ...commandHandlers: Application.ICommandHandler<any, any>[]
         ) => {
-          commandHandlers.forEach((handler) => {
-            const subject =
-              NatsStreamingCommandBus.getSubjectFromHandler(handler);
-            commandBus.subscribe(subject, handler);
-          });
-          return;
+          return commandHandlers;
         },
-        inject: [
-          { token: BUSES_TOKENS.STREAMING_COMMAND_BUS, optional: false },
-          ...streamingCommandHandlers,
-        ],
+        inject: [...streamingCommandHandlers],
       },
     ];
 
@@ -221,21 +160,20 @@ export class JetstreamCoreModule {
             ...config,
           },
         },
-        ...PubSubCommandHandlersSubscriptions,
-        ...PubSubQueryHandlersSubscriptions,
-        ...StreamingDomainEventHandlersSubscriptions,
-        ...StreamingIntegrationEventHandlersSubscriptions,
-        ...StreamingCommandHandlersSubscriptions,
+        ...handlers,
         Jetstream,
         pubSubCommandBus,
         pubSubQueryBus,
         streamingDomainEventBus,
+        streamingCommandBus,
+        SubscriptionsService,
       ],
       exports: [
         Jetstream,
         pubSubCommandBus,
         pubSubQueryBus,
         streamingDomainEventBus,
+        streamingCommandBus,
       ],
     };
   }

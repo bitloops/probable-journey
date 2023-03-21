@@ -81,7 +81,7 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
     await this.jetStreamProvider.createStreamIfNotExists(stream, subject);
 
     try {
-      console.log('Subscribing domain event to:', subject);
+      console.log('---Subscribing domain event to:', { subject, durableName });
       // this.logger.log(`
       //   Subscribing ${subject}!
       // `);
@@ -104,8 +104,11 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
         console.log('Exiting domain event loop...');
       })();
     } catch (err) {
-      console.log('Error subscribing to domain event:', err);
-      console.log({ subject });
+      console.log(
+        'Error subscribing to domain event:',
+        { subject, durableName },
+        err,
+      );
     }
   }
 

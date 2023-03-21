@@ -1,6 +1,12 @@
 import { Controller, Inject, Injectable, UseGuards } from '@nestjs/common';
-import { RpcException, GrpcMethod } from '@nestjs/microservices';
+import {
+  RpcException,
+  GrpcMethod,
+  Payload,
+  ClientGrpc,
+} from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
+import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
 
 import { todo } from '../proto/todo';
 
@@ -14,7 +20,7 @@ import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 import { PubSubCommandBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-command-bus';
 import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
 import { JwtGrpcAuthGuard } from '@src/infra/auth/jwt-grpc-auth.guard';
-import { GetUser } from '@src/infra/auth/user.decorator';
+import { GetAuthData } from '@src/infra/auth/authdata.decorator';
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
 @Injectable()
@@ -30,33 +36,28 @@ export class TodoGrpcController {
     private configService: ConfigService,
   ) {
     this.JWT_SECRET = this.configService.get<string>('JWT_SECRET') || '';
-
     if (this.JWT_SECRET === '') {
-      throw new Error('JWT_SECRET is not defined!');
+      throw new Error('JWT_SECRET is not defined in env!');
     }
-  }
-
-  private getJWTToken(req: any): string {
-    const authHeader = req.headers.authorization;
-    if (authHeader) {
-      const token = authHeader.split('Bearer ')[1];
-      return token;
-    }
-    return '';
   }
 
   @GrpcMethod('TodoApp', 'AddTodo')
   async addTodo(
-    request: todo.AddTodoRequest,
-    @GetUser() user: any,
+    @Payload() data: todo.AddTodoRequest,
+    metadata: Metadata, // @TODO figure out how to get the metadata https://github.com/nestjs/nest/issues/4851
+    call: ServerUnaryCall<todo.AddTodoRequest, todo.AddTodoResponse>, // @TODO figure out how to get the call
+    @GetAuthData() authData: any,
   ): Promise<todo.AddTodoResponse> {
-    const command = new AddTodoCommand(request.title, {
-      jwt: user.token,
-      userId: user.userId,
+    // console.log('metadata', metadata);
+    // console.log('call', call);
+    const command = new AddTodoCommand(data.title, {
+      jwt: authData.jwt,
+      userId: authData.user.id,
     });
     const results = await this.commandBus.request(command);
-    if (results.isOk) return new todo.AddTodoResponse(results.data);
-    else {
+    if (results.isOk) {
+      return new todo.AddTodoResponse({ id: results.data });
+    } else {
       const error = results.error;
       console.error('Error while creating todo:', error?.message);
       throw new RpcException({

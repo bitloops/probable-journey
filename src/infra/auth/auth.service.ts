@@ -13,8 +13,6 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user: UserEntity | null = await this.usersService.findOne(email);
-
-    console.log('user', user, pass);
     if (user) {
       const passwordsMatch = await bcrypt.compare(pass, user.password);
       if (passwordsMatch) {

@@ -11,7 +11,7 @@ export class JwtGrpcAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const call = context.switchToRpc().getContext();
     const metadata = call.internalRepr;
-    const bearerToken = metadata['authorization'];
+    const bearerToken = metadata.get('authorization')[0].replace('Bearer ', '');
 
     if (!bearerToken) {
       throw new RpcException({
@@ -21,14 +21,39 @@ export class JwtGrpcAuthGuard implements CanActivate {
     }
 
     try {
-      const token = bearerToken.replace('Bearer ', '');
       const secret = this.configService.get('JWT_SECRET');
-      const decoded = jwt.verify(token, secret);
+      const payload = jwt.verify(bearerToken, secret);
+      // if the token is an object and has the property exp, then it's a valid token
+      if (payload === undefined) {
+        throw new RpcException({
+          code: 3,
+          message: 'JWT token is missing',
+        });
+      }
+      if (
+        payload === undefined ||
+        typeof payload !== 'object' ||
+        !payload.hasOwnProperty('exp')
+      ) {
+        throw new RpcException({
+          code: 3,
+          message: 'JWT token is invalid',
+        });
+      }
+      const decoded: jwt.JwtPayload = payload;
 
+      // check if the token is expired
+      if (decoded.exp && decoded.exp < Date.now() / 1000) {
+        throw new RpcException({
+          code: 16,
+          message: 'JWT token has expired',
+        });
+      }
       call.decodedToken = decoded;
+      call.jwt = bearerToken;
       return true;
     } catch (error) {
-      throw new RpcException({ code: 7, message: 'Invalid JWT token' });
+      throw new RpcException({ code: 3, message: 'Invalid JWT token' });
     }
   }
 }

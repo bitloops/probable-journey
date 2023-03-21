@@ -1,21 +1,19 @@
 import { Application, ok, Either, Domain } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
-import { CommandHandler } from '@nestjs/cqrs';
-import { UpdateUserEmailCommand } from '../../commands/update-user-email.command';
+import { CreateUserCommand } from '../../commands/create-user.command';
 import { UserReadModel } from '../../domain/read-models/user-email.read-model';
 import {
   UserEmailReadRepoPort,
   UserEmailReadRepoPortToken,
 } from '../../ports/user-email-read.repo-port';
 
-type UpdateUserEmailCommandHandlerResponse = Either<void, never>;
+type CreateUserCommandHandlerResponse = Either<void, never>;
 
-@CommandHandler(UpdateUserEmailCommand)
-export class UpdateUserEmailCommandHandler
+export class CreateUserCommandHandler
   implements
     Application.ICommandHandler<
-      UpdateUserEmailCommand,
-      Promise<UpdateUserEmailCommandHandlerResponse>
+      CreateUserCommand,
+      Promise<CreateUserCommandHandlerResponse>
     >
 {
   constructor(
@@ -24,7 +22,7 @@ export class UpdateUserEmailCommandHandler
   ) {}
 
   get command() {
-    return UpdateUserEmailCommand;
+    return CreateUserCommand;
   }
 
   get boundedContext(): string {
@@ -32,15 +30,15 @@ export class UpdateUserEmailCommandHandler
   }
 
   async execute(
-    command: UpdateUserEmailCommand,
-  ): Promise<UpdateUserEmailCommandHandlerResponse> {
+    command: CreateUserCommand,
+  ): Promise<CreateUserCommandHandlerResponse> {
     const requestUserId = new Domain.UUIDv4(command.userId);
     const userIdEmail = new UserReadModel(
       requestUserId.toString(),
       command.email,
     );
 
-    await this.userEmailRepo.save(userIdEmail);
+    await this.userEmailRepo.create(userIdEmail);
     return ok();
   }
 }

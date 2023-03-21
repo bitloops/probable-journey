@@ -38,7 +38,6 @@
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/platform-fastify": "^9.3.9",
-    "@nestjs/typeorm": "^9.0.1",
     "@types/passport-jwt": "^3.0.8",
     "@types/passport-local": "^1.0.35",
     "async-mutex": "^0.4.0",
@@ -47,15 +46,13 @@
     "google-protobuf": "^3.21.2",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.1",
-    "mysql2": "^3.2.0",
     "nats": "^2.13.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pg": "^8.10.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0",
-    "typeorm": "^0.3.12"
+    "rxjs": "^7.2.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

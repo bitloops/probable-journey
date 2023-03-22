@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { TodoWriteRepository } from './repository/todo-write.repository';
-import { Todo, TodoSchema } from './repository/schema/todo.schema';
 import { TodoReadRepository } from './repository/todo-read.repository';
 import { TodoModule as LibTodoModule } from 'src/lib/bounded-contexts/todo/todo/todo.module';
 import { TodoWriteRepoPortToken } from '@src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
@@ -35,7 +33,6 @@ const RepoProviders = [
   imports: [
     LibTodoModule.register({
       imports: [
-        MongooseModule.forFeature([{ name: Todo.name, schema: TodoSchema }]),
         MongoModule,
         JetstreamModule.forFeature({
           moduleOfHandlers: TodoModule,

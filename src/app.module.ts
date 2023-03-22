@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { TodoModule } from './bounded-contexts/todo/todo/todo.module';
 import { MarketingModule } from './bounded-contexts/marketing/marketing/marketing.module';
 import { IamModule } from './bounded-contexts/iam/iam/iam.module';
@@ -18,7 +17,6 @@ import { MongoModule } from './infra/db/mongo/mongo.module';
       load: [configuration, authConfiguration],
     }),
     JetstreamModule.forRoot({}),
-    MongooseModule.forRoot('mongodb://localhost/todo'),
     PostgresModule.forRoot({
       database: process.env.PG_IAM_DATABASE ?? 'iam',
       host: process.env.PG_IAM_HOST ?? 'localhost',
@@ -27,9 +25,9 @@ import { MongoModule } from './infra/db/mongo/mongo.module';
       password: process.env.PG_IAM_PASSWORD ?? 'postgres',
       max: 20,
     }),
-    MongoModule.forRoot(
-      'mongodb://localhost:30001/?directConnection=true&replicaSet=my-replica-set',
-    ),
+    MongoModule.forRoot({
+      url: 'mongodb://localhost:30001/?directConnection=true&replicaSet=my-replica-set',
+    }),
 
     TodoModule,
     MarketingModule,

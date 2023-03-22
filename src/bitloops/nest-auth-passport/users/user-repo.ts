@@ -1,13 +1,23 @@
-import { Application, Either, ok, fail } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Either,
+  ok,
+  fail,
+  Infra,
+} from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import { constants } from '@bitloops/postgres';
 import { UserRepoPort } from './user-repo.port';
+import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream';
+import { UserRegisteredIntegrationEvent } from './user-registered.integration-event';
 
 @Injectable()
 export class UserPostgresRepository implements UserRepoPort {
   private readonly tableName = 'users';
   constructor(
     @Inject(constants.pg_connection) private readonly connection: any,
+    @Inject(BUSES_TOKENS.STREAMING_INTEGRATION_EVENT_BUS)
+    private readonly integrationEventBus: Infra.EventBus.IEventBus,
   ) {}
 
   async getByEmail(email: string): Promise<User | null> {
@@ -47,6 +57,9 @@ export class UserPostgresRepository implements UserRepoPort {
       const insertUserValues = [id, email, password];
       await this.connection.query(insertUserText, insertUserValues);
       await client.query('COMMIT');
+
+      const event = new UserRegisteredIntegrationEvent({ userId: id!, email });
+      this.integrationEventBus.publish(event);
       return ok();
     } catch (e) {
       await client.query('ROLLBACK');

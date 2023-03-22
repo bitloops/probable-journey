@@ -9,6 +9,7 @@ import { GrpcOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 import { ApiModule } from './api/api.module';
 import config from './config/configuration';
+import { correlationId } from './bitloops/tracing/traces.middleware';
 
 // gRPC microservice configuration
 const grpcMicroserviceOptions: () => GrpcOptions = () => {
@@ -33,6 +34,7 @@ async function bootstrap() {
     }),
     { abortOnError: false },
   );
+  app.use(correlationId);
   const appConfig = config();
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(appConfig.http.port, appConfig.http.ip, () => {

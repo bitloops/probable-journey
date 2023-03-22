@@ -9,8 +9,6 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { RegisterCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/register.command';
 import { UpdateEmailCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/update-email.command';
 import { UpdateEmailDTO } from './dto/update-email.dto';
 import { RegisterDTO } from './dto/register.dto';
@@ -18,7 +16,6 @@ import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 import { PubSubCommandBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-command-bus';
 import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
 import { Application } from '@src/bitloops/bl-boilerplate-core';
-import { DomainErrors } from '@src/lib/bounded-contexts/iam/authentication/domain/errors';
 import {
   AuthService,
   JwtAuthGuard,
@@ -62,22 +59,18 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() body: RegisterDTO) {
-    const hashedPassword = await this.hashPassword(body.password);
-    const command = new RegisterCommand({
-      email: body.email,
-      password: hashedPassword,
-    });
-    const results = await this.commandBus.request(command);
-    if (results.isOk) return results.data;
+    const user = { email: body.email, password: body.password };
+    const result = await this.authService.register(user);
+    // const command = new RegisterCommand({
+    //   email: body.email,
+    //   password: hashedPassword,
+    // });
+    // const results = await this.commandBus.request(command);
+    if (result.isOk()) return result.value;
     else {
-      switch (results.error.errorId) {
-        case Application.Repo.Errors.Conflict.errorId:
-          throw new HttpException(results.error.message, HttpStatus.CONFLICT);
-        case DomainErrors.InvalidEmailDomainError.errorId:
-          throw new HttpException(
-            results.error.message,
-            HttpStatus.BAD_REQUEST,
-          );
+      switch (result.value.constructor) {
+        case Application.Repo.Errors.Conflict:
+          throw new HttpException(result.value, HttpStatus.CONFLICT);
         default:
           throw new HttpException(
             'Server error',
@@ -85,10 +78,6 @@ export class AuthController {
           );
       }
     }
-  }
-
-  private hashPassword(password: string) {
-    const saltOrRounds = 10;
-    return bcrypt.hash(password, saltOrRounds);
+    // this.domainEventBus.publish(aggregate.domainEvents);
   }
 }

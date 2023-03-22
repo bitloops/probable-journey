@@ -1,91 +1,59 @@
 import { Application, Either, ok, fail } from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
-import {
-  Collection,
-  MongoClient,
-  TransactionOptions,
-  ClientSession,
-} from 'mongodb';
+import { constants } from '@bitloops/postgres';
 import { UserRepoPort } from './user-repo.port';
 
-const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'iam';
-const MONGO_DB_TODO_COLLECTION =
-  process.env.MONGO_DB_TODO_COLLECTION || 'users';
-
 @Injectable()
-export class UserRepository implements UserRepoPort {
-  private collectionName = MONGO_DB_TODO_COLLECTION;
-  private dbName = MONGO_DB_DATABASE;
-  private collection: Collection;
-  constructor(@Inject('MONGO_DB_CONNECTION') private client: MongoClient) {
-    this.collection = this.client
-      .db(this.dbName)
-      .collection(this.collectionName);
-  }
+export class UserPostgresRepository implements UserRepoPort {
+  private readonly tableName = 'users';
+  constructor(
+    @Inject(constants.pg_connection) private readonly connection: any,
+  ) {}
 
-  async getByEmail(
-    email: string,
-    session?: ClientSession,
-  ): Promise<User | null> {
-    const result = await this.collection.findOne(
-      {
-        email: email,
-      },
-      {
-        session,
-      },
+  async getByEmail(email: string): Promise<User | null> {
+    const result = await this.connection.query(
+      `SELECT * FROM ${this.tableName} WHERE email = $1`,
+      [email],
     );
 
-    if (!result) {
+    if (!result.rows.length) {
       return null;
     }
 
-    const { _id, ...user } = result as any;
-    return {
-      ...user,
-      id: _id.toString(),
-    };
-  }
+    const user = result.rows[0];
 
-  private async save(user: User, session?: ClientSession): Promise<void> {
-    await this.collection.insertOne(
-      {
-        _id: user.id as any,
-        ...user,
-      },
-      {
-        session,
-      },
-    );
+    return user;
   }
 
   async checkDoesNotExistAndCreate(
     user: User,
   ): Promise<Either<void, Application.Repo.Errors.Conflict>> {
-    const session = this.client.startSession();
+    // note: we don't try/catch this because if connecting throws an exception
+    // we don't need to dispose of the client (it will be undefined)
+    const client = await this.connection.connect();
+
     try {
-      // Lock write
-      const transactionOptions: TransactionOptions = {
-        readConcern: { level: 'snapshot' },
-        writeConcern: { w: 'majority' },
-      };
-      session.startTransaction(transactionOptions);
+      await client.query('BEGIN');
 
-      const alreadyExistedUser = await this.getByEmail(user.email, session);
-      if (alreadyExistedUser)
-        return fail(new Application.Repo.Errors.Conflict(user.email));
+      const userExistsQuery = `SELECT * FROM ${this.tableName} WHERE email = $1`;
+      const res = await client.query(userExistsQuery, [user.email]);
+      if (res.rows.length > 0) {
+        throw new Error('User already exists');
+      }
 
-      await this.save(user, session);
+      const insertUserText = `INSERT INTO ${this.tableName} (id, email, password) VALUES ($1, $2, $3);`;
 
-      await session.commitTransaction();
+      const { id, email, password } = user;
+      const insertUserValues = [id, email, password];
+      await this.connection.query(insertUserText, insertUserValues);
+      await client.query('COMMIT');
+      return ok();
     } catch (e) {
-      console.log(e);
-      await session.abortTransaction();
-      //throw
+      await client.query('ROLLBACK');
+      console.log('Error in transaction', e);
+      return fail(new Application.Repo.Errors.Conflict(user.email));
     } finally {
-      session.endSession();
+      client.release();
     }
-
-    return ok();
   }
 }

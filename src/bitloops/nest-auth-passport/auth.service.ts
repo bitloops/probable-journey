@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { v4 as uuid } from 'uuid';
+import { Application, Either } from '../bl-boilerplate-core';
 import { UsersService } from './users/users.service';
 
 @Injectable()
@@ -30,5 +32,22 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async register(
+    user: User,
+  ): Promise<Either<void, Application.Repo.Errors.Conflict>> {
+    const hashedPassword = await this.hashPassword(user.password);
+    if (!user.id) user.id = uuid();
+    const userToBeCreated = {
+      ...user,
+      password: hashedPassword,
+    };
+    return this.usersService.create(userToBeCreated);
+  }
+
+  private hashPassword(password: string) {
+    const saltOrRounds = 10;
+    return bcrypt.hash(password, saltOrRounds);
   }
 }

@@ -5,7 +5,7 @@ import { LocalStrategy } from './local.strategy';
 import { UsersService } from './users/users.service';
 import { UserRepoPortToken } from './users/user-repo.port';
 import { JwtAuthModule } from './jwt/jwt.module';
-import { UserPostgresRepository } from './users/user-pg-repo';
+import { UserPostgresRepository } from './users/user-repo';
 import {
   PostgresModule,
   PostgresModuleAsyncOptions,

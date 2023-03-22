@@ -8,23 +8,21 @@ import { GrpcOptions, Transport } from '@nestjs/microservices';
 
 import { AppModule } from './app.module';
 import { ApiModule } from './api/api.module';
-import { ConfigService } from '@nestjs/config';
-
-const HTTP_PORT = 3000;
-const HTTP_IP = '0.0.0.0';
-const GRPC_PORT = 3001;
-const GRPC_IP = '0.0.0.0';
-const GRPC_PACKAGE_NAME = 'todo';
-const GRPC_PROTO_PATH = 'src/proto/todo.proto';
+import config from './config/configuration';
 
 // gRPC microservice configuration
-const grpcMicroserviceOptions: GrpcOptions = {
-  transport: Transport.GRPC,
-  options: {
-    url: `${GRPC_IP}:${GRPC_PORT}`,
-    package: GRPC_PACKAGE_NAME,
-    protoPath: GRPC_PROTO_PATH,
-  },
+const grpcMicroserviceOptions: () => GrpcOptions = () => {
+  const grpcConfig = config().grpc;
+  console.log('grpcConfig', grpcConfig);
+
+  return {
+    transport: Transport.GRPC,
+    options: {
+      url: `${grpcConfig.ip}:${grpcConfig.port}`,
+      package: grpcConfig.packageName,
+      protoPath: grpcConfig.protoPath,
+    },
+  };
 };
 
 async function bootstrap() {
@@ -35,21 +33,25 @@ async function bootstrap() {
     }),
     { abortOnError: false },
   );
-  const config = app.get(ConfigService);
+  const appConfig = config();
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(HTTP_PORT, HTTP_IP, () => {
-    console.log(`HTTP server is listening on ${HTTP_IP}:${config.get('port')}`);
+  await app.listen(appConfig.http.port, appConfig.http.ip, () => {
+    console.log(
+      `HTTP server is listening on ${appConfig.http.ip}:${appConfig.http.port}`,
+    );
   });
 
   // Initialize the gRPC server
   const grpcApp = await NestFactory.createMicroservice(
     ApiModule,
-    grpcMicroserviceOptions,
+    grpcMicroserviceOptions(),
   );
 
   // Start the gRPC server
   grpcApp.listen().then(() => {
-    console.log(`gRPC server is listening on ${GRPC_IP}:${GRPC_PORT}`);
+    console.log(
+      `gRPC server is listening on ${appConfig.grpc.ip}:${appConfig.grpc.port}`,
+    );
   });
 
   await NestFactory.createMicroservice(AppModule);

@@ -3,10 +3,13 @@ import { CanActivate } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
+import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 
 @Injectable()
 export class JwtGrpcAuthGuard implements CanActivate {
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService<AuthEnvironmentVariables, true>,
+  ) {}
 
   canActivate(context: ExecutionContext): boolean {
     const call = context.switchToRpc().getContext();
@@ -21,7 +24,7 @@ export class JwtGrpcAuthGuard implements CanActivate {
     }
 
     try {
-      const secret = this.configService.get('JWT_SECRET');
+      const secret = this.configService.get('jwtSecret', { infer: true });
       const payload = jwt.verify(bearerToken, secret);
       // if the token is an object and has the property exp, then it's a valid token
       if (payload === undefined) {

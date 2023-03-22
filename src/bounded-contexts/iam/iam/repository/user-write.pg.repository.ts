@@ -13,17 +13,21 @@ import { UserEntity } from '@src/lib/bounded-contexts/iam/authentication/domain/
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses';
 import { constants } from '@src/infra/db/postgres/postgres.module';
 import { EmailVO } from '@src/lib/bounded-contexts/iam/authentication/domain/EmailVO';
-
-const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
+import { ConfigService } from '@nestjs/config';
+import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 
 @Injectable()
 export class UserWritePostgresRepository implements UserWriteRepoPort {
   private readonly tableName = 'users';
+  private readonly JWT_SECRET: string;
   constructor(
     @Inject(constants.pg_connection) private readonly connection: any,
     @Inject(BUSES_TOKENS.STREAMING_DOMAIN_EVENT_BUS)
     private readonly domainEventBus: Infra.EventBus.IEventBus,
-  ) {}
+    private configService: ConfigService<AuthEnvironmentVariables, true>,
+  ) {
+    this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
+  }
 
   async update(aggregate: UserEntity): Promise<void> {
     const userPrimitives = aggregate.toPrimitives();
@@ -48,7 +52,7 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
-      jwtPayload = jwtwebtoken.verify(jwt, JWT_SECRET);
+      jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
     } catch (err) {
       throw new Error('Invalid JWT!');
     }

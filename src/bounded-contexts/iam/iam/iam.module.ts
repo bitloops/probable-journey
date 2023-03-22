@@ -27,17 +27,17 @@ const RepoProviders = [
       inject: [...RepoProviders],
       imports: [
         MongoModule,
-        // PostgresModule.forFeature(
-        //   // `DROP TABLE IF EXISTS users;`,
-        //   `-- DROP TABLE users;
-        //   CREATE TABLE IF NOT EXISTS users (
-        //     "id" UUID,
-        //     "email" VARCHAR(100) NOT NULL,
-        //     "password" VARCHAR(100) NOT NULL,
-        //     "last_login" TIMESTAMP,
-        //     PRIMARY KEY ("id")
-        //   );`,
-        // ),
+        PostgresModule.forFeature(
+          // `DROP TABLE IF EXISTS users;`,
+          `-- DROP TABLE users;
+          CREATE TABLE IF NOT EXISTS users (
+            "id" UUID,
+            "email" VARCHAR(100) NOT NULL,
+            "password" VARCHAR(100) NOT NULL,
+            "last_login" TIMESTAMP,
+            PRIMARY KEY ("id")
+          );`,
+        ),
       ],
     }),
     JetstreamModule.forFeature({

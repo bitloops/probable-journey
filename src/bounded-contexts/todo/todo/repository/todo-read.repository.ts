@@ -9,8 +9,8 @@ import {
   TodoReadModel,
   TTodoReadModelSnapshot,
 } from 'src/lib/bounded-contexts/todo/todo/domain/TodoReadModel';
-
-const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
+import { ConfigService } from '@nestjs/config';
+import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'todo';
 const MONGO_DB_TODO_COLLECTION =
@@ -21,11 +21,16 @@ export class TodoReadRepository implements TodoReadRepoPort {
   private collectionName = MONGO_DB_TODO_COLLECTION;
   private dbName = MONGO_DB_DATABASE;
   private collection: Collection;
+  private JWT_SECRET: string;
 
-  constructor(@Inject('MONGO_DB_CONNECTION') private client: MongoClient) {
+  constructor(
+    @Inject('MONGO_DB_CONNECTION') private client: MongoClient,
+    private configService: ConfigService<AuthEnvironmentVariables, true>,
+  ) {
     this.collection = this.client
       .db(this.dbName)
       .collection(this.collectionName);
+    this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
   }
 
   async getById(id: string): Promise<TodoReadModel | null> {
@@ -36,7 +41,7 @@ export class TodoReadRepository implements TodoReadRepoPort {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
-      jwtPayload = jwtwebtoken.verify(jwt, JWT_SECRET);
+      jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
     } catch (err) {
       throw new Error('Invalid JWT!');
     }

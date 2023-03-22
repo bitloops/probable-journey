@@ -21,6 +21,7 @@ import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 import { PubSubCommandBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-command-bus';
 import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
 import { JwtAuthGuard } from '@src/infra/auth/jwt-auth.guard';
+import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
 @Injectable()
@@ -32,9 +33,9 @@ export class TodoController {
     private readonly commandBus: PubSubCommandBus, // private readonly queryBus: QueryBus, // @Inject('NATS_JETSTREAM') private readonly nc: any,
     @Inject(BUSES_TOKENS.PUBSUB_QUERY_BYS)
     private readonly queryBus: PubSubQueryBus,
-    private configService: ConfigService,
+    private configService: ConfigService<AuthEnvironmentVariables, true>,
   ) {
-    this.JWT_SECRET = this.configService.get<string>('JWT_SECRET') || '';
+    this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
 
     if (this.JWT_SECRET === '') {
       throw new Error('JWT_SECRET is not defined!');

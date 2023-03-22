@@ -18,8 +18,9 @@ import { UserWriteRepoPort } from '@src/lib/bounded-contexts/iam/authentication/
 import { UserEntity } from '@src/lib/bounded-contexts/iam/authentication/domain/UserEntity';
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses';
 import { EmailVO } from '@src/lib/bounded-contexts/iam/authentication/domain/EmailVO';
+import { ConfigService } from '@nestjs/config';
+import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 
-const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'iam';
 const MONGO_DB_TODO_COLLECTION =
   process.env.MONGO_DB_TODO_COLLECTION || 'users';
@@ -29,14 +30,20 @@ export class UserWriteRepository implements UserWriteRepoPort {
   private collectionName = MONGO_DB_TODO_COLLECTION;
   private dbName = MONGO_DB_DATABASE;
   private collection: Collection;
+  private JWT_SECRET: string;
   constructor(
     @Inject('MONGO_DB_CONNECTION') private client: MongoClient,
     @Inject(BUSES_TOKENS.STREAMING_DOMAIN_EVENT_BUS)
     private readonly domainEventBus: Infra.EventBus.IEventBus,
+    private readonly configService: ConfigService<
+      AuthEnvironmentVariables,
+      true
+    >,
   ) {
     this.collection = this.client
       .db(this.dbName)
       .collection(this.collectionName);
+    this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
   }
 
   update(aggregate: UserEntity): Promise<void> {
@@ -53,7 +60,7 @@ export class UserWriteRepository implements UserWriteRepoPort {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
-      jwtPayload = jwtwebtoken.verify(jwt, JWT_SECRET);
+      jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
     } catch (err) {
       throw new Error('Invalid JWT!');
     }

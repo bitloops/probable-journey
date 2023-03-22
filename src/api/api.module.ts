@@ -6,12 +6,15 @@ import { TodoController } from './todo.rest.controller';
 import { TodoGrpcController } from './todo.grpc.controller';
 import { JetstreamModule } from '@src/bitloops/nest-jetstream';
 import { PostgresModule } from '@src/infra/db/postgres/postgres.module';
+import configuration from '@src/config/configuration';
+import authConfiguration from '@src/config/auth.configuration';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.development.env',
+      load: [configuration, authConfiguration],
     }),
     AuthModule,
     JetstreamModule.forRoot({}),

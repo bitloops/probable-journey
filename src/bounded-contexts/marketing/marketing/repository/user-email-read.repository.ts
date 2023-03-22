@@ -4,8 +4,9 @@ import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
 import { UserEmailReadRepoPort } from '@src/lib/bounded-contexts/marketing/marketing/ports/user-email-read.repo-port';
 import { UserReadModel } from '@src/lib/bounded-contexts/marketing/marketing/domain/read-models/user-email.read-model';
+import { ConfigService } from '@nestjs/config';
+import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 
-const JWT_SECRET = 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B';
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'marketing';
 const MONGO_DB_TODO_COLLECTION =
   process.env.MONGO_DB_TODO_COLLECTION || 'userEmail';
@@ -15,10 +16,15 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
   private collectionName = MONGO_DB_TODO_COLLECTION;
   private dbName = MONGO_DB_DATABASE;
   private collection: Collection;
-  constructor(@Inject('MONGO_DB_CONNECTION') private client: MongoClient) {
+  private JWT_SECRET: string;
+  constructor(
+    @Inject('MONGO_DB_CONNECTION') private client: MongoClient,
+    private configService: ConfigService<AuthEnvironmentVariables, true>,
+  ) {
     this.collection = this.client
       .db(this.dbName)
       .collection(this.collectionName);
+    this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
   }
 
   async getUserEmail(
@@ -28,7 +34,7 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
-      jwtPayload = jwtwebtoken.verify(jwt, JWT_SECRET);
+      jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
     } catch (err) {
       throw new Error('Invalid JWT!');
     }
@@ -63,7 +69,7 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
-      jwtPayload = jwtwebtoken.verify(jwt, JWT_SECRET);
+      jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
     } catch (err) {
       throw new Error('Invalid JWT!');
     }

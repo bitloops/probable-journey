@@ -4,17 +4,17 @@ import { IamModule as LibIamModule } from 'src/lib/bounded-contexts/iam/authenti
 import { MongoModule } from '@src/infra/db/mongo/mongo.module';
 import { PostgresModule } from '@src/infra/db/postgres/postgres.module';
 import { UserWriteRepoPortToken } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
-import { UserWriteRepository } from './repository/user-write.repository';
 import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/iam/authentication/application/command-handlers';
 import { NatsStreamingIntegrationEventBus } from '@src/bitloops/nest-jetstream/buses/nats-streaming-integration-event-bus';
 import { JetstreamModule } from '@src/bitloops/nest-jetstream';
 import { StreamingDomainEventHandlers } from '@src/lib/bounded-contexts/iam/authentication/application/event-handlers';
 import { StreamingIntegrationEventBusToken } from '@src/lib/bounded-contexts/iam/authentication/constants';
+import { UserWritePostgresRepository } from './repository/user-write.pg.repository';
 
 const RepoProviders = [
   {
     provide: UserWriteRepoPortToken,
-    useClass: UserWriteRepository,
+    useClass: UserWritePostgresRepository,
   },
   {
     provide: StreamingIntegrationEventBusToken,

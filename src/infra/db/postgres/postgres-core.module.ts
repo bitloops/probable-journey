@@ -30,7 +30,7 @@ export class PostgresCoreModule {
         const client = await pool.connect();
         try {
           const res = await client.query(sqlStatement);
-          console.log('queryResult: ', res);
+          // console.log('queryResult: ', res);
         } catch (error) {
           console.log('postgres statement error:', error);
         } finally {

@@ -8,6 +8,7 @@ import { GrpcOptions, Transport } from '@nestjs/microservices';
 
 import { AppModule } from './app.module';
 import { ApiModule } from './api/api.module';
+import { ConfigService } from '@nestjs/config';
 
 const HTTP_PORT = 3000;
 const HTTP_IP = '0.0.0.0';
@@ -34,9 +35,10 @@ async function bootstrap() {
     }),
     { abortOnError: false },
   );
+  const config = app.get(ConfigService);
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(HTTP_PORT, HTTP_IP, () => {
-    console.log(`HTTP server is listening on ${HTTP_IP}:${HTTP_PORT}`);
+    console.log(`HTTP server is listening on ${HTTP_IP}:${config.get('port')}`);
   });
 
   // Initialize the gRPC server

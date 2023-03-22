@@ -36,3 +36,4 @@ lerna-debug.log*
 
 data/mongo-1
 .env
+data/*

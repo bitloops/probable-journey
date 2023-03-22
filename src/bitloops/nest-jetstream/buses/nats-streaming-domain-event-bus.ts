@@ -91,6 +91,7 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
         for await (const m of sub) {
           console.log('Received domainEvent::');
           const domainEvent = jsonCodec.decode(m.data) as any;
+          // domainEvent.data = Domain.EventData.fromPrimitives(domainEvent.data);
 
           const reply = await handler.handle(domainEvent);
           m.ack();

@@ -28,7 +28,6 @@ const RepoProviders = [
       imports: [
         MongoModule,
         PostgresModule.forFeature(
-          // `DROP TABLE IF EXISTS users;`,
           `-- DROP TABLE users;
           CREATE TABLE IF NOT EXISTS users (
             "id" UUID,

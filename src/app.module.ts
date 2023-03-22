@@ -8,6 +8,7 @@ import { PostgresModule } from './bitloops/postgres/postgres.module';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import authConfiguration from './config/auth.configuration';
+import { MongoModule } from './infra/db/mongo/mongo.module';
 
 @Module({
   imports: [
@@ -26,6 +27,9 @@ import authConfiguration from './config/auth.configuration';
       password: process.env.PG_IAM_PASSWORD ?? 'postgres',
       max: 20,
     }),
+    MongoModule.forRoot(
+      'mongodb://localhost:30001/?directConnection=true&replicaSet=my-replica-set',
+    ),
 
     TodoModule,
     MarketingModule,

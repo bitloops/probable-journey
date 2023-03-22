@@ -10,7 +10,6 @@ import {
 } from '@nestjs/jwt';
 import { UsersService } from './users/users.service';
 import { UserWriteRepoPortToken } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
-import { MongoModule } from '@src/infra/db/mongo/mongo.module';
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import { UserWritePostgresRepository } from '@src/bounded-contexts/iam/iam/repository/user-write.pg.repository';
@@ -41,7 +40,6 @@ export class JwtAuthModule {
 @Module({
   imports: [
     PassportModule,
-    MongoModule,
     JwtAuthModule.registerAsync({
       useFactory: (
         configService: ConfigService<AuthEnvironmentVariables, true>,

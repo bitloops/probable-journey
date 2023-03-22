@@ -7,7 +7,7 @@ import { PostgresModule } from './bitloops/postgres/postgres.module';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import authConfiguration from './config/auth.configuration';
-import { MongoModule } from './infra/db/mongo/mongo.module';
+import { MongoModule } from './bitloops/mongo/mongo.module';
 
 @Module({
   imports: [

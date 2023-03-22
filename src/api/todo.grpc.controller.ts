@@ -19,9 +19,11 @@ import { GetTodosQuery } from '../lib/bounded-contexts/todo/todo/queries/get-tod
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 import { PubSubCommandBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-command-bus';
 import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
-import { JwtGrpcAuthGuard } from '@src/infra/auth/jwt-grpc-auth.guard';
-import { GetAuthData } from '@src/infra/auth/authdata.decorator';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
+import {
+  GetAuthData,
+  JwtGrpcAuthGuard,
+} from '@src/bitloops/nest-auth-passport';
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
 @Injectable()

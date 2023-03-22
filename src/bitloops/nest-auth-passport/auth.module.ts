@@ -1,27 +1,46 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
+import { ConfigService } from '@nestjs/config';
+import { AuthService } from './auth.service';
 import { LocalStrategy } from './local.strategy';
-import { JwtModule } from '@nestjs/jwt';
 import { UsersService } from './users/users.service';
-import { MongoModule } from '@src/infra/db/mongo/mongo.module';
 import { UserRepoPortToken } from './users/user-repo.port';
-import { UserRepository } from './users/user-repo';
+import { JwtAuthModule } from './jwt/jwt.module';
+import { AuthEnvironmentVariables } from './auth.configuration';
+import { UserPostgresRepository } from './users/user-pg-repo';
+import { PostgresModule } from '../postgres/postgres.module';
 
 @Module({
   imports: [
     PassportModule,
-    MongoModule,
-    JwtModule.register({
-      secret: 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B',
-      signOptions: { expiresIn: '3600s' },
+    JwtAuthModule.registerAsync({
+      useFactory: (
+        configService: ConfigService<AuthEnvironmentVariables, true>,
+      ) => ({
+        secret: configService.get('jwtSecret'),
+        signOptions: { expiresIn: '3600s' },
+      }),
+      inject: [ConfigService],
+    }),
+    PostgresModule.forRootAsync({
+      useFactory: (
+        configService: ConfigService<AuthEnvironmentVariables, true>,
+      ) => ({
+        database: configService.get('database.database', { infer: true }),
+        host: configService.get('database.host', { infer: true }),
+        port: configService.get('database.port', { infer: true }),
+        user: configService.get('database.user', { infer: true }),
+        password: configService.get('database.password', { infer: true }),
+        max: 20,
+      }),
+      inject: [ConfigService],
     }),
   ],
   providers: [
     AuthService,
     LocalStrategy,
     UsersService,
-    { provide: UserRepoPortToken, useClass: UserRepository },
+    { provide: UserRepoPortToken, useClass: UserPostgresRepository },
   ],
   exports: [AuthService],
 })

@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from '@src/infra/auth/auth.module';
 import { AuthController } from './authentication.controller';
 import { TodoController } from './todo.rest.controller';
 import { TodoGrpcController } from './todo.grpc.controller';
 import { JetstreamModule } from '@src/bitloops/nest-jetstream';
 import configuration from '@src/config/configuration';
 import authConfiguration from '@src/config/auth.configuration';
+import { AuthModule } from '@src/bitloops/nest-auth-passport';
 
 @Module({
   imports: [

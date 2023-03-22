@@ -17,11 +17,13 @@ import { RegisterDTO } from './dto/register.dto';
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 import { PubSubCommandBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-command-bus';
 import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
-import { JwtAuthGuard } from '@src/infra/auth/jwt-auth.guard';
-import { LocalAuthGuard } from '@src/infra/auth/local-auth.guard';
-import { AuthService } from '@src/infra/auth/auth.service';
 import { Application } from '@src/bitloops/bl-boilerplate-core';
 import { DomainErrors } from '@src/lib/bounded-contexts/iam/authentication/domain/errors';
+import {
+  AuthService,
+  JwtAuthGuard,
+  LocalAuthGuard,
+} from '@src/bitloops/nest-auth-passport';
 
 @Controller('auth')
 export class AuthController {

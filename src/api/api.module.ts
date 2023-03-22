@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './authentication.controller';
 import { TodoController } from './todo.rest.controller';
 import { TodoGrpcController } from './todo.grpc.controller';
 import { JetstreamModule } from '@src/bitloops/nest-jetstream';
 import configuration from '@src/config/configuration';
-import authConfiguration from '@src/config/auth.configuration';
+import authConfiguration, {
+  AuthEnvironmentVariables,
+} from '@src/config/auth.configuration';
 import { AuthModule } from '@src/bitloops/nest-auth-passport';
 
 @Module({
@@ -15,7 +17,30 @@ import { AuthModule } from '@src/bitloops/nest-auth-passport';
       envFilePath: '.development.env',
       load: [configuration, authConfiguration],
     }),
-    AuthModule,
+    AuthModule.forRootAsync({
+      jwtOptions: {
+        useFactory: (
+          configService: ConfigService<AuthEnvironmentVariables, true>,
+        ) => ({
+          secret: configService.get('jwtSecret'),
+          signOptions: { expiresIn: '3600s' },
+        }),
+        inject: [ConfigService],
+      },
+      postgresOptions: {
+        useFactory: (
+          configService: ConfigService<AuthEnvironmentVariables, true>,
+        ) => ({
+          database: configService.get('database.database', { infer: true }),
+          host: configService.get('database.host', { infer: true }),
+          port: configService.get('database.port', { infer: true }),
+          user: configService.get('database.user', { infer: true }),
+          password: configService.get('database.password', { infer: true }),
+          max: 20,
+        }),
+        inject: [ConfigService],
+      },
+    }),
     JetstreamModule.forRoot({}),
   ],
   controllers: [AuthController, TodoController, TodoGrpcController],

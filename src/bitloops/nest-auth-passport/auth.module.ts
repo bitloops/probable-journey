@@ -1,41 +1,20 @@
-import { Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './local.strategy';
 import { UsersService } from './users/users.service';
 import { UserRepoPortToken } from './users/user-repo.port';
 import { JwtAuthModule } from './jwt/jwt.module';
-import { AuthEnvironmentVariables } from './auth.configuration';
 import { UserPostgresRepository } from './users/user-pg-repo';
-import { PostgresModule } from '../postgres/postgres.module';
+import {
+  PostgresModule,
+  PostgresModuleAsyncOptions,
+} from '../postgres/postgres.module';
+import { JwtModuleAsyncOptions } from '@nestjs/jwt';
+import { JWTSecret } from './constants';
 
 @Module({
-  imports: [
-    PassportModule,
-    JwtAuthModule.registerAsync({
-      useFactory: (
-        configService: ConfigService<AuthEnvironmentVariables, true>,
-      ) => ({
-        secret: configService.get('jwtSecret'),
-        signOptions: { expiresIn: '3600s' },
-      }),
-      inject: [ConfigService],
-    }),
-    PostgresModule.forRootAsync({
-      useFactory: (
-        configService: ConfigService<AuthEnvironmentVariables, true>,
-      ) => ({
-        database: configService.get('database.database', { infer: true }),
-        host: configService.get('database.host', { infer: true }),
-        port: configService.get('database.port', { infer: true }),
-        user: configService.get('database.user', { infer: true }),
-        password: configService.get('database.password', { infer: true }),
-        max: 20,
-      }),
-      inject: [ConfigService],
-    }),
-  ],
+  imports: [PassportModule],
   providers: [
     AuthService,
     LocalStrategy,
@@ -44,4 +23,33 @@ import { PostgresModule } from '../postgres/postgres.module';
   ],
   exports: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule {
+  static forRootAsync({
+    jwtOptions,
+    postgresOptions,
+  }: {
+    jwtOptions: JwtModuleAsyncOptions;
+    postgresOptions: PostgresModuleAsyncOptions;
+  }): DynamicModule {
+    const jwtSecretProvider = {
+      provide: JWTSecret,
+      useFactory: async (...args: any[]) => {
+        if (!jwtOptions.useFactory) {
+          throw new Error('No useFactory function provided');
+        }
+        return ((await jwtOptions.useFactory(...args)) as any).secret;
+      },
+      inject: jwtOptions.inject,
+    };
+
+    return {
+      module: AuthModule,
+      imports: [
+        JwtAuthModule.registerAsync(jwtOptions),
+        PostgresModule.forRootAsync(postgresOptions),
+      ],
+      providers: [jwtSecretProvider],
+      exports: [jwtSecretProvider],
+    };
+  }
+}

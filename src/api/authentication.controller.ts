@@ -83,6 +83,7 @@ export class AuthController {
           );
       }
     }
+    // this.domainEventBus.publish(aggregate.domainEvents);
   }
 
   private hashPassword(password: string) {

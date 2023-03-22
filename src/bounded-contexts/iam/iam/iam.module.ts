@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { IamModule as LibIamModule } from 'src/lib/bounded-contexts/iam/authentication/iam.module';
-import { MongoModule } from '@src/infra/db/mongo/mongo.module';
+import { MongoModule } from '@bitloops/mongo/mongo.module';
 import { PostgresModule } from '@bitloops/postgres';
 import { UserWriteRepoPortToken } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
 import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/iam/authentication/application/command-handlers';

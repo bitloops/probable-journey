@@ -4,7 +4,7 @@ import { TodoModule } from './bounded-contexts/todo/todo/todo.module';
 import { MarketingModule } from './bounded-contexts/marketing/marketing/marketing.module';
 import { IamModule } from './bounded-contexts/iam/iam/iam.module';
 import { JetstreamModule } from '@src/bitloops/nest-jetstream';
-import { PostgresModule } from './infra/db/postgres/postgres.module';
+import { PostgresModule } from './bitloops/postgres/postgres.module';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import authConfiguration from './config/auth.configuration';

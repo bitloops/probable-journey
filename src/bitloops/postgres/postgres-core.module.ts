@@ -6,7 +6,10 @@ import {
   Global,
 } from '@nestjs/common';
 import { Pool, PoolConfig } from 'pg';
-import { POSTGRES_DB_CONNECTION } from './postgres.constants';
+import { constants } from './postgres.constants';
+import { PostgresModuleAsyncOptions } from './postgres.module';
+
+const POSTGRES_DB_CONNECTION = constants.pg_connection;
 @Global()
 @Module({})
 export class PostgresCoreModule {
@@ -15,6 +18,22 @@ export class PostgresCoreModule {
     const poolProvider: Provider<any> = {
       provide: POSTGRES_DB_CONNECTION,
       useFactory: () => new Pool(options),
+    };
+    return {
+      module: PostgresCoreModule,
+      providers: [poolProvider],
+      exports: [poolProvider],
+    };
+  }
+
+  static forRootAsync(options: PostgresModuleAsyncOptions): DynamicModule {
+    const poolProvider: Provider<any> = {
+      provide: POSTGRES_DB_CONNECTION,
+      useFactory: async (...args: any[]) => {
+        const poolConfig = await options.useFactory(...args);
+        return new Pool(poolConfig);
+      },
+      inject: options.inject || [],
     };
     return {
       module: PostgresCoreModule,

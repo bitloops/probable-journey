@@ -11,7 +11,7 @@ import * as jwtwebtoken from 'jsonwebtoken';
 import { UserWriteRepoPort } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
 import { UserEntity } from '@src/lib/bounded-contexts/iam/authentication/domain/UserEntity';
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses';
-import { constants } from '@src/infra/db/postgres/postgres.module';
+import { constants } from '@bitloops/postgres';
 import { EmailVO } from '@src/lib/bounded-contexts/iam/authentication/domain/EmailVO';
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';

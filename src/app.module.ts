@@ -5,13 +5,17 @@ import { MarketingModule } from './bounded-contexts/marketing/marketing/marketin
 import { IamModule } from './bounded-contexts/iam/iam/iam.module';
 import { JetstreamModule } from '@src/bitloops/nest-jetstream';
 import { PostgresModule } from './infra/db/postgres/postgres.module';
+import { ConfigModule } from '@nestjs/config';
+import configuration from './config/configuration';
+import authConfiguration from './config/auth.configuration';
 
 @Module({
   imports: [
-    // ConfigModule.forRoot({
-    //   isGlobal: true,
-    //   envFilePath: '.development.env',
-    // }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.development.env',
+      load: [configuration, authConfiguration],
+    }),
     JetstreamModule.forRoot({}),
     MongooseModule.forRoot('mongodb://localhost/todo'),
     PostgresModule.forRoot({
@@ -22,6 +26,7 @@ import { PostgresModule } from './infra/db/postgres/postgres.module';
       password: process.env.PG_IAM_PASSWORD ?? 'postgres',
       max: 20,
     }),
+
     TodoModule,
     MarketingModule,
     IamModule,

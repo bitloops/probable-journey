@@ -1,10 +1,4 @@
-import {
-  Application,
-  Either,
-  Infra,
-  ok,
-  fail,
-} from '@bitloops/bl-boilerplate-core';
+import { Application, Either, ok, fail } from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import {
   Collection,
@@ -12,7 +6,6 @@ import {
   TransactionOptions,
   ClientSession,
 } from 'mongodb';
-import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses';
 import { UserRepoPort } from './user-repo.port';
 
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'iam';
@@ -24,11 +17,7 @@ export class UserRepository implements UserRepoPort {
   private collectionName = MONGO_DB_TODO_COLLECTION;
   private dbName = MONGO_DB_DATABASE;
   private collection: Collection;
-  constructor(
-    @Inject('MONGO_DB_CONNECTION') private client: MongoClient,
-    @Inject(BUSES_TOKENS.STREAMING_DOMAIN_EVENT_BUS)
-    private readonly domainEventBus: Infra.EventBus.IEventBus,
-  ) {
+  constructor(@Inject('MONGO_DB_CONNECTION') private client: MongoClient) {
     this.collection = this.client
       .db(this.dbName)
       .collection(this.collectionName);

@@ -11,9 +11,9 @@ import {
 import { UsersService } from './users/users.service';
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
-import { UserWritePostgresRepository } from '@src/bounded-contexts/iam/iam/repository/user-write.pg.repository';
 import { PostgresModule } from '@src/bitloops/postgres';
 import { UserRepoPortToken } from '@src/bitloops/nest-auth-passport/users/user-repo.port';
+import { UserPostgresRepository } from '@src/bitloops/nest-auth-passport/users/user-pg-repo';
 // import { UserRepository } from '@src/bitloops/nest-auth-passport/users/user-repo';
 
 // This can be used from other contexts/modules, that don't need to know about the local strategy(users service)
@@ -69,7 +69,7 @@ export class JwtAuthModule {
     AuthService,
     LocalStrategy,
     UsersService,
-    { provide: UserRepoPortToken, useClass: UserWritePostgresRepository },
+    { provide: UserRepoPortToken, useClass: UserPostgresRepository },
   ],
   exports: [AuthService],
 })

@@ -22,6 +22,7 @@ import { PubSubCommandBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub
 import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import { JwtAuthGuard } from '@src/bitloops/nest-auth-passport';
+import { Traceable } from '@src/bitloops/tracing';
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
 @Injectable()
@@ -46,6 +47,7 @@ export class TodoController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
+  @Traceable()
   async addTodo(@Request() req, @Body() dto: AddTodoDto) {
     // const jwt = jwtwebtoken.sign({ userId: dto.userId }, this.JWT_SECRET);
     const command = new AddTodoCommand(

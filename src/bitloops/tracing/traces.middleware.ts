@@ -1,14 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { AsyncLocalStorage } from 'async_hooks';
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { v4 as uuid } from 'uuid';
-
-type AsyncLocalStorageKeys = 'correlationId';
-
-type AsyncLocalStorageStore = Map<AsyncLocalStorageKeys, string>;
-
-export const asyncLocalStorage =
-  new AsyncLocalStorage<AsyncLocalStorageStore>();
+import { randomUUID } from 'crypto';
+import { asyncLocalStorage } from './storage';
 
 @Injectable()
 export class CorrelationIdMiddleware implements NestMiddleware {
@@ -25,7 +18,7 @@ export function correlationId(
   res: FastifyReply['raw'],
   next: () => void,
 ) {
-  const correlationId = req.headers['x-correlation-id'] || uuid();
+  const correlationId = req.headers['x-correlation-id'] || randomUUID();
   console.log(`Request... ${correlationId}`);
   const map = new Map();
   map.set('correlationId', correlationId);

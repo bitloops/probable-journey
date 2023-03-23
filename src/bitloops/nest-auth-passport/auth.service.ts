@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { Application, Either } from '../bl-boilerplate-core';
 import { UsersService } from './users/users.service';
 import { User } from './users/user.model';
+import { Traceable } from '@bitloops/tracing';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +26,7 @@ export class AuthService {
     return null;
   }
 
+  @Traceable()
   async login(user: User) {
     const payload = {
       email: user.email,

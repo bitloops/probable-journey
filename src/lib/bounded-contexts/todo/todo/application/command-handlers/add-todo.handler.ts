@@ -15,6 +15,7 @@ import {
   TodoWriteRepoPortToken,
 } from '../../ports/TodoWriteRepoPort';
 import { UserIdVO } from '../../domain/UserIdVO';
+import { Traceable } from '@src/bitloops/tracing';
 
 type AddTodoUseCaseResponse = Either<
   string,
@@ -42,6 +43,7 @@ export class AddTodoHandler
     return 'Todo';
   }
 
+  @Traceable()
   async execute(command: AddTodoCommand): Promise<AddTodoUseCaseResponse> {
     this.ctx = command.ctx;
     console.log('AddTodoCommand...');

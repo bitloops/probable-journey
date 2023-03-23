@@ -1,8 +1,8 @@
 import { Infra, Application } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
 import { TodoAddedDomainEvent } from '../../../domain/events/todo-added.event';
-import { TodoCompletedIntegrationEvent } from '../../../contracts/integration-events/todo-completed.integration-event';
 import { StreamingIntegrationEventBusToken } from '../../../constants';
+import { TodoAddedIntegrationEvent } from '../../../contracts/integration-events/todo-added.integration-event';
 
 export class TodoAddedDomainToIntegrationEventHandler
   implements Application.IHandle
@@ -20,7 +20,7 @@ export class TodoAddedDomainToIntegrationEventHandler
   }
 
   public async handle(event: TodoAddedDomainEvent): Promise<void> {
-    const events = TodoCompletedIntegrationEvent.create(event);
+    const events = TodoAddedIntegrationEvent.create(event);
 
     await this.eventBus.publish(events);
 

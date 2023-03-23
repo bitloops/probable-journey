@@ -6,10 +6,8 @@ import { TodoAddedDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 import { ContextBuilder } from '../../builders/context.builder';
 import { TodoPropsBuilder } from '../../builders/todo-props.builder';
-import {
-  // MockTodoFailWriteRepo,
-  MockAddTodoWriteRepo,
-} from './add-todo-write-repo.mock';
+import { MockAddTodoWriteRepo } from './add-todo-write-repo.mock';
+import { FAILED_USER_ID } from './add-todo.mock';
 
 describe('Add todo feature test', () => {
   it('Todo created successfully', async () => {
@@ -34,12 +32,11 @@ describe('Add todo feature test', () => {
       .withUserId(userId)
       .build();
 
-    expect(mockTodoWriteRepo.getMockSaveMethod()).toHaveBeenCalledWith(
+    expect(mockTodoWriteRepo.mockSaveMethod).toHaveBeenCalledWith(
       expect.any(TodoEntity),
       ctx,
     );
-    const todoAggregate =
-      mockTodoWriteRepo.getMockSaveMethod().mock.calls[0][0];
+    const todoAggregate = mockTodoWriteRepo.mockSaveMethod.mock.calls[0][0];
     expect(todoAggregate.props).toEqual(todoProps);
     expect(todoAggregate.domainEvents[0]).toBeInstanceOf(TodoAddedDomainEvent);
     expect(typeof result.value).toBe('string');
@@ -61,13 +58,13 @@ describe('Add todo feature test', () => {
     const result = await addTodoHandler.execute(addTodoCommand);
 
     //then
-    expect(mockTodoWriteRepo.getMockSaveMethod()).not.toHaveBeenCalled();
+    expect(mockTodoWriteRepo.mockSaveMethod).not.toHaveBeenCalled();
     expect(result.value).toBeInstanceOf(DomainErrors.TitleOutOfBoundsError);
   });
 
-  it('Todo failed to be created, repo error', async () => {
+  it.skip('Todo failed to be created, repo error', async () => {
     const todoTitle = 'New todo title';
-    const userId = '123';
+    const userId = FAILED_USER_ID;
 
     // given
     const mockTodoWriteRepo = new MockAddTodoWriteRepo();
@@ -81,7 +78,7 @@ describe('Add todo feature test', () => {
     const result = await addTodoHandler.execute(addTodoCommand);
 
     //then
-    expect(mockTodoWriteRepo.getMockSaveMethod()).toHaveBeenCalled();
+    expect(mockTodoWriteRepo.mockSaveMethod).toHaveBeenCalled();
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });
 });

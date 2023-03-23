@@ -1,5 +1,5 @@
 import * as util from 'util';
-import { asyncLocalStorage } from './traces.middleware';
+import { asyncLocalStorage } from './storage';
 // target: the constructor or prototype of the class decorated.
 // propertyKey: the name of the key.
 // descriptor(ES6): the descriptor of that property.
@@ -50,6 +50,7 @@ export function Traceable() {
     console.log('Inserted decorators returned function');
     console.log(target, propertyKey, descriptor);
     const originalMethod = descriptor.value;
+    // For now we only trace async functions
     if (!isAsyncFunction(originalMethod)) {
       throw new Error(
         'Traceable decorator can only be applied to async methods for now',
@@ -59,17 +60,18 @@ export function Traceable() {
     descriptor.value = async function (...args: any[]) {
       console.log('Started executing: ' + propertyKey);
 
-      const correlationId = asyncLocalStorage.getStore();
-      console.log(
-        'decorator: correlationId',
-        correlationId?.get('correlationId'),
-      );
+      const store = asyncLocalStorage.getStore();
+      const correlationId = store?.get('correlationId');
+      console.table({
+        correlationId,
+      });
+      console.log('user context', store?.get('userContext'));
       try {
         return await originalMethod.apply(this, args);
       } catch (error) {
         return error;
       } finally {
-        console.log(`${propertyKey} was executed.`);
+        console.log(`${propertyKey} has finished execution.`);
       }
     };
   };

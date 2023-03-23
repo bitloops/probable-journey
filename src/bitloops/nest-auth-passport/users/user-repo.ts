@@ -37,7 +37,12 @@ export class UserPostgresRepository implements UserRepoPort {
 
   async checkDoesNotExistAndCreate(
     user: User,
-  ): Promise<Either<void, Application.Repo.Errors.Conflict>> {
+  ): Promise<
+    Either<
+      void,
+      Application.Repo.Errors.Conflict | Application.Repo.Errors.Unexpected
+    >
+  > {
     // note: we don't try/catch this because if connecting throws an exception
     // we don't need to dispose of the client (it will be undefined)
     const client = await this.connection.connect();
@@ -48,7 +53,7 @@ export class UserPostgresRepository implements UserRepoPort {
       const userExistsQuery = `SELECT * FROM ${this.tableName} WHERE email = $1`;
       const res = await client.query(userExistsQuery, [user.email]);
       if (res.rows.length > 0) {
-        throw new Error('User already exists');
+        throw new Application.Repo.Errors.Conflict(user.email);
       }
 
       const insertUserText = `INSERT INTO ${this.tableName} (id, email, password) VALUES ($1, $2, $3);`;
@@ -61,10 +66,13 @@ export class UserPostgresRepository implements UserRepoPort {
       const event = new UserRegisteredIntegrationEvent({ userId: id!, email });
       this.integrationEventBus.publish(event);
       return ok();
-    } catch (e) {
+    } catch (e: any) {
       await client.query('ROLLBACK');
-      console.log('Error in transaction', e);
-      return fail(new Application.Repo.Errors.Conflict(user.email));
+      if (e instanceof Application.Repo.Errors.Conflict) {
+        return fail(e);
+      }
+      console.log('Error in transaction:', e);
+      return fail(new Application.Repo.Errors.Unexpected(e.message));
     } finally {
       client.release();
     }

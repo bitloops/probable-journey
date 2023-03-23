@@ -71,6 +71,7 @@ export class AuthController {
       switch (result.value.constructor) {
         case Application.Repo.Errors.Conflict:
           throw new HttpException(result.value, HttpStatus.CONFLICT);
+        case Application.Repo.Errors.Unexpected:
         default:
           throw new HttpException(
             'Server error',

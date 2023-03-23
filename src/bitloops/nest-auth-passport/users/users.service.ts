@@ -19,7 +19,12 @@ export class UsersService {
 
   async create(
     user: User,
-  ): Promise<Either<void, Application.Repo.Errors.Conflict>> {
+  ): Promise<
+    Either<
+      void,
+      Application.Repo.Errors.Conflict | Application.Repo.Errors.Unexpected
+    >
+  > {
     return this.userRepo.checkDoesNotExistAndCreate(user);
   }
 }

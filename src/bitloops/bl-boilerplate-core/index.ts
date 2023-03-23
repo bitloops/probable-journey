@@ -51,6 +51,7 @@ import {
 } from './domain/standard-values';
 import { IErrorEvent as IErrorEventImport } from './application/events/IErrorEvent';
 import { ConflictError } from './errors/repository/ConflictError';
+import { UnexpectedError } from './errors/repository/UnexpectedError';
 
 namespace Domain {
   export class Error extends DomainError {}
@@ -98,6 +99,7 @@ namespace Application {
       export class NotFound extends NotFoundError {}
       export class Concurrency extends ConcurrencyError {}
       export class Conflict extends ConflictError {}
+      export class Unexpected extends UnexpectedError {}
     }
     export type ICRUDPort<Aggregate, AggregateId> = CRUDRepoPort<
       Aggregate,

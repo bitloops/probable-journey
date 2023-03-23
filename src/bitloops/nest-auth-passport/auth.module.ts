@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Module, Type } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './local.strategy';
@@ -11,7 +11,8 @@ import {
   PostgresModuleAsyncOptions,
 } from '../postgres/postgres.module';
 import { JwtModuleAsyncOptions } from '@nestjs/jwt';
-import { JWTSecret } from './constants';
+import { JWTSecret, IntegrationEventBusToken } from './constants';
+import { Infra } from '../bl-boilerplate-core';
 
 @Module({
   imports: [PassportModule],
@@ -27,9 +28,11 @@ export class AuthModule {
   static forRootAsync({
     jwtOptions,
     postgresOptions,
+    integrationEventBus,
   }: {
     jwtOptions: JwtModuleAsyncOptions;
     postgresOptions: PostgresModuleAsyncOptions;
+    integrationEventBus: Type<Infra.EventBus.IEventBus>;
   }): DynamicModule {
     const jwtSecretProvider = {
       provide: JWTSecret,
@@ -41,6 +44,10 @@ export class AuthModule {
       },
       inject: jwtOptions.inject,
     };
+    const integrationEventBusProvider = {
+      provide: IntegrationEventBusToken,
+      useClass: integrationEventBus,
+    };
 
     return {
       module: AuthModule,
@@ -48,7 +55,7 @@ export class AuthModule {
         JwtAuthModule.registerAsync(jwtOptions),
         PostgresModule.forRootAsync(postgresOptions),
       ],
-      providers: [jwtSecretProvider],
+      providers: [jwtSecretProvider, integrationEventBusProvider],
       exports: [jwtSecretProvider],
     };
   }

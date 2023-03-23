@@ -18,7 +18,6 @@ import { CompleteTodoDto } from './dto/complete-todo.dto';
 import { GetTodosQuery } from '../lib/bounded-contexts/todo/todo/queries/get-todos.query';
 
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
-import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import { JwtAuthGuard } from '@src/bitloops/nest-auth-passport';
 import { Traceable } from '@src/bitloops/tracing';
@@ -33,7 +32,7 @@ export class TodoController {
     @Inject(BUSES_TOKENS.PUBSUB_COMMAND_BUS)
     private readonly commandBus: Infra.CommandBus.IPubSubCommandBus,
     @Inject(BUSES_TOKENS.PUBSUB_QUERY_BYS)
-    private readonly queryBus: PubSubQueryBus,
+    private readonly queryBus: Infra.QueryBus.IQueryBus,
     private configService: ConfigService<AuthEnvironmentVariables, true>,
   ) {
     this.JWT_SECRET = this.configService.get('jwtSecret', {

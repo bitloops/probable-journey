@@ -13,7 +13,6 @@ import { UpdateEmailCommand } from '@src/lib/bounded-contexts/iam/authentication
 import { UpdateEmailDTO } from './dto/update-email.dto';
 import { RegisterDTO } from './dto/register.dto';
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
-import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import {
   AuthService,
@@ -28,7 +27,7 @@ export class AuthController {
     @Inject(BUSES_TOKENS.PUBSUB_COMMAND_BUS)
     private readonly commandBus: Infra.CommandBus.IPubSubCommandBus,
     @Inject(BUSES_TOKENS.PUBSUB_QUERY_BYS)
-    private readonly queryBus: PubSubQueryBus,
+    private readonly queryBus: Infra.QueryBus.IQueryBus,
     private readonly authService: AuthService,
   ) {}
 

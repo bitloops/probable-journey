@@ -1,4 +1,6 @@
-import { RepoError } from '@src/bitloops/bl-boilerplate-core/application/RepoError';
+// import { RepoError } from '@src/bitloops/bl-boilerplate-core/application/RepoError';
+
+import { RepoError } from '../../application/RepoError';
 
 export class ConflictError extends RepoError {
   static errorId = 'CONFLICT_ERROR';

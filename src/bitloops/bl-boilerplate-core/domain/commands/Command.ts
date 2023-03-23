@@ -21,7 +21,7 @@ import { config } from '../../config';
 import { TContext } from '../context';
 
 export type CommandMetadata = {
-  // responseTopic: string;
+  responseTopic?: string;
   toContextId: string;
   createdTimestamp: number;
 };

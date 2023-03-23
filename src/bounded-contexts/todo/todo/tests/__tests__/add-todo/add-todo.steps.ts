@@ -4,8 +4,8 @@ import { AddTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/add
 import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
 import { TodoAddedDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain/events/todo-added.event';
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
-import { ContextBuilder } from '../builders/context.builder';
-import { TodoPropsBuilder } from '../builders/todo-props.builder';
+import { ContextBuilder } from '../../builders/context.builder';
+import { TodoPropsBuilder } from '../../builders/todo-props.builder';
 import {
   // MockTodoFailWriteRepo,
   MockAddTodoWriteRepo,

@@ -1,20 +1,11 @@
 import { Controller, Inject, Injectable, UseGuards } from '@nestjs/common';
-import {
-  RpcException,
-  GrpcMethod,
-  Payload,
-  ClientGrpc,
-} from '@nestjs/microservices';
+import { RpcException, GrpcMethod, Payload } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
 
 import { todo } from '../proto/todo';
 
-import { TodoReadModel } from '../lib/bounded-contexts/todo/todo/domain/TodoReadModel';
 import { AddTodoCommand } from '../lib/bounded-contexts/todo/todo/commands/add-todo.command';
-import { AddTodoDto } from './dto/add-todo.dto';
-import { CompleteTodoDto } from './dto/complete-todo.dto';
-import { GetTodosQuery } from '../lib/bounded-contexts/todo/todo/queries/get-todos.query';
 
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';

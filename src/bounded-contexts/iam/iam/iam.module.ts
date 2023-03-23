@@ -6,9 +6,15 @@ import { PostgresModule } from '@bitloops/postgres';
 import { UserWriteRepoPortToken } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
 import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/iam/authentication/application/command-handlers';
 import { NatsStreamingIntegrationEventBus } from '@src/bitloops/nest-jetstream/buses/nats-streaming-integration-event-bus';
-import { JetstreamModule } from '@src/bitloops/nest-jetstream';
+import {
+  JetstreamModule,
+  NatsStreamingDomainEventBus,
+} from '@src/bitloops/nest-jetstream';
 import { StreamingDomainEventHandlers } from '@src/lib/bounded-contexts/iam/authentication/application/event-handlers';
-import { StreamingIntegrationEventBusToken } from '@src/lib/bounded-contexts/iam/authentication/constants';
+import {
+  StreamingDomainEventBusToken,
+  StreamingIntegrationEventBusToken,
+} from '@src/lib/bounded-contexts/iam/authentication/constants';
 import { UserWritePostgresRepository } from './repository/user-write.pg.repository';
 
 const RepoProviders = [
@@ -19,6 +25,10 @@ const RepoProviders = [
   {
     provide: StreamingIntegrationEventBusToken,
     useClass: NatsStreamingIntegrationEventBus,
+  },
+  {
+    provide: StreamingDomainEventBusToken,
+    useClass: NatsStreamingDomainEventBus,
   },
 ];
 @Module({

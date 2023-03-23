@@ -87,6 +87,9 @@ namespace Application {
     IResponse
   >;
   export type IHandle = IHandleImport;
+  export interface IHandleIntegrationEvent extends IHandleImport {
+    version: string;
+  }
 
   export abstract class Command extends CommandImport {}
   export type TCommandMetadata = CommandMetadataImport;

@@ -10,11 +10,11 @@ import { Injectable, Inject } from '@nestjs/common';
 import * as jwtwebtoken from 'jsonwebtoken';
 import { UserWriteRepoPort } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
 import { UserEntity } from '@src/lib/bounded-contexts/iam/authentication/domain/UserEntity';
-import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses';
 import { constants } from '@bitloops/postgres';
 import { EmailVO } from '@src/lib/bounded-contexts/iam/authentication/domain/EmailVO';
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
+import { StreamingDomainEventBusToken } from '@src/lib/bounded-contexts/iam/authentication/constants';
 
 @Injectable()
 export class UserWritePostgresRepository implements UserWriteRepoPort {
@@ -22,7 +22,7 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
   private readonly JWT_SECRET: string;
   constructor(
     @Inject(constants.pg_connection) private readonly connection: any,
-    @Inject(BUSES_TOKENS.STREAMING_DOMAIN_EVENT_BUS)
+    @Inject(StreamingDomainEventBusToken)
     private readonly domainEventBus: Infra.EventBus.IEventBus,
     private configService: ConfigService<AuthEnvironmentVariables, true>,
   ) {

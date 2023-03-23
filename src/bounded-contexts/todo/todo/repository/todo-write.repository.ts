@@ -4,9 +4,9 @@ import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
 import { TodoWriteRepoPort } from 'src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 import { TodoEntity } from 'src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
-import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
+import { StreamingDomainEventBusToken } from '@src/lib/bounded-contexts/todo/todo/constants';
 
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'todo';
 const MONGO_DB_TODO_COLLECTION =
@@ -21,7 +21,7 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
 
   constructor(
     @Inject('MONGO_DB_CONNECTION') private client: MongoClient,
-    @Inject(BUSES_TOKENS.STREAMING_DOMAIN_EVENT_BUS)
+    @Inject(StreamingDomainEventBusToken)
     private readonly domainEventBus: Infra.EventBus.IEventBus,
     private configService: ConfigService<AuthEnvironmentVariables, true>,
   ) {

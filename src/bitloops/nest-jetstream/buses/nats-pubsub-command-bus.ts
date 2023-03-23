@@ -1,21 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ProvidersConstants } from '../contract';
-import { NatsConnection, JSONCodec } from 'nats';
-import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { NatsConnection, JSONCodec, headers, Msg } from 'nats';
+import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
+import { ProvidersConstants } from '../jetstream.constants';
+import { asyncLocalStorage } from '@src/bitloops/tracing';
 
 const jsonCodec = JSONCodec();
 
-export interface PubSubCommandBus {
-  publish(command: any): Promise<void>;
-  request(command: any): Promise<any>;
-  pubSubSubscribe(
-    subject: string,
-    handler: Application.IUseCase<any, any>,
-  ): Promise<void>;
-}
-
 @Injectable()
-export class NatsPubSubCommandBus implements PubSubCommandBus {
+export class NatsPubSubCommandBus
+  implements Infra.CommandBus.IPubSubCommandBus
+{
   private nc: NatsConnection;
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER) private readonly nats: any,
@@ -44,14 +38,20 @@ export class NatsPubSubCommandBus implements PubSubCommandBus {
       this.nats.getConnection().getServer(),
     );
 
-    return await this.nc
-      .request(topic, jsonCodec.encode(command))
-      .then((response) => {
-        return jsonCodec.decode(response.data);
-      })
-      .catch((err) => {
-        console.log('Error in command request:', err);
+    const h = headers();
+    for (const [key, value] of Object.entries(command.metadata)) {
+      h.append(key, value.toString());
+    }
+
+    try {
+      const response = await this.nc.request(topic, jsonCodec.encode(command), {
+        headers: h,
+        timeout: 10000,
       });
+      return jsonCodec.decode(response.data);
+    } catch (error) {
+      console.log('Error in command request', error);
+    }
   }
 
   async pubSubSubscribe(
@@ -60,41 +60,53 @@ export class NatsPubSubCommandBus implements PubSubCommandBus {
   ) {
     try {
       console.log('Subscribing to:', subject);
-      // this.logger.log(`
-      //   Subscribing ${subject}!
-      // `);
       const sub = this.nc.subscribe(subject);
       (async () => {
         for await (const m of sub) {
-          const query = jsonCodec.decode(m.data);
-          const reply = await handler.execute(query);
-          if (reply.isOk && reply.isOk() && m.reply) {
-            this.nc.publish(
-              m.reply,
-              jsonCodec.encode({
-                isOk: true,
-                data: reply.value,
-              }),
-            );
-          } else if (reply.isFail && reply.isFail() && m.reply) {
-            this.nc.publish(
-              m.reply,
-              jsonCodec.encode({
-                isOk: false,
-                error: reply.value,
-              }),
-            );
+          const command = jsonCodec.decode(m.data);
+
+          const correlationId = m.headers?.get('correlationId');
+          if (!correlationId) {
+            await this.handleReceivedCommand(handler, command, m);
+            continue;
           }
-          console.log(
-            `[${sub.getProcessed()}]: ${JSON.stringify(
-              jsonCodec.decode(m.data),
-            )}`,
-          );
+
+          const map: any = new Map(Object.entries({ correlationId }));
+          asyncLocalStorage.run(map, async () => {
+            this.handleReceivedCommand(handler, command, m);
+          });
         }
         console.log('subscription closed');
       })();
     } catch (err) {
       console.log('Error in command-bus subscribe:', err);
     }
+  }
+
+  private async handleReceivedCommand(
+    handler: Application.ICommandHandler<any, any>,
+    command: any,
+    m: Msg,
+  ) {
+    const reply = await handler.execute(command);
+    if (reply.isOk && reply.isOk() && m.reply) {
+      return this.nc.publish(
+        m.reply,
+        jsonCodec.encode({
+          isOk: true,
+          data: reply.value,
+        }),
+      );
+    } else if (reply.isFail && reply.isFail() && m.reply) {
+      return this.nc.publish(
+        m.reply,
+        jsonCodec.encode({
+          isOk: false,
+          error: reply.value,
+        }),
+      );
+    }
+    if (!reply) return;
+    else console.error('Reply is neither ok nor error:', reply);
   }
 }

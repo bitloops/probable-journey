@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ProvidersConstants } from '../contract';
 import {
   NatsConnection,
   JSONCodec,
@@ -12,6 +11,7 @@ import { Application, Domain, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
 import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
 import { EventHandler } from '@src/bitloops/bl-boilerplate-core/domain/events/IEventBus';
+import { ProvidersConstants } from '../jetstream.constants';
 
 const jsonCodec = JSONCodec();
 
@@ -33,7 +33,7 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
 
   static getDurableName(subject: string, handler: Application.IHandle) {
     // Durable name cannot contain a dot
-    const subjectWithoutDots = subject.replace('.', '-');
+    const subjectWithoutDots = subject.replace(/\./g, '-');
     return `${subjectWithoutDots}-${handler.constructor.name}`;
   }
 

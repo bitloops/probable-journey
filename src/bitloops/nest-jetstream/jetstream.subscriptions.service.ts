@@ -5,16 +5,8 @@ import {
   NatsStreamingDomainEventBus,
   NatsStreamingIntegrationEventBus,
 } from './buses';
-import { PubSubQueryBus } from './buses/nats-pubsub-query-bus';
-import { PubSubCommandBus } from './buses/nats-pubsub-command-bus';
-
-export const HANDLERS_TOKENS = {
-  STREAMING_COMMAND_HANDLERS: 'StreamingCommandHandlers',
-  STREAMING_DOMAIN_EVENT_HANDLERS: 'StreamingDomainEventHandlers',
-  STREAMING_INTEGRATION_EVENT_HANDLERS: 'StreamingIntegrationEventHandlers',
-  PUBSUB_COMMAND_HANDLERS: 'PubSubCommandHandlers',
-  PUBSUB_QUERY_HANDLERS: 'PubSubQueryHandlers',
-};
+import { HANDLERS_TOKENS } from './jetstream.constants';
+import { Infra } from '../bl-boilerplate-core';
 
 @Injectable()
 export class SubscriptionsService {
@@ -29,9 +21,9 @@ export class SubscriptionsService {
     @Inject(HANDLERS_TOKENS.STREAMING_COMMAND_HANDLERS)
     private streamingCommandHandlers: any[],
     @Inject(BUSES_TOKENS.PUBSUB_COMMAND_BUS)
-    private commandBus: PubSubCommandBus,
+    private commandBus: Infra.CommandBus.IPubSubCommandBus,
     @Inject(BUSES_TOKENS.PUBSUB_QUERY_BYS)
-    private queryBus: PubSubQueryBus,
+    private queryBus: Infra.QueryBus.IQueryBus,
     @Inject(BUSES_TOKENS.STREAMING_DOMAIN_EVENT_BUS)
     private eventBus: NatsStreamingDomainEventBus,
     @Inject(BUSES_TOKENS.STREAMING_INTEGRATION_EVENT_BUS)

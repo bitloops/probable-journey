@@ -16,10 +16,10 @@ import {
 import * as jwtwebtoken from 'jsonwebtoken';
 import { UserWriteRepoPort } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
 import { UserEntity } from '@src/lib/bounded-contexts/iam/authentication/domain/UserEntity';
-import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses';
 import { EmailVO } from '@src/lib/bounded-contexts/iam/authentication/domain/EmailVO';
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
+import { StreamingDomainEventBusToken } from '@src/lib/bounded-contexts/iam/authentication/constants';
 
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'iam';
 const MONGO_DB_TODO_COLLECTION =
@@ -33,7 +33,7 @@ export class UserWriteRepository implements UserWriteRepoPort {
   private JWT_SECRET: string;
   constructor(
     @Inject('MONGO_DB_CONNECTION') private client: MongoClient,
-    @Inject(BUSES_TOKENS.STREAMING_DOMAIN_EVENT_BUS)
+    @Inject(StreamingDomainEventBusToken)
     private readonly domainEventBus: Infra.EventBus.IEventBus,
     private readonly configService: ConfigService<
       AuthEnvironmentVariables,

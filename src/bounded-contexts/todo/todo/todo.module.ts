@@ -11,11 +11,17 @@ import {
   StreamingDomainEventHandlers,
   StreamingIntegrationEventHandlers,
 } from '@src/lib/bounded-contexts/todo/todo/application/event-handlers';
-import { StreamingIntegrationEventBusToken } from '@src/lib/bounded-contexts/todo/todo/constants';
+import {
+  StreamingDomainEventBusToken,
+  StreamingIntegrationEventBusToken,
+} from '@src/lib/bounded-contexts/todo/todo/constants';
 import { NatsStreamingIntegrationEventBus } from '@src/bitloops/nest-jetstream/buses/nats-streaming-integration-event-bus';
-import { JetstreamModule } from '@src/bitloops/nest-jetstream';
+import {
+  JetstreamModule,
+  NatsStreamingDomainEventBus,
+} from '@src/bitloops/nest-jetstream';
 
-const RepoProviders = [
+const providers = [
   {
     provide: TodoWriteRepoPortToken,
     useClass: TodoWriteRepository,
@@ -27,6 +33,10 @@ const RepoProviders = [
   {
     provide: StreamingIntegrationEventBusToken,
     useClass: NatsStreamingIntegrationEventBus,
+  },
+  {
+    provide: StreamingDomainEventBusToken,
+    useClass: NatsStreamingDomainEventBus,
   },
 ];
 @Module({
@@ -44,7 +54,7 @@ const RepoProviders = [
           ],
         }),
       ],
-      inject: [...RepoProviders],
+      inject: [...providers],
     }),
   ],
   exports: [LibTodoModule],

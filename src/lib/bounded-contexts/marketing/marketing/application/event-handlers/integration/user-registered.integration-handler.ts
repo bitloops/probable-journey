@@ -5,7 +5,7 @@ import { CreateUserCommand } from '../../../commands/create-user.command';
 import { StreamingCommandBusToken } from '../../../constants';
 
 export class UserRegisteredIntegrationEventHandler
-  implements Application.IHandle
+  implements Application.IHandleIntegrationEvent
 {
   constructor(
     @Inject(StreamingCommandBusToken)
@@ -18,6 +18,10 @@ export class UserRegisteredIntegrationEventHandler
 
   get boundedContext() {
     return UserRegisteredIntegrationEvent.fromContextId;
+  }
+
+  get version() {
+    return UserRegisteredIntegrationEvent.versions[0];
   }
 
   public async handle(event: UserRegisteredIntegrationEvent): Promise<void> {

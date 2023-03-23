@@ -1,20 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ProvidersConstants } from '../contract';
 import { NatsConnection, JSONCodec } from 'nats';
-import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
+import { ProvidersConstants } from '../jetstream.constants';
 
 const jsonCodec = JSONCodec();
 
-export interface PubSubQueryBus {
-  request(query: any): Promise<any>;
-  pubSubSubscribe(
-    subject: string,
-    handler: Application.IQueryHandler<any, any>,
-  ): Promise<void>;
-}
-
 @Injectable()
-export class NatsPubSubQueryBus implements PubSubQueryBus {
+export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
   private nc: NatsConnection;
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER) private readonly nats: any,

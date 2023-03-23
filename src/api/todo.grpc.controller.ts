@@ -8,13 +8,12 @@ import { todo } from '../proto/todo';
 import { AddTodoCommand } from '../lib/bounded-contexts/todo/todo/commands/add-todo.command';
 
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
-import { PubSubCommandBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-command-bus'; // TODO get from index
-import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import {
   GetAuthData,
   JwtGrpcAuthGuard,
 } from '@src/bitloops/nest-auth-passport';
+import { Infra } from '@src/bitloops/bl-boilerplate-core';
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
 @Injectable()
@@ -24,9 +23,9 @@ export class TodoGrpcController {
   private readonly JWT_SECRET: string;
   constructor(
     @Inject(BUSES_TOKENS.PUBSUB_COMMAND_BUS)
-    private readonly commandBus: PubSubCommandBus, // private readonly queryBus: QueryBus, // @Inject('NATS_JETSTREAM') private readonly nc: any,
+    private readonly commandBus: Infra.CommandBus.IPubSubCommandBus,
     @Inject(BUSES_TOKENS.PUBSUB_QUERY_BYS)
-    private readonly queryBus: PubSubQueryBus,
+    private readonly queryBus: Infra.QueryBus.IQueryBus,
     private configService: ConfigService<AuthEnvironmentVariables, true>,
   ) {
     this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });

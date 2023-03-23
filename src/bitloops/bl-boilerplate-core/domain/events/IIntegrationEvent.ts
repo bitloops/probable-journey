@@ -27,10 +27,3 @@ interface IIntegrationEventInputMetadata extends TEventMetadata {
 export interface IIntegrationEvent<T> extends IEvent<T> {
   metadata: IIntegrationEventInputMetadata;
 }
-
-// export abstract class IntegrationEvent<T> extends Event<T> {
-//   constructor(eventTopic: string, data: T, metadata: TIntegrationEventInputMetadata) {
-//     super(eventTopic, data, metadata);
-//     this.metadata = { ...this.metadata, version: metadata.version };
-//   }
-// }

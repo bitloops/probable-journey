@@ -1,6 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import {
   BUSES_TOKENS,
+  NatsPubSubCommandBus,
+  NatsPubSubQueryBus,
   NatsStreamingCommandBus,
   NatsStreamingDomainEventBus,
   NatsStreamingIntegrationEventBus,
@@ -40,10 +42,8 @@ export class SubscriptionsService {
 
   private subscribePubSubCommandHandlers(commandHandlers: any[]) {
     commandHandlers.forEach((handler) => {
-      const command = handler.command;
-      const boundedContext = handler.boundedContext;
       this.commandBus.pubSubSubscribe(
-        `${boundedContext}.${command?.name}`,
+        NatsPubSubCommandBus.getTopicFromHandler(handler),
         handler,
       );
     });
@@ -52,10 +52,8 @@ export class SubscriptionsService {
 
   private subscribePubSubQueryHandlers(queryHandlers: any[]) {
     queryHandlers.forEach((handler) => {
-      const query = handler.query;
-      const boundedContext = handler.boundedContext;
       this.queryBus.pubSubSubscribe(
-        `${boundedContext}.${query?.name}`,
+        NatsPubSubQueryBus.getTopicFromHandler(handler),
         handler,
       );
     });
@@ -64,11 +62,8 @@ export class SubscriptionsService {
   private subscribeStreamingDomainEventHandlers(domainEventHandlers: any[]) {
     return Promise.all(
       domainEventHandlers.map((handler) => {
-        const event = handler.event;
-        const boundedContext = handler.boundedContext;
-        const stream =
-          NatsStreamingDomainEventBus.getStreamName(boundedContext);
-        const subject = `${stream}.${event.name}`;
+        const subject =
+          NatsStreamingDomainEventBus.getSubjectFromHandler(handler);
         return this.eventBus.subscribe(subject, handler);
       }),
     );

@@ -27,16 +27,6 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
     this.js = this.nc.jetstream();
   }
 
-  static getStreamName(boundedContext: string) {
-    return `DomainEvents_${boundedContext}`;
-  }
-
-  static getDurableName(subject: string, handler: Application.IHandle) {
-    // Durable name cannot contain a dot
-    const subjectWithoutDots = subject.replace(/\./g, '-');
-    return `${subjectWithoutDots}-${handler.constructor.name}`;
-  }
-
   async publish(
     domainEventsInput: Domain.IDomainEvent<any> | Domain.IDomainEvent<any>[],
   ): Promise<void> {
@@ -118,5 +108,32 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
     eventHandler: EventHandler<T>,
   ): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  static getSubjectFromHandler(handler: Application.IHandle): string {
+    const event = handler.event;
+    const boundedContext = handler.boundedContext;
+    const stream = NatsStreamingDomainEventBus.getStreamName(boundedContext);
+    const subject = `${stream}.${event.name}`;
+    return subject;
+  }
+
+  static getSubjectFromEventInstance(
+    domainEvent: Domain.IDomainEvent<any>,
+  ): string {
+    const boundedContext = domainEvent.metadata.fromContextId;
+    const stream = NatsStreamingDomainEventBus.getStreamName(boundedContext);
+    const subject = `${stream}.${domainEvent.constructor.name}`;
+    return subject;
+  }
+
+  static getStreamName(boundedContext: string) {
+    return `DomainEvents_${boundedContext}`;
+  }
+
+  static getDurableName(subject: string, handler: Application.IHandle) {
+    // Durable name cannot contain a dot
+    const subjectWithoutDots = subject.replace(/\./g, '-');
+    return `${subjectWithoutDots}-${handler.constructor.name}`;
   }
 }

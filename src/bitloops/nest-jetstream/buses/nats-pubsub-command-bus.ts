@@ -1,8 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { NatsConnection, JSONCodec, headers, Msg } from 'nats';
+import { Inject, Injectable, Optional } from '@nestjs/common';
+import { NatsConnection, JSONCodec, headers, Msg, MsgHdrs } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
-import { ProvidersConstants } from '../jetstream.constants';
-import { asyncLocalStorage } from '@src/bitloops/tracing';
+import {
+  ASYNC_LOCAL_STORAGE,
+  ASYNC_LOCAL_STORAGE_FIELDS as METADATA_HEADERS,
+  ProvidersConstants,
+} from '../jetstream.constants';
 
 const jsonCodec = JSONCodec();
 
@@ -13,39 +16,31 @@ export class NatsPubSubCommandBus
   private nc: NatsConnection;
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER) private readonly nats: any,
+    // @Optional()
+    @Inject(ASYNC_LOCAL_STORAGE)
+    private readonly asyncLocalStorage: any,
   ) {
     this.nc = this.nats.getConnection();
   }
 
   async publish(command: Application.Command): Promise<void> {
-    const boundedContext = command.metadata.toContextId;
-    const topic = `${boundedContext}.${command.constructor.name}`;
-    console.log(
-      'Publishing in server:',
-      topic,
-      this.nats.getConnection().getServer(),
-    );
+    const topic = NatsPubSubCommandBus.getTopicFromCommandInstance(command);
+    console.log('Publishing in :', topic);
+    const headers = this.generateHeaders(command);
 
-    this.nc.publish(topic, jsonCodec.encode(command));
+    this.nc.publish(topic, jsonCodec.encode(command), { headers });
   }
 
   async request(command: Application.Command): Promise<any> {
-    const boundedContext = command.metadata.toContextId;
-    const topic = `${boundedContext}.${command.constructor.name}`;
-    console.log(
-      'Publishing in server:',
-      topic,
-      this.nats.getConnection().getServer(),
-    );
+    const topic = NatsPubSubCommandBus.getTopicFromCommandInstance(command);
 
-    const h = headers();
-    for (const [key, value] of Object.entries(command.metadata)) {
-      h.append(key, value.toString());
-    }
+    console.log('Publishing in :', topic);
+
+    const headers = this.generateHeaders(command);
 
     try {
       const response = await this.nc.request(topic, jsonCodec.encode(command), {
-        headers: h,
+        headers,
         timeout: 10000,
       });
       return jsonCodec.decode(response.data);
@@ -65,22 +60,44 @@ export class NatsPubSubCommandBus
         for await (const m of sub) {
           const command = jsonCodec.decode(m.data);
 
-          const correlationId = m.headers?.get('correlationId');
-          if (!correlationId) {
+          const correlationId = m.headers?.get(METADATA_HEADERS.CORRELATION_ID);
+          if (correlationId === undefined) {
             await this.handleReceivedCommand(handler, command, m);
             continue;
           }
 
-          const map: any = new Map(Object.entries({ correlationId }));
-          asyncLocalStorage.run(map, async () => {
+          const contextData: any = new Map(Object.entries({ correlationId }));
+          this.asyncLocalStorage.run(contextData, async () => {
             this.handleReceivedCommand(handler, command, m);
           });
         }
-        console.log('subscription closed');
       })();
     } catch (err) {
       console.log('Error in command-bus subscribe:', err);
     }
+  }
+
+  private generateHeaders(command: Application.Command): MsgHdrs {
+    const h = headers();
+    for (const [key, value] of Object.entries(command.metadata)) {
+      h.append(key, value.toString());
+    }
+    return h;
+  }
+
+  static getTopicFromHandler(
+    handler: Application.ICommandHandler<any, any>,
+  ): string {
+    const command = handler.command;
+    const boundedContext = handler.boundedContext;
+
+    return `${boundedContext}.${command.name}`;
+  }
+
+  static getTopicFromCommandInstance(command: Application.Command): string {
+    const boundedContext = command.metadata.toContextId;
+    const topic = `${boundedContext}.${command.constructor.name}`;
+    return topic;
   }
 
   private async handleReceivedCommand(

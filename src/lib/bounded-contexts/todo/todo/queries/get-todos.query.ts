@@ -1,19 +1,13 @@
 import { Application } from '@bitloops/bl-boilerplate-core';
 
-export class GetTodosQuery {
+export class GetTodosQuery implements Application.IQuery {
+  public metadata: Application.TQueryMetadata;
   public readonly boundedContext = 'Todo';
-  public readonly createdAt = Date.now();
-  constructor(public readonly ctx: any) {}
-}
 
-export class GetTodosQueryLegacy extends Application.Query {
-  public static readonly queryName = 'Todo.GET_TODOS';
-  public ctx: any;
-  constructor(ctx: any) {
-    super(GetTodosQueryLegacy.queryName, 'Todo');
-    this.ctx = ctx;
-  }
-  static getQueryTopic(): string {
-    return super.getQueryTopic(GetTodosQueryLegacy.queryName, 'Todo');
+  constructor(public ctx: any) {
+    this.metadata = {
+      toContextId: 'Todo',
+      createdTimestamp: Date.now(),
+    };
   }
 }

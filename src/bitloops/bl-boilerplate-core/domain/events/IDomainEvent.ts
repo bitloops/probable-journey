@@ -14,7 +14,6 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-import { UUIDv4 } from '../UUIDv4';
 import { IEvent } from './IEvent';
 
 export interface IDomainEvent<T> extends IEvent<T> {

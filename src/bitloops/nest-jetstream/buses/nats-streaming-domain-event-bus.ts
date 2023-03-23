@@ -33,7 +33,7 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
 
   static getDurableName(subject: string, handler: Application.IHandle) {
     // Durable name cannot contain a dot
-    const subjectWithoutDots = subject.replace('.', '-');
+    const subjectWithoutDots = subject.replace(/\./g, '-');
     return `${subjectWithoutDots}-${handler.constructor.name}`;
   }
 

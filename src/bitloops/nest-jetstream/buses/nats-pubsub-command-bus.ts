@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { NatsConnection, JSONCodec, headers } from 'nats';
+import { NatsConnection, JSONCodec, headers, Msg } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { ProvidersConstants } from '../jetstream.constants';
+import { asyncLocalStorage } from '@src/bitloops/tracing';
 
 const jsonCodec = JSONCodec();
 
@@ -59,45 +60,53 @@ export class NatsPubSubCommandBus
   ) {
     try {
       console.log('Subscribing to:', subject);
-      // this.logger.log(`
-      //   Subscribing ${subject}!
-      // `);
       const sub = this.nc.subscribe(subject);
       (async () => {
         for await (const m of sub) {
           const command = jsonCodec.decode(m.data);
-          if (m.headers) {
-            const collerationId = m.headers.get('correlationId');
-            console.log('correlationId');
+
+          const correlationId = m.headers?.get('correlationId');
+          if (!correlationId) {
+            await this.handleReceivedCommand(handler, command, m);
+            continue;
           }
-          const reply = await handler.execute(command);
-          if (reply.isOk && reply.isOk() && m.reply) {
-            this.nc.publish(
-              m.reply,
-              jsonCodec.encode({
-                isOk: true,
-                data: reply.value,
-              }),
-            );
-          } else if (reply.isFail && reply.isFail() && m.reply) {
-            this.nc.publish(
-              m.reply,
-              jsonCodec.encode({
-                isOk: false,
-                error: reply.value,
-              }),
-            );
-          }
-          console.log(
-            `[${sub.getProcessed()}]: ${JSON.stringify(
-              jsonCodec.decode(m.data),
-            )}`,
-          );
+
+          const map: any = new Map(Object.entries({ correlationId }));
+          asyncLocalStorage.run(map, async () => {
+            this.handleReceivedCommand(handler, command, m);
+          });
         }
         console.log('subscription closed');
       })();
     } catch (err) {
       console.log('Error in command-bus subscribe:', err);
     }
+  }
+
+  private async handleReceivedCommand(
+    handler: Application.ICommandHandler<any, any>,
+    command: any,
+    m: Msg,
+  ) {
+    const reply = await handler.execute(command);
+    if (reply.isOk && reply.isOk() && m.reply) {
+      return this.nc.publish(
+        m.reply,
+        jsonCodec.encode({
+          isOk: true,
+          data: reply.value,
+        }),
+      );
+    } else if (reply.isFail && reply.isFail() && m.reply) {
+      return this.nc.publish(
+        m.reply,
+        jsonCodec.encode({
+          isOk: false,
+          error: reply.value,
+        }),
+      );
+    }
+    if (!reply) return;
+    else console.error('Reply is neither ok nor error:', reply);
   }
 }

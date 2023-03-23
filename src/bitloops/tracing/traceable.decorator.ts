@@ -56,7 +56,9 @@ export function Traceable() {
     }
 
     descriptor.value = async function (...args: any[]) {
-      console.log('Started executing: ' + propertyKey);
+      console.log(
+        `Started executing ... [${this.constructor.name}][${propertyKey}]`,
+      );
 
       const store = asyncLocalStorage.getStore();
       const correlationId = store?.get('correlationId');
@@ -69,7 +71,9 @@ export function Traceable() {
       } catch (error) {
         return error;
       } finally {
-        console.log(`${propertyKey} has finished execution.`);
+        console.log(
+          `Finished executing ... [${this.constructor.name}][${propertyKey}].`,
+        );
       }
     };
   };

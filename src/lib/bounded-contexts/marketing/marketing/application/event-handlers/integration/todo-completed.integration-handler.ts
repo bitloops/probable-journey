@@ -3,7 +3,7 @@ import { TodoCompletedIntegrationEvent } from '@src/lib/bounded-contexts/todo/to
 import { IncrementTodosCommand } from '../../../commands/Increment-todos.command';
 
 export class TodoCompletedIntegrationEventHandler
-  implements Application.IHandle
+  implements Application.IHandleIntegrationEvent
 {
   constructor(private commandBus: Infra.CommandBus.IPubSubCommandBus) {}
 
@@ -13,6 +13,10 @@ export class TodoCompletedIntegrationEventHandler
 
   get boundedContext() {
     return 'IAM';
+  }
+
+  get version() {
+    return TodoCompletedIntegrationEvent.versions[0];
   }
 
   public async handle(event: TodoCompletedIntegrationEvent): Promise<void> {

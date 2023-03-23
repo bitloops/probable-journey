@@ -1,5 +1,4 @@
 import { Domain, Either, ok } from '@bitloops/bl-boilerplate-core';
-import { UserRegisteredDomainEvent } from './events/user-registered.event';
 import { UserLoggedInDomainEvent } from './events/user-logged-in.event';
 import { EmailVO } from './EmailVO';
 import { UserUpdatedEmailDomainEvent } from './events/user-updated-email.event';
@@ -26,10 +25,10 @@ export class UserEntity extends Domain.Aggregate<UserProps> {
   public static create(props: UserProps): Either<UserEntity, never> {
     const user = new UserEntity(props);
 
-    const isNew = !props.id;
-    if (isNew) {
-      user.addDomainEvent(new UserRegisteredDomainEvent(user));
-    }
+    // const isNew = !props.id;
+    // if (isNew) {
+    //   user.addDomainEvent(new UserRegisteredDomainEvent(user));
+    // }
     return ok(user);
   }
 

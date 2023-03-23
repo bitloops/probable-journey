@@ -33,7 +33,10 @@ import {
 } from './domain/commands/Command';
 import { TContext as TContextImport } from './domain/context';
 import { IDomainEvent as IDomainEventImport } from './domain/events/IDomainEvent';
-import { Query as QueryImport } from './domain/queries/Query';
+import {
+  IQuery as IQueryImport,
+  QueryMetadata as TQueryMetadataImport,
+} from './domain/queries/IQuery';
 
 import { IHandle as IHandleImport } from './application/IHandle';
 import {
@@ -95,7 +98,8 @@ namespace Application {
   export type TCommandMetadata = CommandMetadataImport;
   export type TContext = TContextImport;
 
-  export class Query extends QueryImport {}
+  export type IQuery = IQueryImport;
+  export type TQueryMetadata = TQueryMetadataImport;
 
   export namespace Repo {
     export namespace Errors {

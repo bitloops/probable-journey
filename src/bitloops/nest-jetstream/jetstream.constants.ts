@@ -8,3 +8,9 @@ export const HANDLERS_TOKENS = {
   PUBSUB_COMMAND_HANDLERS: 'PubSubCommandHandlers',
   PUBSUB_QUERY_HANDLERS: 'PubSubQueryHandlers',
 };
+
+export const ASYNC_LOCAL_STORAGE = Symbol('ASYNC_LOCAL_STORAGE');
+
+export const ASYNC_LOCAL_STORAGE_FIELDS = {
+  CORRELATION_ID: 'correlationId',
+};

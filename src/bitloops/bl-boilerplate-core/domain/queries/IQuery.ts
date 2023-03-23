@@ -20,7 +20,7 @@
 import { IMessage } from '../messages/IMessage';
 
 export type QueryMetadata = {
-  responseTopic: string;
+  responseTopic?: string;
   toContextId: string;
   createdTimestamp: number;
   // messageId?: string;
@@ -28,7 +28,7 @@ export type QueryMetadata = {
 };
 
 export interface IQuery extends IMessage {
-  uuid: string;
-  queryTopic: string;
+  uuid?: string;
+  // queryTopic: string;
   metadata: QueryMetadata;
 }

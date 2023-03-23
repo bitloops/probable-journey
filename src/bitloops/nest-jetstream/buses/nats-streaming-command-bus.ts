@@ -124,7 +124,7 @@ export class NatsStreamingCommandBus
     handler: Application.ICommandHandler<any, any>,
   ) {
     // Durable name cannot contain a dot
-    const subjectWithoutDots = subject.replace('.', '-');
+    const subjectWithoutDots = subject.replace(/\./g, '-');
     return `${subjectWithoutDots}-${handler.constructor.name}`;
   }
 }

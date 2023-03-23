@@ -12,7 +12,12 @@ import {
 } from './buses';
 import { Application } from '../bl-boilerplate-core';
 import { SubscriptionsService } from './jetstream.subscriptions.service';
-import { HANDLERS_TOKENS, ProvidersConstants } from './jetstream.constants';
+import {
+  ASYNC_LOCAL_STORAGE,
+  HANDLERS_TOKENS,
+  ProvidersConstants,
+} from './jetstream.constants';
+import { asyncLocalStorage } from '@bitloops/tracing';
 
 const pubSubCommandBus = {
   provide: BUSES_TOKENS.PUBSUB_COMMAND_BUS,
@@ -49,6 +54,12 @@ export class JetstreamCoreModule {
       },
     };
 
+    // This would probably be injected in plugin config, alongside connectionOptions
+    const asyncLocalStorageProvider = {
+      provide: ASYNC_LOCAL_STORAGE,
+      useValue: asyncLocalStorage,
+    };
+
     return {
       module: JetstreamCoreModule,
       providers: [
@@ -58,6 +69,7 @@ export class JetstreamCoreModule {
         streamingDomainEventBus,
         streamingIntegrationEventBus,
         streamingCommandBus,
+        asyncLocalStorageProvider,
       ],
       exports: [
         jetstreamProviders,
@@ -66,6 +78,7 @@ export class JetstreamCoreModule {
         streamingDomainEventBus,
         streamingIntegrationEventBus,
         streamingCommandBus,
+        asyncLocalStorageProvider,
       ],
     };
   }
@@ -134,20 +147,7 @@ export class JetstreamCoreModule {
     return {
       imports: [moduleOfHandlers],
       module: JetstreamCoreModule,
-      providers: [
-        ...handlers,
-        pubSubCommandBus,
-        pubSubQueryBus,
-        streamingDomainEventBus,
-        streamingCommandBus,
-        SubscriptionsService,
-      ],
-      exports: [
-        pubSubCommandBus,
-        pubSubQueryBus,
-        streamingDomainEventBus,
-        streamingCommandBus,
-      ],
+      providers: [...handlers, SubscriptionsService],
     };
   }
 }

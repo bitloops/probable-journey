@@ -3,8 +3,10 @@ import { NatsConnection, JSONCodec, headers, MsgHdrs } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import {
   ASYNC_LOCAL_STORAGE,
+  METADATA_HEADERS,
   ProvidersConstants,
 } from '../jetstream.constants';
+import { AsyncLocalStorage } from 'node:async_hooks';
 
 const jsonCodec = JSONCodec();
 
@@ -15,7 +17,7 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER) private readonly nats: any,
     // @Optional()
     @Inject(ASYNC_LOCAL_STORAGE)
-    private readonly asyncLocalStorage: any,
+    private readonly asyncLocalStorage: AsyncLocalStorage<any>,
   ) {
     this.nc = this.nats.getConnection();
   }
@@ -53,6 +55,26 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
       (async () => {
         for await (const m of sub) {
           const query = jsonCodec.decode(m.data);
+
+          const correlationId = m.headers?.get(METADATA_HEADERS.CORRELATION_ID);
+
+          if (correlationId) {
+            const contextData: any = new Map(Object.entries({ correlationId }));
+            const reply = await this.asyncLocalStorage.run(contextData, () => {
+              return handler.execute(query);
+            });
+            if (reply.isOk && m.reply) {
+              this.nc.publish(
+                m.reply,
+                jsonCodec.encode({
+                  isOk: true,
+                  data: reply.value,
+                }),
+              );
+            }
+            continue;
+          }
+
           const reply = await handler.execute(query);
           if (reply.isOk && m.reply) {
             this.nc.publish(

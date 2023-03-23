@@ -9,6 +9,7 @@ export class AddTodoCommand extends Application.Command {
   public readonly metadata: Application.TCommandMetadata = {
     toContextId: 'Todo',
     createdTimestamp: Date.now(),
+    // Async localStorage should perhaps be injected or directly used from our library.
     correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
   };
   public title: string;

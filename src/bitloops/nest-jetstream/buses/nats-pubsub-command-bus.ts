@@ -1,9 +1,9 @@
-import { Inject, Injectable, Optional } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { NatsConnection, JSONCodec, headers, Msg, MsgHdrs } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import {
   ASYNC_LOCAL_STORAGE,
-  ASYNC_LOCAL_STORAGE_FIELDS as METADATA_HEADERS,
+  METADATA_HEADERS,
   ProvidersConstants,
 } from '../jetstream.constants';
 
@@ -16,7 +16,6 @@ export class NatsPubSubCommandBus
   private nc: NatsConnection;
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER) private readonly nats: any,
-    // @Optional()
     @Inject(ASYNC_LOCAL_STORAGE)
     private readonly asyncLocalStorage: any,
   ) {

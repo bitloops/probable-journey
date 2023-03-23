@@ -11,6 +11,6 @@ export const HANDLERS_TOKENS = {
 
 export const ASYNC_LOCAL_STORAGE = Symbol('ASYNC_LOCAL_STORAGE');
 
-export const ASYNC_LOCAL_STORAGE_FIELDS = {
+export const METADATA_HEADERS = {
   CORRELATION_ID: 'correlationId',
 };

@@ -47,8 +47,6 @@ export function Traceable() {
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ) {
-    console.log('Inserted decorators returned function');
-    console.log(target, propertyKey, descriptor);
     const originalMethod = descriptor.value;
     // For now we only trace async functions
     if (!isAsyncFunction(originalMethod)) {

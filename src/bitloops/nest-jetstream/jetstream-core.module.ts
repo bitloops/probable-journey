@@ -1,16 +1,8 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
 import { ConnectionOptions } from 'nats';
-import { Jetstream } from './jetstream.service';
 import { NestjsJetstream } from './nestjs-jetstream.class';
-import { ProvidersConstants } from './contract';
-import {
-  NatsPubSubCommandBus,
-  PubSubCommandBus,
-} from './buses/nats-pubsub-command-bus';
-import {
-  NatsPubSubQueryBus,
-  PubSubQueryBus,
-} from './buses/nats-pubsub-query-bus';
+import { NatsPubSubCommandBus } from './buses/nats-pubsub-command-bus';
+import { NatsPubSubQueryBus } from './buses/nats-pubsub-query-bus';
 import { NatsStreamingDomainEventBus } from './buses/nats-streaming-domain-event-bus';
 import { JetstreamModuleFeatureConfig } from './interfaces/module-feature-input.interface';
 import { BUSES_TOKENS } from './buses/constants';
@@ -19,10 +11,8 @@ import {
   NatsStreamingCommandBus,
 } from './buses';
 import { Application } from '../bl-boilerplate-core';
-import {
-  HANDLERS_TOKENS,
-  SubscriptionsService,
-} from './jetstream.subscriptions.service';
+import { SubscriptionsService } from './jetstream.subscriptions.service';
+import { HANDLERS_TOKENS, ProvidersConstants } from './jetstream.constants';
 
 const pubSubCommandBus = {
   provide: BUSES_TOKENS.PUBSUB_COMMAND_BUS,
@@ -59,18 +49,10 @@ export class JetstreamCoreModule {
       },
     };
 
-    const configProv = {
-      provide: ProvidersConstants.JETSTREAM_CONNECTION_CONFIG_PROVIDER,
-      useValue: {
-        ...connectionOptions,
-      },
-    };
-
     return {
       module: JetstreamCoreModule,
       providers: [
         jetstreamProviders,
-        configProv,
         pubSubCommandBus,
         pubSubQueryBus,
         streamingDomainEventBus,
@@ -79,7 +61,6 @@ export class JetstreamCoreModule {
       ],
       exports: [
         jetstreamProviders,
-        configProv,
         pubSubCommandBus,
         pubSubQueryBus,
         streamingDomainEventBus,
@@ -154,14 +135,7 @@ export class JetstreamCoreModule {
       imports: [moduleOfHandlers],
       module: JetstreamCoreModule,
       providers: [
-        {
-          provide: ProvidersConstants.JETSTREAM_STREAM_CONFIG_PROVIDER,
-          useValue: {
-            ...config,
-          },
-        },
         ...handlers,
-        Jetstream,
         pubSubCommandBus,
         pubSubQueryBus,
         streamingDomainEventBus,
@@ -169,7 +143,6 @@ export class JetstreamCoreModule {
         SubscriptionsService,
       ],
       exports: [
-        Jetstream,
         pubSubCommandBus,
         pubSubQueryBus,
         streamingDomainEventBus,

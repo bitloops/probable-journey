@@ -24,6 +24,7 @@ export type CommandMetadata = {
   // responseTopic: string;
   toContextId: string;
   createdTimestamp: number;
+  correlationId?: string;
 };
 
 export interface ICommand {

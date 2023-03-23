@@ -13,9 +13,8 @@ import { UpdateEmailCommand } from '@src/lib/bounded-contexts/iam/authentication
 import { UpdateEmailDTO } from './dto/update-email.dto';
 import { RegisterDTO } from './dto/register.dto';
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
-import { PubSubCommandBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-command-bus';
 import { PubSubQueryBus } from '@src/bitloops/nest-jetstream/buses/nats-pubsub-query-bus';
-import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import {
   AuthService,
   JwtAuthGuard,
@@ -27,7 +26,7 @@ import { Traceable } from '@bitloops/tracing';
 export class AuthController {
   constructor(
     @Inject(BUSES_TOKENS.PUBSUB_COMMAND_BUS)
-    private readonly commandBus: PubSubCommandBus, // private readonly queryBus: QueryBus, // @Inject('NATS_JETSTREAM') private readonly nc: any,
+    private readonly commandBus: Infra.CommandBus.IPubSubCommandBus,
     @Inject(BUSES_TOKENS.PUBSUB_QUERY_BYS)
     private readonly queryBus: PubSubQueryBus,
     private readonly authService: AuthService,

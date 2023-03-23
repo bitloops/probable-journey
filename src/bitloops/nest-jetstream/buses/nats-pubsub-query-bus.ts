@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ProvidersConstants } from '../contract';
 import { NatsConnection, JSONCodec } from 'nats';
 import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { ProvidersConstants } from '../jetstream.constants';
 
 const jsonCodec = JSONCodec();
 

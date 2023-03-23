@@ -17,7 +17,6 @@ export class NestjsJetstream {
   private mutex: Mutex;
 
   constructor() {
-    // this.type = 'nats-jetstream';
     this.mutex = new Mutex();
   }
 

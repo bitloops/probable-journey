@@ -23,6 +23,8 @@ export interface TEventMetadata {
   id: string;
   createdAtTimestamp: number;
   fromContextId: string;
+  messageId?: string;
+  correlationId?: string;
 }
 
 export interface IEvent<T> extends IMessage {

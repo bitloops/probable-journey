@@ -1,4 +1,4 @@
-import { RepoError } from '@src/bitloops/bl-boilerplate-core/application/RepoError';
+import { RepoError } from '../../application/RepoError';
 
 export class UnexpectedError extends RepoError {
   static errorId = 'UNEXPECTED_ERROR';

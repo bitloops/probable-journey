@@ -23,6 +23,8 @@ export type QueryMetadata = {
   responseTopic: string;
   toContextId: string;
   createdTimestamp: number;
+  // messageId?: string;
+  correlationId?: string;
 };
 
 export interface IQuery extends IMessage {

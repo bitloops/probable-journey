@@ -1,6 +1,6 @@
 import { TodoWriteRepoPort } from '@src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 
-export class MockTodoWriteRepo {
+export class MockAddTodoWriteRepo {
   private mockSaveMethod = jest.fn();
   private mockTodoWriteRepo: TodoWriteRepoPort;
 

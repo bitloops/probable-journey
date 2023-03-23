@@ -19,7 +19,7 @@ import { Traceable } from '@src/bitloops/tracing';
 
 type AddTodoUseCaseResponse = Either<
   string,
-  DomainErrors.TitleOutOfBoundsError
+  DomainErrors.TitleOutOfBoundsError | Application.Repo.Errors.Unexpected
 >;
 
 export class AddTodoHandler
@@ -62,7 +62,11 @@ export class AddTodoHandler
       return fail(todo.value);
     }
 
-    await this.todoRepo.save(todo.value, this.ctx);
+    const saved = await this.todoRepo.save(todo.value, this.ctx);
+    // console.log('hereeeeeeeeeeeeeeeee', saved);
+    // if (saved.isFail()) {
+    //   return fail(saved.value);
+    // }
 
     return ok(todo.value.id.toString());
   }

@@ -1,11 +1,15 @@
+import { Application } from '@src/bitloops/bl-boilerplate-core';
 import { AddTodoHandler } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers/add-todo.handler';
 import { AddTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/add-todo.command';
 import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
 import { TodoAddedDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain/events/todo-added.event';
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
-import { ContextBuilder } from './builders/context.builder';
-import { TodoPropsBuilder } from './builders/todo-props.builder';
-import { MockTodoWriteRepo } from './mocks/todo-write-repo.mock';
+import { ContextBuilder } from '../builders/context.builder';
+import { TodoPropsBuilder } from '../builders/todo-props.builder';
+import {
+  // MockTodoFailWriteRepo,
+  MockAddTodoWriteRepo,
+} from './add-todo-write-repo.mock';
 
 describe('Add todo feature test', () => {
   it('Todo created successfully', async () => {
@@ -13,7 +17,7 @@ describe('Add todo feature test', () => {
     const userId = '123';
 
     // given
-    const mockTodoWriteRepo = new MockTodoWriteRepo();
+    const mockTodoWriteRepo = new MockAddTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
     const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
 
@@ -46,7 +50,7 @@ describe('Add todo feature test', () => {
     const userId = '123';
 
     // given
-    const mockTodoWriteRepo = new MockTodoWriteRepo();
+    const mockTodoWriteRepo = new MockAddTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
     const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
 
@@ -59,5 +63,25 @@ describe('Add todo feature test', () => {
     //then
     expect(mockTodoWriteRepo.getMockSaveMethod()).not.toHaveBeenCalled();
     expect(result.value).toBeInstanceOf(DomainErrors.TitleOutOfBoundsError);
+  });
+
+  it('Todo failed to be created, repo error', async () => {
+    const todoTitle = 'New todo title';
+    const userId = '123';
+
+    // given
+    const mockTodoWriteRepo = new MockAddTodoWriteRepo();
+    const ctx = new ContextBuilder().withUserId(userId).build();
+    const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
+
+    // when
+    const addTodoHandler = new AddTodoHandler(
+      mockTodoWriteRepo.getMockTodoWriteRepo(),
+    );
+    const result = await addTodoHandler.execute(addTodoCommand);
+
+    //then
+    expect(mockTodoWriteRepo.getMockSaveMethod()).toHaveBeenCalled();
+    expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });
 });

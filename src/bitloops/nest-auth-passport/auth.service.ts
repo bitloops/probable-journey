@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import { Application, Either } from '../bl-boilerplate-core';
 import { UsersService } from './users/users.service';
+import { User } from './users/user.model';
 
 @Injectable()
 export class AuthService {

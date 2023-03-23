@@ -1,4 +1,5 @@
 import { Application, Either } from '@bitloops/bl-boilerplate-core';
+import { User } from './user.model';
 
 export interface UserRepoPort {
   getByEmail(email: string): Promise<User | null>;

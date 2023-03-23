@@ -10,6 +10,7 @@ import { constants } from '@bitloops/postgres';
 import { UserRepoPort } from './user-repo.port';
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream';
 import { UserRegisteredIntegrationEvent } from './user-registered.integration-event';
+import { User } from './user.model';
 
 @Injectable()
 export class UserPostgresRepository implements UserRepoPort {

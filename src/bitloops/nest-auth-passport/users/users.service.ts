@@ -4,6 +4,7 @@ import {
   UserRepoPort,
   UserRepoPortToken,
 } from '@src/bitloops/nest-auth-passport/users/user-repo.port';
+import { User } from './user.model';
 
 @Injectable()
 export class UsersService {

@@ -3,7 +3,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './authentication.controller';
 import { TodoController } from './todo.rest.controller';
 import { TodoGrpcController } from './todo.grpc.controller';
-import { JetstreamModule } from '@src/bitloops/nest-jetstream';
+import {
+  JetstreamModule,
+  NatsStreamingIntegrationEventBus,
+} from '@src/bitloops/nest-jetstream';
 import configuration from '@src/config/configuration';
 import authConfiguration, {
   AuthEnvironmentVariables,
@@ -40,6 +43,7 @@ import { AuthModule } from '@src/bitloops/nest-auth-passport';
         }),
         inject: [ConfigService],
       },
+      integrationEventBus: NatsStreamingIntegrationEventBus,
     }),
     JetstreamModule.forRoot({}),
   ],

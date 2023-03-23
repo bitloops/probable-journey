@@ -8,16 +8,16 @@ import {
 import { Injectable, Inject } from '@nestjs/common';
 import { constants } from '@bitloops/postgres';
 import { UserRepoPort } from './user-repo.port';
-import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream';
 import { UserRegisteredIntegrationEvent } from './user-registered.integration-event';
 import { User } from './user.model';
+import { IntegrationEventBusToken } from '../constants';
 
 @Injectable()
 export class UserPostgresRepository implements UserRepoPort {
   private readonly tableName = 'users';
   constructor(
     @Inject(constants.pg_connection) private readonly connection: any,
-    @Inject(BUSES_TOKENS.STREAMING_INTEGRATION_EVENT_BUS)
+    @Inject(IntegrationEventBusToken)
     private readonly integrationEventBus: Infra.EventBus.IEventBus,
   ) {}
 

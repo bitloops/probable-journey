@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { Infra, Application } from '@src/bitloops/bl-boilerplate-core';
-import { UserRegisteredIntegrationEvent } from '@src/lib/bounded-contexts/iam/authentication/contracts/integration-events/user-registered.integration-event';
+import { UserRegisteredIntegrationEvent } from '@src/bitloops/nest-auth-passport';
 import { CreateUserCommand } from '../../../commands/create-user.command';
 import { StreamingCommandBusToken } from '../../../constants';
 
@@ -17,7 +17,7 @@ export class UserRegisteredIntegrationEventHandler
   }
 
   get boundedContext() {
-    return 'IAM';
+    return UserRegisteredIntegrationEvent.fromContextId;
   }
 
   public async handle(event: UserRegisteredIntegrationEvent): Promise<void> {

@@ -16,7 +16,10 @@ import {
 } from '../../ports/TodoWriteRepoPort';
 import { ApplicationErrors } from '../errors';
 
-type ModifyTodoTitleResponse = Either<void, DomainErrors.TitleOutOfBoundsError>;
+type ModifyTodoTitleResponse = Either<
+  void,
+  DomainErrors.TitleOutOfBoundsError | Application.Repo.Errors.Unexpected
+>;
 
 @CommandHandler(ModifyTodoTitleCommand)
 export class ModifyTodoTitleHandler

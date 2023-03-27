@@ -13,7 +13,7 @@ export class IncrementTodosCommand extends Application.Command {
 
   constructor(
     props: TIncrementTodosCommand,
-    public readonly ctx?: Application.TContext,
+    public readonly ctx: Application.TContext,
   ) {
     super();
     this.userId = props.userId;

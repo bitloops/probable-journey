@@ -1,8 +1,8 @@
-import { Either, Domain, ok, fail } from "@src/bitloops/bl-boilerplate-core";
-import { CompletedTodosVO } from "./completed-todos.vo";
-import { UserIdVO } from "./user-id.vo";
-import { TodoCompletionsIncrementedDomainEvent } from "./events/todo-completions-incremented.event";
-import { DomainErrors } from "@src/lib/bounded-contexts/marketing/marketing/domain/errors";
+import { Either, Domain, ok, fail } from '@src/bitloops/bl-boilerplate-core';
+import { CompletedTodosVO } from './completed-todos.vo';
+import { UserIdVO } from './user-id.vo';
+import { TodoCompletionsIncrementedDomainEvent } from './events/todo-completions-incremented.event';
+import { DomainErrors } from '@src/lib/bounded-contexts/marketing/marketing/domain/errors';
 
 export interface UserProps {
   id?: Domain.UUIDv4;
@@ -34,7 +34,10 @@ export class UserEntity extends Domain.Aggregate<UserProps> {
     return this._id;
   }
 
-  incrementCompletedTodos(): Either<void, DomainErrors.InvalidTodosCounterError> {
+  incrementCompletedTodos(): Either<
+    void,
+    DomainErrors.InvalidTodosCounterError
+  > {
     const incrementedCompletedTodos = this.props.completedTodos.counter + 1;
     const completedTodos = CompletedTodosVO.create({
       counter: incrementedCompletedTodos,
@@ -44,7 +47,7 @@ export class UserEntity extends Domain.Aggregate<UserProps> {
     }
 
     this.props.completedTodos = completedTodos.value;
-    this.addDomainEvent(new TodoCompletionsIncrementedDomainEvent(this))
+    this.addDomainEvent(new TodoCompletionsIncrementedDomainEvent(this));
     return ok();
   }
 

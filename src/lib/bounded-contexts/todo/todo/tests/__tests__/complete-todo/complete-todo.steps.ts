@@ -7,12 +7,14 @@ import { ContextBuilder } from '../../builders/context.builder';
 import { TodoPropsBuilder } from '../../builders/todo-props.builder';
 import { MockCompleteTodoWriteRepo } from './complete-todo-write-repo.mock';
 import {
+  COMPLETE_TODO_ALREADY_COMPLETED_CASE,
   COMPLETE_TODO_NOT_FOUND_CASE,
   COMPLETE_TODO_REPO_ERROR_GETBYID_CASE,
   COMPLETE_TODO_REPO_ERROR_SAVE_CASE,
   COMPLETE_TODO_SUCCESS_CASE,
 } from './complete-todo.mock';
 import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
 
 describe('Complete todo feature test', () => {
   it('Todo completed successfully', async () => {
@@ -79,7 +81,30 @@ describe('Complete todo feature test', () => {
     );
     expect(result.value).toBeInstanceOf(ApplicationErrors.TodoNotFoundError);
   });
-  it('Todo failed to be completed, repo error to getById', async () => {
+  it('Todo completed failed, todo already completed', async () => {
+    const userId = COMPLETE_TODO_ALREADY_COMPLETED_CASE.userId;
+    const todoId = COMPLETE_TODO_ALREADY_COMPLETED_CASE.id;
+
+    // given
+    const mockCompleteTodoWriteRepo = new MockCompleteTodoWriteRepo();
+    const ctx = new ContextBuilder().withUserId(userId).build();
+    const completeTodoCommand = new CompleteTodoCommand({ todoId }, ctx);
+
+    // when
+    const completeTodoHandler = new CompleteTodoHandler(
+      mockCompleteTodoWriteRepo.getMockTodoWriteRepo(),
+    );
+    const result = await completeTodoHandler.execute(completeTodoCommand);
+
+    //then
+    expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
+      { value: todoId },
+      ctx,
+    );
+    expect(result.value).toBeInstanceOf(DomainErrors.TodoAlreadyCompletedError);
+  });
+
+  it('Todo failed to be completed, getById repo error', async () => {
     const userId = COMPLETE_TODO_REPO_ERROR_GETBYID_CASE.userId;
     const todoId = COMPLETE_TODO_REPO_ERROR_GETBYID_CASE.id;
 
@@ -101,7 +126,7 @@ describe('Complete todo feature test', () => {
     );
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });
-  it('Todo failed to be completed, repo error to save', async () => {
+  it('Todo failed to be completed, save repo error', async () => {
     const userId = COMPLETE_TODO_REPO_ERROR_SAVE_CASE.userId;
     const todoId = COMPLETE_TODO_REPO_ERROR_SAVE_CASE.id;
 

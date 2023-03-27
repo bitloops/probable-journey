@@ -7,7 +7,9 @@ import {
 } from '@src/bitloops/bl-boilerplate-core';
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 import { TodoWriteRepoPort } from '@src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
+import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
 import {
+  UNCOMPLETE_TODO_ALREADY_UNCOMPLETED_CASE,
   UNCOMPLETE_TODO_NOT_FOUND_CASE,
   UNCOMPLETE_TODO_REPO_ERROR_GETBYID_CASE,
   UNCOMPLETE_TODO_REPO_ERROR_SAVE_CASE,
@@ -21,7 +23,7 @@ export class MockCompleteTodoWriteRepo {
 
   constructor() {
     this.mockSaveMethod = this.getMockSaveMethod();
-    this.mockGetByIdMethod = this.getMockById();
+    this.mockGetByIdMethod = this.getMockGetByIdMethod();
     this.mockTodoWriteRepo = {
       save: this.mockSaveMethod,
       getById: this.mockGetByIdMethod,
@@ -53,12 +55,16 @@ export class MockCompleteTodoWriteRepo {
     );
   }
 
-  private getMockById() {
+  private getMockGetByIdMethod() {
     return jest.fn(
       (
         id: Domain.UUIDv4,
       ): Promise<
-        Either<TodoEntity | null, Application.Repo.Errors.Unexpected>
+        Either<
+          TodoEntity | null,
+          | DomainErrors.TodoAlreadyUncompletedError
+          | Application.Repo.Errors.Unexpected
+        >
       > => {
         if (id.equals(new Domain.UUIDv4(UNCOMPLETE_TODO_SUCCESS_CASE.id))) {
           const todo = TodoEntity.fromPrimitives(UNCOMPLETE_TODO_SUCCESS_CASE);
@@ -66,6 +72,15 @@ export class MockCompleteTodoWriteRepo {
         }
         if (id.equals(new Domain.UUIDv4(UNCOMPLETE_TODO_NOT_FOUND_CASE.id))) {
           return Promise.resolve(ok(null));
+        }
+        if (
+          id.equals(
+            new Domain.UUIDv4(UNCOMPLETE_TODO_ALREADY_UNCOMPLETED_CASE.id),
+          )
+        ) {
+          return Promise.resolve(
+            fail(new DomainErrors.TodoAlreadyUncompletedError(id.toString())),
+          );
         }
         if (
           id.equals(

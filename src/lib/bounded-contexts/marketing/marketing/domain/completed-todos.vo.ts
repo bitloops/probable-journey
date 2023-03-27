@@ -18,7 +18,9 @@ export class CompletedTodosVO extends Domain.ValueObject<CompletedTodosProps> {
   public static create(
     props: CompletedTodosProps,
   ): Either<CompletedTodosVO, DomainErrors.InvalidTodosCounterError> {
-    const res = Domain.applyRules([new Rules.CompletedTodosIsPositiveNumber(props.counter)]);
+    const res = Domain.applyRules([
+      new Rules.CompletedTodosIsPositiveNumber(props.counter),
+    ]);
     if (res) return fail(res);
     return ok(new CompletedTodosVO(props));
   }

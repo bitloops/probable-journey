@@ -6,6 +6,7 @@ import { ContextBuilder } from '../../builders/context.builder';
 import { TodoPropsBuilder } from '../../builders/todo-props.builder';
 import { MockCompleteTodoWriteRepo } from './uncomplete-todo-write-repo.mock';
 import {
+  UNCOMPLETE_TODO_ALREADY_UNCOMPLETED_CASE,
   UNCOMPLETE_TODO_NOT_FOUND_CASE,
   UNCOMPLETE_TODO_REPO_ERROR_GETBYID_CASE,
   UNCOMPLETE_TODO_REPO_ERROR_SAVE_CASE,
@@ -13,6 +14,7 @@ import {
 } from './uncomplete-todo.mock';
 import { Application } from '@src/bitloops/bl-boilerplate-core';
 import { TodoUncompletedDomainEvent } from '../../../domain/events/todo-uncompleted.event';
+import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
 
 describe('Uncomplete todo feature test', () => {
   it('Todo uncompleted successfully', async () => {
@@ -79,7 +81,32 @@ describe('Uncomplete todo feature test', () => {
     );
     expect(result.value).toBeInstanceOf(ApplicationErrors.TodoNotFoundError);
   });
-  it('Todo failed to be uncompleted, repo error to getById', async () => {
+  it('Todo uncompleted failed, todo already uncompleted', async () => {
+    const userId = UNCOMPLETE_TODO_ALREADY_UNCOMPLETED_CASE.userId;
+    const todoId = UNCOMPLETE_TODO_ALREADY_UNCOMPLETED_CASE.id;
+
+    // given
+    const mockCompleteTodoWriteRepo = new MockCompleteTodoWriteRepo();
+    const ctx = new ContextBuilder().withUserId(userId).build();
+    const completeTodoCommand = new CompleteTodoCommand({ todoId }, ctx);
+
+    // when
+    const completeTodoHandler = new UncompleteTodoHandler(
+      mockCompleteTodoWriteRepo.getMockTodoWriteRepo(),
+    );
+    const result = await completeTodoHandler.execute(completeTodoCommand);
+
+    //then
+    expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
+      { value: todoId },
+      ctx,
+    );
+    expect(result.value).toBeInstanceOf(
+      DomainErrors.TodoAlreadyUncompletedError,
+    );
+  });
+
+  it('Todo failed to be uncompleted, getById repo error', async () => {
     const userId = UNCOMPLETE_TODO_REPO_ERROR_GETBYID_CASE.userId;
     const todoId = UNCOMPLETE_TODO_REPO_ERROR_GETBYID_CASE.id;
 
@@ -101,7 +128,7 @@ describe('Uncomplete todo feature test', () => {
     );
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });
-  it('Todo failed to be uncompleted, repo error to save', async () => {
+  it('Todo failed to be uncompleted, save repo error', async () => {
     const userId = UNCOMPLETE_TODO_REPO_ERROR_SAVE_CASE.userId;
     const todoId = UNCOMPLETE_TODO_REPO_ERROR_SAVE_CASE.id;
 

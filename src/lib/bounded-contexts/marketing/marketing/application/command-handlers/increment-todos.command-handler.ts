@@ -9,6 +9,7 @@ import {
   UserWriteRepoPort,
   UserWriteRepoPortToken,
 } from '../../ports/user-write.repo-port';
+import { Traceable } from '@src/bitloops/tracing';
 
 type IncrementDepositsCommandHandlerResponse = Either<
   void,
@@ -22,6 +23,7 @@ export class IncrementTodosCommandHandler
       Promise<IncrementDepositsCommandHandlerResponse>
     >
 {
+  private ctx: Application.TContext;
   constructor(
     @Inject(UserWriteRepoPortToken) private userRepo: UserWriteRepoPort,
   ) {}
@@ -34,11 +36,15 @@ export class IncrementTodosCommandHandler
     return 'Marketing';
   }
 
+  @Traceable()
   async execute(
     command: IncrementTodosCommand,
   ): Promise<IncrementDepositsCommandHandlerResponse> {
+    this.ctx = command.ctx;
+    console.log('IncrementTodosCommandHandler');
+
     const requestUserId = new Domain.UUIDv4(command.userId);
-    const user = await this.userRepo.getById(requestUserId);
+    const user = await this.userRepo.getById(requestUserId, this.ctx);
     if (user.isFail()) {
       return fail(user.value);
     }
@@ -59,14 +65,14 @@ export class IncrementTodosCommandHandler
       }
       const newUser = newUserOrError.value;
       newUser.incrementCompletedTodos();
-      const saveResult = await this.userRepo.save(newUser);
+      const saveResult = await this.userRepo.save(newUser, this.ctx);
       if (saveResult.isFail()) {
         return fail(saveResult.value);
       }
       return ok();
     } else {
       user.value.incrementCompletedTodos();
-      const saveResult = await this.userRepo.save(user.value);
+      const saveResult = await this.userRepo.save(user.value, this.ctx);
       if (saveResult.isFail()) {
         return fail(saveResult.value);
       }

@@ -25,3 +25,10 @@ export const COMPLETE_TODO_REPO_ERROR_SAVE_CASE = {
   title: 'New todo title',
   completed: false,
 };
+
+export const COMPLETE_TODO_ALREADY_COMPLETED_CASE = {
+  userId: '123',
+  id: 'todo5',
+  title: 'New todo title',
+  completed: true,
+};

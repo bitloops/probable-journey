@@ -1,17 +1,25 @@
-import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { Application, Domain } from '@src/bitloops/bl-boilerplate-core';
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 import { TodoWriteRepoPort } from '@src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
+import {
+  MODIFY_INVALID_TITLE_CASE,
+  MODIFY_TITLE_SUCCESS_CASE,
+  MODIFY_TODO_NOT_FOUND_CASE,
+  MODIFY_TODO_REPO_ERROR_CASE,
+} from './modify-title-todo.mock';
 
 export class ModifyTitleWriteRepo {
   private mockTodoWriteRepo: TodoWriteRepoPort;
   public readonly mockUpdateMethod: jest.Mock;
+  public readonly mockGetByIdMethod: jest.Mock;
 
   constructor() {
     this.mockUpdateMethod = this.getMockUpdateMethod();
+    this.mockGetByIdMethod = this.getMockGetByIdMethod();
     this.mockTodoWriteRepo = {
-      save: this.mockUpdateMethod,
-      getById: jest.fn(),
-      update: jest.fn(),
+      save: jest.fn(),
+      getById: this.mockGetByIdMethod,
+      update: this.mockUpdateMethod,
       delete: jest.fn(),
     };
   }
@@ -22,11 +30,51 @@ export class ModifyTitleWriteRepo {
 
   private getMockUpdateMethod(): jest.Mock {
     return jest.fn((todo: TodoEntity): Promise<void> => {
-      // TODO this should return a Promise<Either<void, Application.Repo.Errors.Unexpected>> and import fail from npm package
-      //   if (todo.userId.id.equals(new Domain.UUIDv4(FAILED_USER_ID))) {
-      //     return fail(new Application.Repo.Errors.Unexpected('Unexpected error'));
-      //   }
+      if (
+        todo.userId.id.equals(
+          new Domain.UUIDv4(MODIFY_TODO_REPO_ERROR_CASE.titleId),
+        )
+      ) {
+        return fail(new Application.Repo.Errors.Unexpected('Unexpected error'));
+      }
       return Promise.resolve();
+    });
+  }
+
+  private getMockGetByIdMethod(): jest.Mock {
+    return jest.fn((id: Domain.UUIDv4): Promise<TodoEntity | null> => {
+      if (id.equals(new Domain.UUIDv4(MODIFY_TITLE_SUCCESS_CASE.titleId))) {
+        const { userId, completed, titleBeforeUpdate, titleId } =
+          MODIFY_TITLE_SUCCESS_CASE;
+        const todo = TodoEntity.fromPrimitives({
+          id: titleId,
+          title: titleBeforeUpdate,
+          userId,
+          completed,
+        });
+        return Promise.resolve(todo);
+      } else if (
+        id.equals(new Domain.UUIDv4(MODIFY_INVALID_TITLE_CASE.titleId))
+      ) {
+        const { userId, completed, titleBeforeUpdate, titleId } =
+          MODIFY_INVALID_TITLE_CASE;
+        const todo = TodoEntity.fromPrimitives({
+          id: titleId,
+          title: titleBeforeUpdate,
+          userId,
+          completed,
+        });
+        return Promise.resolve(todo);
+      } else if (
+        id.equals(new Domain.UUIDv4(MODIFY_TODO_NOT_FOUND_CASE.titleId))
+      ) {
+        return Promise.resolve(null);
+      } else if (
+        id.equals(new Domain.UUIDv4(MODIFY_TODO_REPO_ERROR_CASE.titleId))
+      ) {
+        return fail(new Application.Repo.Errors.Unexpected('Unexpected error'));
+      }
+      return Promise.resolve(null);
     });
   }
 }

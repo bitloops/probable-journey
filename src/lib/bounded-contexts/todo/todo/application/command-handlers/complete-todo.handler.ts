@@ -57,7 +57,7 @@ export class CompleteTodoHandler
     if (todo.isFail()) {
       return fail(todo.value);
     }
-    if (todo.value === null) {
+    if (!todo.value) {
       return fail(new ApplicationErrors.TodoNotFoundError(command.id));
     }
 

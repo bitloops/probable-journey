@@ -22,8 +22,16 @@ export const MODIFY_TODO_NOT_FOUND_CASE = {
   completed: false,
 };
 
-export const MODIFY_TODO_REPO_ERROR_CASE = {
+export const MODIFY_TODO_GET_BY_ID_REPO_ERROR_CASE = {
   titleId: '1234',
+  titleBeforeUpdate: 'new title',
+  titleAfterUpdate: 'modify title',
+  userId: '123',
+  completed: false,
+};
+
+export const MODIFY_TODO_UPDATE_REPO_ERROR_CASE = {
+  titleId: '12345',
   titleBeforeUpdate: 'new title',
   titleAfterUpdate: 'modify title',
   userId: '123',

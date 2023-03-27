@@ -10,8 +10,9 @@ import { TodoPropsBuilder } from '../../builders/todo-props.builder';
 import {
   MODIFY_INVALID_TITLE_CASE,
   MODIFY_TITLE_SUCCESS_CASE,
+  MODIFY_TODO_GET_BY_ID_REPO_ERROR_CASE,
   MODIFY_TODO_NOT_FOUND_CASE,
-  MODIFY_TODO_REPO_ERROR_CASE,
+  MODIFY_TODO_UPDATE_REPO_ERROR_CASE,
 } from './modify-title-todo.mock';
 import { ModifyTitleWriteRepo } from './modify-title-write-repo.mock';
 
@@ -111,7 +112,8 @@ describe('Modify title todo feature test', () => {
   });
 
   it('Todo title failed to be modified, getById repo error', async () => {
-    const { userId, titleId, titleAfterUpdate } = MODIFY_TODO_REPO_ERROR_CASE;
+    const { userId, titleId, titleAfterUpdate } =
+      MODIFY_TODO_GET_BY_ID_REPO_ERROR_CASE;
 
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();
@@ -137,7 +139,8 @@ describe('Modify title todo feature test', () => {
   });
 
   it('Todo title failed to be modified, update repo error', async () => {
-    const { userId, titleId, titleAfterUpdate } = MODIFY_TODO_REPO_ERROR_CASE;
+    const { userId, titleId, titleAfterUpdate } =
+      MODIFY_TODO_UPDATE_REPO_ERROR_CASE;
 
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();

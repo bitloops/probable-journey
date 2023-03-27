@@ -1,9 +1,6 @@
-import { AddTodoHandler } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers/add-todo.handler';
+import { Domain } from '@src/bitloops/bl-boilerplate-core';
 import { CompleteTodoHandler } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers/complete-todo.handler';
-import { AddTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/add-todo.command';
 import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
-import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
-import { TodoAddedDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain/events/todo-added.event';
 import { TodoCompletedDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain/events/todo-completed.event';
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 import { ContextBuilder } from '../../builders/context.builder';
@@ -22,7 +19,6 @@ describe('Complete todo feature test', () => {
     // given
     const mockCompleteTodoWriteRepo = new MockCompleteTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    // const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
     const completeTodoCommand = new CompleteTodoCommand({ todoId }, ctx);
 
     // when
@@ -36,35 +32,24 @@ describe('Complete todo feature test', () => {
       .withTitle(todoTitle)
       .withCompleted(true)
       .withUserId(userId)
+      .withId(todoId)
       .build();
 
-    expect(mockCompleteTodoWriteRepo.getMockSaveMethod()).toHaveBeenCalledWith(
+    expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
+      { value: todoId },
+      ctx,
+    );
+    expect(mockCompleteTodoWriteRepo.mockSaveMethod).toHaveBeenCalledWith(
       expect.any(TodoEntity),
       ctx,
     );
+
     const todoAggregate =
-      mockCompleteTodoWriteRepo.getMockSaveMethod().mock.calls[0][0];
+      mockCompleteTodoWriteRepo.mockSaveMethod.mock.calls[0][0];
     expect(todoAggregate.props).toEqual(todoProps);
     expect(todoAggregate.domainEvents[0]).toBeInstanceOf(
       TodoCompletedDomainEvent,
     );
-    expect(typeof result.value).toBe('string');
+    expect(typeof result.value).toBe('undefined');
   });
-
-//   it('Todo failed to be created, invalid title', async () => {
-//     //     const todoTitle = 'i';
-//     //     const userId = '123';
-//     //     // given
-//     //     const mockTodoWriteRepo = new MockTodoWriteRepo();
-//     //     const ctx = new ContextBuilder().withUserId(userId).build();
-//     //     const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
-//     //     // when
-//     //     const addTodoHandler = new AddTodoHandler(
-//     //       mockTodoWriteRepo.getMockTodoWriteRepo(),
-//     //     );
-//     //     const result = await addTodoHandler.execute(addTodoCommand);
-//     //     //then
-//     //     expect(mockTodoWriteRepo.getMockSaveMethod()).not.toHaveBeenCalled();
-//     //     expect(result.value).toBeInstanceOf(DomainErrors.TitleOutOfBoundsError);
-//   });
 });

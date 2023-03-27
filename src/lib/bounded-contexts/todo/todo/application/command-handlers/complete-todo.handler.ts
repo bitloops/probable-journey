@@ -14,6 +14,7 @@ import {
   TodoWriteRepoPort,
   TodoWriteRepoPortToken,
 } from '../../ports/TodoWriteRepoPort';
+import { Traceable } from '@src/bitloops/tracing';
 
 type CompleteTodoUseCaseResponse = Either<
   void,
@@ -28,6 +29,7 @@ export class CompleteTodoHandler
       Promise<CompleteTodoUseCaseResponse>
     >
 {
+  private ctx: Application.TContext;
   constructor(
     @Inject(TodoWriteRepoPortToken)
     private readonly todoRepo: TodoWriteRepoPort,
@@ -41,12 +43,17 @@ export class CompleteTodoHandler
     return 'Todo';
   }
 
+  @Traceable()
   async execute(
     command: CompleteTodoCommand,
   ): Promise<CompleteTodoUseCaseResponse> {
+    this.ctx = command.ctx;
     console.log('CompleteTodoHandler');
 
-    const todo = await this.todoRepo.getById(new Domain.UUIDv4(command.id));
+    const todo = await this.todoRepo.getById(
+      new Domain.UUIDv4(command.id),
+      this.ctx,
+    );
     if (todo === null) {
       return fail(new ApplicationErrors.TodoNotFoundError(command.id));
     }
@@ -55,7 +62,7 @@ export class CompleteTodoHandler
     if (completedOrError.isFail()) {
       return fail(completedOrError.value);
     }
-    await this.todoRepo.save(todo);
+    await this.todoRepo.save(todo, this.ctx);
 
     return ok();
   }

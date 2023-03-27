@@ -7,25 +7,20 @@ import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntit
 import { ContextBuilder } from '../../builders/context.builder';
 import { TodoPropsBuilder } from '../../builders/todo-props.builder';
 import { MockAddTodoWriteRepo } from './add-todo-write-repo.mock';
-import { FAILED_USER_ID } from './add-todo.mock';
-
-// Given <title> , <userId> and <saveMethod>
-// When I add todo
-// Then I should have <props> , <domainEvent> and <result>
-
-// Examples:
-//   | title | userId | saveMethod | props | domainEvent | result |
-//   | New todo title | 123 | void | {title: 'New todo title', ...} | TodoAddedDomainEvent | typeof string |
+import {
+  ADD_TODO_INVALID_TITLE_CASE,
+  ADD_TODO_REPO_ERROR_CASE,
+  ADD_TODO_SUCCESS_CASE,
+} from './add-todo.mock';
 
 describe('Add todo feature test', () => {
   it('Todo created successfully', async () => {
-    const todoTitle = 'New todo title';
-    const userId = '123';
+    const { userId, title, completed } = ADD_TODO_SUCCESS_CASE;
 
     // given
     const mockTodoWriteRepo = new MockAddTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
+    const addTodoCommand = new AddTodoCommand({ title }, ctx);
 
     // when
     const addTodoHandler = new AddTodoHandler(
@@ -35,8 +30,8 @@ describe('Add todo feature test', () => {
 
     //then
     const todoProps = new TodoPropsBuilder()
-      .withTitle(todoTitle)
-      .withCompleted(false)
+      .withTitle(title)
+      .withCompleted(completed)
       .withUserId(userId)
       .build();
 
@@ -51,13 +46,11 @@ describe('Add todo feature test', () => {
   });
 
   it('Todo failed to be created, invalid title', async () => {
-    const todoTitle = 'i';
-    const userId = '123';
-
+    const { userId, title } = ADD_TODO_INVALID_TITLE_CASE;
     // given
     const mockTodoWriteRepo = new MockAddTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
+    const addTodoCommand = new AddTodoCommand({ title }, ctx);
 
     // when
     const addTodoHandler = new AddTodoHandler(
@@ -71,13 +64,12 @@ describe('Add todo feature test', () => {
   });
 
   it('Todo failed to be created, repo error', async () => {
-    const todoTitle = 'New todo title';
-    const userId = FAILED_USER_ID;
+    const { userId, title } = ADD_TODO_REPO_ERROR_CASE;
 
     // given
     const mockTodoWriteRepo = new MockAddTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
+    const addTodoCommand = new AddTodoCommand({ title }, ctx);
 
     // when
     const addTodoHandler = new AddTodoHandler(

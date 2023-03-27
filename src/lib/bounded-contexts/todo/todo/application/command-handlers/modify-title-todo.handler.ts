@@ -26,6 +26,7 @@ export class ModifyTodoTitleHandler
       Promise<ModifyTodoTitleResponse>
     >
 {
+  private ctx: Application.TContext;
   constructor(
     @Inject(TodoWriteRepoPortToken)
     private readonly todoRepo: TodoWriteRepoPort,
@@ -42,8 +43,9 @@ export class ModifyTodoTitleHandler
   async execute(
     command: ModifyTodoTitleCommand,
   ): Promise<ModifyTodoTitleResponse> {
+    this.ctx = command.ctx;
     const requestId = new Domain.UUIDv4(command.id);
-    const todoFound = await this.todoRepo.getById(requestId);
+    const todoFound = await this.todoRepo.getById(requestId, this.ctx);
 
     if (!todoFound) {
       return fail(
@@ -57,7 +59,7 @@ export class ModifyTodoTitleHandler
     }
 
     todoFound.modifyTitle(titleToUpdate.value);
-    await this.todoRepo.save(todoFound);
+    await this.todoRepo.update(todoFound, this.ctx);
 
     return ok();
   }

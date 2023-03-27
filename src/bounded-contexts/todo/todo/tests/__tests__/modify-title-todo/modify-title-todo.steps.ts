@@ -1,23 +1,31 @@
+import { Application, Domain } from '@src/bitloops/bl-boilerplate-core';
 import { ModifyTodoTitleHandler } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers/modify-title-todo.handler';
+import { ApplicationErrors } from '@src/lib/bounded-contexts/todo/todo/application/errors';
 import { ModifyTodoTitleCommand } from '@src/lib/bounded-contexts/todo/todo/commands/modify-title-todo.command';
+import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
 import { TodoTitleModifiedDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain/events/todo-title-modified.event';
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 import { ContextBuilder } from '../../builders/context.builder';
 import { TodoPropsBuilder } from '../../builders/todo-props.builder';
+import {
+  MODIFY_INVALID_TITLE_CASE,
+  MODIFY_TITLE_SUCCESS_CASE,
+  MODIFY_TODO_NOT_FOUND_CASE,
+  MODIFY_TODO_REPO_ERROR_CASE,
+} from './modify-title-todo.mock';
 import { ModifyTitleWriteRepo } from './modify-title-write-repo.mock';
 
 describe('Modify title todo feature test', () => {
   it('Todo title modified successfully', async () => {
-    const todoTitle = 'modify title';
-    const userId = '123';
-    const titleId = '1';
+    const { userId, titleId, titleAfterUpdate, completed } =
+      MODIFY_TITLE_SUCCESS_CASE;
 
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
     const modifyTodoTitleCommand = new ModifyTodoTitleCommand(
-      { title: todoTitle, id: titleId },
-      // ctx,
+      { title: titleAfterUpdate, id: titleId },
+      ctx,
     );
 
     // when
@@ -28,12 +36,16 @@ describe('Modify title todo feature test', () => {
 
     //then
     const todoProps = new TodoPropsBuilder()
-      .withTitle(todoTitle)
-      .withCompleted(false)
+      .withTitle(titleAfterUpdate)
+      .withCompleted(completed)
       .withUserId(userId)
       .withId(titleId)
       .build();
 
+    expect(mockTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
+      new Domain.UUIDv4(titleId),
+      ctx,
+    );
     expect(mockTodoWriteRepo.mockUpdateMethod).toHaveBeenCalledWith(
       expect.any(TodoEntity),
       ctx,
@@ -43,46 +55,113 @@ describe('Modify title todo feature test', () => {
     expect(todoAggregate.domainEvents[0]).toBeInstanceOf(
       TodoTitleModifiedDomainEvent,
     );
-    expect(typeof result.value).toBe('string');
+    expect(result.value).toBe(undefined);
   });
 
-  //   it('Todo failed to be created, invalid title', async () => {
-  //     const todoTitle = 'i';
-  //     const userId = '123';
+  it('Todo title failed to be modified, invalid title', async () => {
+    const { userId, titleId, titleAfterUpdate } = MODIFY_INVALID_TITLE_CASE;
 
-  //     // given
-  //     const mockTodoWriteRepo = new MockAddTodoWriteRepo();
-  //     const ctx = new ContextBuilder().withUserId(userId).build();
-  //     const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
+    // given
+    const mockTodoWriteRepo = new ModifyTitleWriteRepo();
+    const ctx = new ContextBuilder().withUserId(userId).build();
+    const modifyTodoTitleCommand = new ModifyTodoTitleCommand(
+      { title: titleAfterUpdate, id: titleId },
+      ctx,
+    );
 
-  //     // when
-  //     const addTodoHandler = new AddTodoHandler(
-  //       mockTodoWriteRepo.getMockTodoWriteRepo(),
-  //     );
-  //     const result = await addTodoHandler.execute(addTodoCommand);
+    // when
+    const modifyTodoTitleHandler = new ModifyTodoTitleHandler(
+      mockTodoWriteRepo.getMockTodoWriteRepo(),
+    );
+    const result = await modifyTodoTitleHandler.execute(modifyTodoTitleCommand);
 
-  //     //then
-  //     expect(mockTodoWriteRepo.mockSaveMethod).not.toHaveBeenCalled();
-  //     expect(result.value).toBeInstanceOf(DomainErrors.TitleOutOfBoundsError);
-  //   });
+    //then
+    expect(mockTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
+      new Domain.UUIDv4(titleId),
+      ctx,
+    );
+    expect(mockTodoWriteRepo.mockUpdateMethod).not.toHaveBeenCalled();
+    expect(result.value).toBeInstanceOf(DomainErrors.TitleOutOfBoundsError);
+  });
 
-  //   it('Todo failed to be created, repo error', async () => {
-  //     const todoTitle = 'New todo title';
-  //     const userId = FAILED_USER_ID;
+  it('Todo title failed to be modified, title not found', async () => {
+    const { userId, titleId, titleAfterUpdate } = MODIFY_TODO_NOT_FOUND_CASE;
 
-  //     // given
-  //     const mockTodoWriteRepo = new MockAddTodoWriteRepo();
-  //     const ctx = new ContextBuilder().withUserId(userId).build();
-  //     const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
+    // given
+    const mockTodoWriteRepo = new ModifyTitleWriteRepo();
+    const ctx = new ContextBuilder().withUserId(userId).build();
+    const modifyTodoTitleCommand = new ModifyTodoTitleCommand(
+      { title: titleAfterUpdate, id: titleId },
+      ctx,
+    );
 
-  //     // when
-  //     const addTodoHandler = new AddTodoHandler(
-  //       mockTodoWriteRepo.getMockTodoWriteRepo(),
-  //     );
-  //     const result = await addTodoHandler.execute(addTodoCommand);
+    // when
+    const modifyTodoTitleHandler = new ModifyTodoTitleHandler(
+      mockTodoWriteRepo.getMockTodoWriteRepo(),
+    );
+    const result = await modifyTodoTitleHandler.execute(modifyTodoTitleCommand);
 
-  //     //then
-  //     expect(mockTodoWriteRepo.mockSaveMethod).toHaveBeenCalled();
-  //     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
-  //   });
+    //then
+    expect(mockTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
+      new Domain.UUIDv4(titleId),
+      ctx,
+    );
+    expect(mockTodoWriteRepo.mockUpdateMethod).not.toHaveBeenCalled();
+    expect(result.value).toBeInstanceOf(ApplicationErrors.TodoNotFoundError);
+  });
+
+  it('Todo title failed to be modified, getById repo error', async () => {
+    const { userId, titleId, titleAfterUpdate } = MODIFY_TODO_REPO_ERROR_CASE;
+
+    // given
+    const mockTodoWriteRepo = new ModifyTitleWriteRepo();
+    const ctx = new ContextBuilder().withUserId(userId).build();
+    const modifyTodoTitleCommand = new ModifyTodoTitleCommand(
+      { title: titleAfterUpdate, id: titleId },
+      ctx,
+    );
+
+    // when
+    const modifyTodoTitleHandler = new ModifyTodoTitleHandler(
+      mockTodoWriteRepo.getMockTodoWriteRepo(),
+    );
+    const result = await modifyTodoTitleHandler.execute(modifyTodoTitleCommand);
+
+    //then
+    expect(mockTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
+      new Domain.UUIDv4(titleId),
+      ctx,
+    );
+    expect(mockTodoWriteRepo.mockUpdateMethod).not.toHaveBeenCalled();
+    expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
+  });
+
+  it('Todo title failed to be modified, update repo error', async () => {
+    const { userId, titleId, titleAfterUpdate } = MODIFY_TODO_REPO_ERROR_CASE;
+
+    // given
+    const mockTodoWriteRepo = new ModifyTitleWriteRepo();
+    const ctx = new ContextBuilder().withUserId(userId).build();
+    const modifyTodoTitleCommand = new ModifyTodoTitleCommand(
+      { title: titleAfterUpdate, id: titleId },
+      ctx,
+    );
+
+    // when
+    const modifyTodoTitleHandler = new ModifyTodoTitleHandler(
+      mockTodoWriteRepo.getMockTodoWriteRepo(),
+    );
+    const result = await modifyTodoTitleHandler.execute(modifyTodoTitleCommand);
+
+    //then
+    expect(mockTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
+      new Domain.UUIDv4(titleId),
+      ctx,
+    );
+    expect(mockTodoWriteRepo.mockUpdateMethod).toHaveBeenCalledWith(
+      expect.any(TodoEntity),
+      ctx,
+    );
+    expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
+  });
 });

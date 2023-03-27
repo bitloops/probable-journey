@@ -9,6 +9,14 @@ import { TodoPropsBuilder } from '../../builders/todo-props.builder';
 import { MockAddTodoWriteRepo } from './add-todo-write-repo.mock';
 import { FAILED_USER_ID } from './add-todo.mock';
 
+// Given <title> , <userId> and <saveMethod>
+// When I add todo
+// Then I should have <props> , <domainEvent> and <result>
+
+// Examples:
+//   | title | userId | saveMethod | props | domainEvent | result |
+//   | New todo title | 123 | void | {title: 'New todo title', ...} | TodoAddedDomainEvent | typeof string |
+
 describe('Add todo feature test', () => {
   it('Todo created successfully', async () => {
     const todoTitle = 'New todo title';
@@ -62,7 +70,7 @@ describe('Add todo feature test', () => {
     expect(result.value).toBeInstanceOf(DomainErrors.TitleOutOfBoundsError);
   });
 
-  it.skip('Todo failed to be created, repo error', async () => {
+  it('Todo failed to be created, repo error', async () => {
     const todoTitle = 'New todo title';
     const userId = FAILED_USER_ID;
 

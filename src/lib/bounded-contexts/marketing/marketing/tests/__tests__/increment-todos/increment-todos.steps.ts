@@ -6,6 +6,8 @@ import { UserPropsBuilder } from '../../builders/user-props.builder';
 import { MockIncrementCompletedTodosWriteRepo } from './increment-todos-write-repo.mock';
 import {
   INCREMENT_TODOS_INVALID_COUNTER_CASE,
+  INCREMENT_TODOS_REPO_ERROR_GETBYID_CASE,
+  INCREMENT_TODOS_REPO_ERROR_SAVE_CASE,
   INCREMENT_TODOS_SUCCESS_USER_DOESNT_EXIST_CASE,
   INCREMENT_TODOS_SUCCESS_USER_EXISTS_CASE,
 } from './increment-todos.mock';
@@ -108,11 +110,58 @@ describe('Increment completed todos feature test', () => {
     const result = await completeTodoHandler.execute(completeTodoCommand);
 
     //then
-
     expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
       { value: userId },
       ctx,
     );
     expect(result.value).toBeInstanceOf(DomainErrors.InvalidTodosCounterError);
+  });
+  it('Incremented completed todos failed, getById repo error', async () => {
+    const { userId } = INCREMENT_TODOS_REPO_ERROR_GETBYID_CASE;
+
+    // given
+    const mockCompleteTodoWriteRepo =
+      new MockIncrementCompletedTodosWriteRepo();
+    const ctx = new ContextBuilder().withUserId(userId).build();
+    const completeTodoCommand = new IncrementTodosCommand({ userId }, ctx);
+
+    // when
+    const completeTodoHandler = new IncrementTodosCommandHandler(
+      mockCompleteTodoWriteRepo.getMockTodoWriteRepo(),
+    );
+    const result = await completeTodoHandler.execute(completeTodoCommand);
+
+    //then
+    expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
+      { value: userId },
+      ctx,
+    );
+    expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
+  });
+  it('Incremented completed todos failed, save repo error', async () => {
+    const { userId } = INCREMENT_TODOS_REPO_ERROR_SAVE_CASE;
+
+    // given
+    const mockCompleteTodoWriteRepo =
+      new MockIncrementCompletedTodosWriteRepo();
+    const ctx = new ContextBuilder().withUserId(userId).build();
+    const completeTodoCommand = new IncrementTodosCommand({ userId }, ctx);
+
+    // when
+    const completeTodoHandler = new IncrementTodosCommandHandler(
+      mockCompleteTodoWriteRepo.getMockTodoWriteRepo(),
+    );
+    const result = await completeTodoHandler.execute(completeTodoCommand);
+
+    //then
+    expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
+      { value: userId },
+      ctx,
+    );
+    expect(mockCompleteTodoWriteRepo.mockSaveMethod).toHaveBeenCalledWith(
+      expect.any(UserEntity),
+      ctx,
+    );
+    expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });
 });

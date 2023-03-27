@@ -1,4 +1,10 @@
-import { Application, ok, Either, Domain } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  ok,
+  Either,
+  Domain,
+  fail,
+} from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
 import { IncrementTodosCommand } from '../../commands/Increment-todos.command';
 import { CompletedTodosVO } from '../../domain/completed-todos.vo';
@@ -71,7 +77,10 @@ export class IncrementTodosCommandHandler
       }
       return ok();
     } else {
-      user.value.incrementCompletedTodos();
+      const incrementedOrError = user.value.incrementCompletedTodos();
+      if (incrementedOrError.isFail()) {
+        return fail(incrementedOrError.value);
+      }
       const saveResult = await this.userRepo.save(user.value, this.ctx);
       if (saveResult.isFail()) {
         return fail(saveResult.value);

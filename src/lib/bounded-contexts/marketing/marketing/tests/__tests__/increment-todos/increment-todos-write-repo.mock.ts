@@ -9,6 +9,8 @@ import { UserEntity } from '@src/lib/bounded-contexts/marketing/marketing/domain
 import { UserWriteRepoPort } from '@src/lib/bounded-contexts/marketing/marketing/ports/user-write.repo-port';
 import {
   INCREMENT_TODOS_INVALID_COUNTER_CASE,
+  INCREMENT_TODOS_REPO_ERROR_GETBYID_CASE,
+  INCREMENT_TODOS_REPO_ERROR_SAVE_CASE,
   INCREMENT_TODOS_SUCCESS_USER_DOESNT_EXIST_CASE,
   INCREMENT_TODOS_SUCCESS_USER_EXISTS_CASE,
 } from './increment-todos.mock';
@@ -39,13 +41,15 @@ export class MockIncrementCompletedTodosWriteRepo {
       (
         user: UserEntity,
       ): Promise<Either<void, Application.Repo.Errors.Unexpected>> => {
-        // if (
-        //   user.id.equals(new Domain.UUIDv4(INCREMENT_TODOS_SUCCESS_CASE.userId))
-        // ) {
-        //   return Promise.resolve(
-        //     fail(new Application.Repo.Errors.Unexpected('Unexpected error')),
-        //   );
-        // }
+        if (
+          user.id.equals(
+            new Domain.UUIDv4(INCREMENT_TODOS_REPO_ERROR_SAVE_CASE.userId),
+          )
+        ) {
+          return Promise.resolve(
+            fail(new Application.Repo.Errors.Unexpected('Unexpected error')),
+          );
+        }
         return Promise.resolve(ok());
       },
     );
@@ -89,6 +93,25 @@ export class MockIncrementCompletedTodosWriteRepo {
           return Promise.resolve(
             fail(new DomainErrors.InvalidTodosCounterError()),
           );
+        }
+        if (
+          id.equals(
+            new Domain.UUIDv4(INCREMENT_TODOS_REPO_ERROR_GETBYID_CASE.userId),
+          )
+        ) {
+          return Promise.resolve(
+            fail(new Application.Repo.Errors.Unexpected('Unexpected error')),
+          );
+        }
+        if (
+          id.equals(
+            new Domain.UUIDv4(INCREMENT_TODOS_REPO_ERROR_SAVE_CASE.userId),
+          )
+        ) {
+          const todo = UserEntity.fromPrimitives(
+            INCREMENT_TODOS_REPO_ERROR_SAVE_CASE,
+          );
+          return Promise.resolve(ok(todo));
         }
         return Promise.resolve(ok(null));
       },

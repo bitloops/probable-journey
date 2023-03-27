@@ -11,3 +11,17 @@ export const COMPLETE_TODO_NOT_FOUND_CASE = {
   title: 'New todo title',
   completed: false,
 };
+
+export const COMPLETE_TODO_REPO_ERROR_GETBYID_CASE = {
+  userId: '123',
+  id: 'todo3',
+  title: 'New todo title',
+  completed: false,
+};
+
+export const COMPLETE_TODO_REPO_ERROR_SAVE_CASE = {
+  userId: '1234',
+  id: 'todo4',
+  title: 'New todo title',
+  completed: false,
+};

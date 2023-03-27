@@ -105,6 +105,19 @@ services:
   #     - bitloops
   #   depends_on:
   #     - jaeger
+
+  pushgateway:
+    image: prom/pushgateway
+    container_name: pushgateway
+    restart: unless-stopped
+    expose:
+      - 9091
+    ports:
+      - "9091:9091"
+    networks:
+      - bitloops
+    labels:
+      org.label-schema.group: "monitoring"
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus

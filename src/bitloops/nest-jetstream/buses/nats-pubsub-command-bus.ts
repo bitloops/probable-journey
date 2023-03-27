@@ -72,7 +72,7 @@ export class NatsPubSubCommandBus
         }
       })();
     } catch (err) {
-      console.log('Error in command-bus subscribe:', err);
+      console.log('Error in command-bus subscribe::', err);
     }
   }
 

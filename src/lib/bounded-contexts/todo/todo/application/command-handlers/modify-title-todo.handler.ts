@@ -5,7 +5,6 @@ import {
   fail,
   ok,
 } from '@bitloops/bl-boilerplate-core';
-import { CommandHandler } from '@nestjs/cqrs';
 import { ModifyTodoTitleCommand } from '../../commands/modify-title-todo.command';
 import { Inject } from '@nestjs/common';
 import { DomainErrors } from '../../domain/errors';
@@ -18,7 +17,6 @@ import { ApplicationErrors } from '../errors';
 
 type ModifyTodoTitleResponse = Either<void, DomainErrors.TitleOutOfBoundsError>;
 
-@CommandHandler(ModifyTodoTitleCommand)
 export class ModifyTodoTitleHandler
   implements
     Application.IUseCase<

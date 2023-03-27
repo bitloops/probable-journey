@@ -1,4 +1,4 @@
-import { AddTodoHandler } from './add-todo.handler';
+import { AddTodoCommandHandler } from './add-todo.handler';
 import { CompleteTodoHandler } from './complete-todo.handler';
 import { UncompleteTodoHandler } from './uncomplete-todo.handler';
 import { ModifyTodoTitleHandler } from './modify-title-todo.handler';
@@ -10,10 +10,13 @@ import { ModifyTodoTitleHandler } from './modify-title-todo.handler';
 // ];
 
 export const PubSubCommandHandlers = [
-  AddTodoHandler,
+  AddTodoCommandHandler,
   // CompleteTodoHandler,
   // UncompleteTodoHandler,
   // ModifyTodoTitleHandler,
 ];
 
-export const StreamingCommandHandlers = [AddTodoHandler, CompleteTodoHandler];
+export const StreamingCommandHandlers = [
+  AddTodoCommandHandler,
+  CompleteTodoHandler,
+];

@@ -1,4 +1,4 @@
-import { AddTodoHandler } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers/add-todo.handler';
+import { AddTodoCommandHandler } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers/add-todo.handler';
 import { CompleteTodoHandler } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers/complete-todo.handler';
 import { AddTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/add-todo.command';
 import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
@@ -51,20 +51,20 @@ describe('Complete todo feature test', () => {
     expect(typeof result.value).toBe('string');
   });
 
-//   it('Todo failed to be created, invalid title', async () => {
-//     //     const todoTitle = 'i';
-//     //     const userId = '123';
-//     //     // given
-//     //     const mockTodoWriteRepo = new MockTodoWriteRepo();
-//     //     const ctx = new ContextBuilder().withUserId(userId).build();
-//     //     const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
-//     //     // when
-//     //     const addTodoHandler = new AddTodoHandler(
-//     //       mockTodoWriteRepo.getMockTodoWriteRepo(),
-//     //     );
-//     //     const result = await addTodoHandler.execute(addTodoCommand);
-//     //     //then
-//     //     expect(mockTodoWriteRepo.getMockSaveMethod()).not.toHaveBeenCalled();
-//     //     expect(result.value).toBeInstanceOf(DomainErrors.TitleOutOfBoundsError);
-//   });
+  //   it('Todo failed to be created, invalid title', async () => {
+  //     //     const todoTitle = 'i';
+  //     //     const userId = '123';
+  //     //     // given
+  //     //     const mockTodoWriteRepo = new MockTodoWriteRepo();
+  //     //     const ctx = new ContextBuilder().withUserId(userId).build();
+  //     //     const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
+  //     //     // when
+  //     //     const addTodoHandler = new AddTodoHandler(
+  //     //       mockTodoWriteRepo.getMockTodoWriteRepo(),
+  //     //     );
+  //     //     const result = await addTodoHandler.execute(addTodoCommand);
+  //     //     //then
+  //     //     expect(mockTodoWriteRepo.getMockSaveMethod()).not.toHaveBeenCalled();
+  //     //     expect(result.value).toBeInstanceOf(DomainErrors.TitleOutOfBoundsError);
+  //   });
 });

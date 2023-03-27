@@ -20,6 +20,8 @@ import { IEventBus as IEventBusImport } from './domain/events/IEventBus';
 import { IIntegrationEvent as IIntegrationEventImport } from './domain/events/IIntegrationEvent';
 import { IRule as IRuleImport } from './domain/IRule';
 import { IMessageBus as IMessageBusImport } from './domain/messages/IMessageBus';
+import { SubscriberHandler as SubscribeHandlerImport } from './domain/messages/IMessageBus';
+import { IMessage as IMessageImport } from './domain/messages/IMessage';
 import { ReadModel as ReadModelImport } from './domain/ReadModel';
 import { UUIDv4 as UUIDv4Import } from './domain/UUIDv4';
 import {
@@ -147,6 +149,9 @@ namespace Infra {
 
   export namespace MessageBus {
     export type IMessageBus = IMessageBusImport;
+    export type IMessage = IMessageImport;
+    export type SubscriberHandler<T extends IMessage> =
+      SubscribeHandlerImport<T>;
   }
 }
 

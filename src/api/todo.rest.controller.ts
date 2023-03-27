@@ -46,7 +46,9 @@ export class TodoController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  @Traceable()
+  @Traceable({
+    operation: 'TodoController',
+  })
   async addTodo(@Request() req, @Body() dto: AddTodoDto) {
     // const jwt = jwtwebtoken.sign({ userId: dto.userId }, this.JWT_SECRET);
     const command = new AddTodoCommand(

@@ -7,16 +7,16 @@ import {
   consumerOpts,
   createInbox,
 } from 'nats';
-import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
+import { Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
-import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
-import { EventHandler } from '@src/bitloops/bl-boilerplate-core/domain/events/IEventBus';
 import { ProvidersConstants } from '../jetstream.constants';
+import { IMessage } from '@src/bitloops/bl-boilerplate-core/domain/messages/IMessage';
+import { SubscriberHandler } from '@src/bitloops/bl-boilerplate-core/domain/messages/IMessageBus';
 
 const jsonCodec = JSONCodec();
 
 @Injectable()
-export class NatsStreamingMessageBus implements Infra.EventBus.IEventBus {
+export class NatsStreamingMessageBus implements Infra.MessageBus.IMessageBus {
   private nc: NatsConnection;
   private js: JetStreamClient;
   constructor(
@@ -27,27 +27,28 @@ export class NatsStreamingMessageBus implements Infra.EventBus.IEventBus {
     this.js = this.nc.jetstream();
   }
 
-  async publish(message: Infra.EventBus.IEvent<any>): Promise<void> {
+  async publish(
+    topic: string,
+    message: Infra.MessageBus.IMessage,
+  ): Promise<void> {
     const options: Partial<JetStreamPublishOptions> = { msgID: '' };
 
     const messageEncoded = jsonCodec.encode(message);
-    const subject =
-      NatsStreamingMessageBus.getSubjectFromEventInstance(messageEncoded);
-    console.log('publishing integration event to:', subject);
 
     try {
-      await this.js.publish(subject, messageEncoded, options);
+      await this.js.publish(topic, messageEncoded, options);
     } catch (err) {
       // NatsError: 503
-      console.error('Error publishing integration event to:', subject, err);
+      console.error('Error publishing integration event to:', topic, err);
     }
   }
 
-  async subscribe(subject: string, handler: Application.IHandle) {
-    const durableName = NatsStreamingMessageBus.getDurableName(
-      subject,
-      handler,
-    );
+  async subscribe(
+    subject: string,
+    handler: Infra.MessageBus.SubscriberHandler<any>,
+  ) {
+    // TODO: Fix durable name
+    const durableName = 'test';
 
     const stream = subject.split('.')[0];
     await this.jetStreamProvider.createStreamIfNotExists(stream, subject);
@@ -58,10 +59,6 @@ export class NatsStreamingMessageBus implements Infra.EventBus.IEventBus {
     opts.deliverTo(createInbox());
 
     try {
-      console.log('---Subscribing integration event to:', {
-        subject,
-        durableName,
-      });
       // this.logger.log(`
       //   Subscribing ${subject}!
       // `);
@@ -70,51 +67,23 @@ export class NatsStreamingMessageBus implements Infra.EventBus.IEventBus {
         for await (const m of sub) {
           const message = jsonCodec.decode(m.data) as any;
 
-          const reply = await handler.handle(message);
+          await handler(message);
           m.ack();
-
-          console.log(
-            `[${sub.getProcessed()}]: ${JSON.stringify(
-              jsonCodec.decode(m.data),
-            )}`,
-          );
         }
       })();
     } catch (err) {
-      console.error('Error subscribing to integration event:', err);
+      console.error('Error subscribing to topic:', subject, err);
     }
   }
-
-  unsubscribe<T extends Infra.EventBus.IEvent<any>>(
+  unsubscribe<T extends IMessage>(
     topic: string,
-    eventHandler: EventHandler<T>,
+    subscriberHandler: SubscriberHandler<T>,
   ): Promise<void> {
     throw new Error('Method not implemented.');
   }
-
-  static getSubjectFromHandler(handler: Application.IHandle): string {
-    const event = handler.event;
-    const boundedContext = handler.boundedContext;
-    const stream = NatsStreamingMessageBus.getStreamName(boundedContext);
-    const subject = `${stream}.${event.name}`;
-    return subject;
-  }
-
-  static getSubjectFromEventInstance(message: any): string {
-    const boundedContext = message.metadata.fromContextId;
-    const stream = NatsStreamingMessageBus.getStreamName(boundedContext);
-    const version = message.metadata.version;
-    const subject = `${stream}.${message.constructor.name}.${version}`;
-    return subject;
-  }
-
-  static getStreamName(boundedContext: string) {
-    return `Messages_${boundedContext}`;
-  }
-
-  static getDurableName(subject: string, handler: Application.IHandle) {
-    // Durable name cannot contain a dot
-    const subjectWithoutDots = subject.replace(/\./g, '-');
-    return `${subjectWithoutDots}-${handler.constructor.name}`;
+  getSubscriberHandlers<T extends IMessage>(
+    topic: string,
+  ): SubscriberHandler<T>[] {
+    throw new Error('Method not implemented.');
   }
 }

@@ -4,7 +4,6 @@ import * as bcrypt from 'bcrypt';
 import { Application, Either } from '../bl-boilerplate-core';
 import { UsersService } from './users/users.service';
 import { User } from './users/user.model';
-import { Traceable } from '@bitloops/tracing';
 import { randomUUID } from 'crypto';
 
 @Injectable()
@@ -26,7 +25,6 @@ export class AuthService {
     return null;
   }
 
-  @Traceable()
   async login(user: User) {
     const payload = {
       email: user.email,

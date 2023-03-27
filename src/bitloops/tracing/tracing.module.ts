@@ -22,7 +22,7 @@ import { MESSAGE_BUS_TOKEN } from './constants';
 @Global()
 @Module({})
 export class TracingModule {
-  static register(params: { messageBus: Type<Infra.EventBus.IEventBus> }) {
+  static register(params: { messageBus: Type<Infra.MessageBus.IMessageBus> }) {
     const { messageBus } = params;
     const messageBusProvider = {
       provide: MESSAGE_BUS_TOKEN,

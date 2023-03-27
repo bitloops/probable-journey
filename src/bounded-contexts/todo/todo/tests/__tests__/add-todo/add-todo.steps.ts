@@ -1,5 +1,5 @@
 import { Application } from '@src/bitloops/bl-boilerplate-core';
-import { AddTodoHandler } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers/add-todo.handler';
+import { AddTodoCommandHandler } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers/add-todo.handler';
 import { AddTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/add-todo.command';
 import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
 import { TodoAddedDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain/events/todo-added.event';
@@ -20,7 +20,7 @@ describe('Add todo feature test', () => {
     const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
 
     // when
-    const addTodoHandler = new AddTodoHandler(
+    const addTodoHandler = new AddTodoCommandHandler(
       mockTodoWriteRepo.getMockTodoWriteRepo(),
     );
     const result = await addTodoHandler.execute(addTodoCommand);
@@ -52,7 +52,7 @@ describe('Add todo feature test', () => {
     const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
 
     // when
-    const addTodoHandler = new AddTodoHandler(
+    const addTodoHandler = new AddTodoCommandHandler(
       mockTodoWriteRepo.getMockTodoWriteRepo(),
     );
     const result = await addTodoHandler.execute(addTodoCommand);
@@ -72,7 +72,7 @@ describe('Add todo feature test', () => {
     const addTodoCommand = new AddTodoCommand({ title: todoTitle }, ctx);
 
     // when
-    const addTodoHandler = new AddTodoHandler(
+    const addTodoHandler = new AddTodoCommandHandler(
       mockTodoWriteRepo.getMockTodoWriteRepo(),
     );
     const result = await addTodoHandler.execute(addTodoCommand);

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './authentication.controller';
 import { TodoController } from './todo.rest.controller';
@@ -6,12 +6,14 @@ import { TodoGrpcController } from './todo.grpc.controller';
 import {
   JetstreamModule,
   NatsStreamingIntegrationEventBus,
+  NatsStreamingMessageBus,
 } from '@src/bitloops/nest-jetstream';
 import configuration from '@src/config/configuration';
 import authConfiguration, {
   AuthEnvironmentVariables,
 } from '@src/config/auth.configuration';
 import { AuthModule } from '@src/bitloops/nest-auth-passport';
+import { CorrelationIdMiddleware, TracingModule } from '@src/bitloops/tracing';
 
 @Module({
   imports: [
@@ -46,13 +48,14 @@ import { AuthModule } from '@src/bitloops/nest-auth-passport';
       integrationEventBus: NatsStreamingIntegrationEventBus,
     }),
     JetstreamModule.forRoot({}),
+    TracingModule.register({
+      messageBus: NatsStreamingMessageBus,
+    }),
   ],
   controllers: [AuthController, TodoController, TodoGrpcController],
 })
-export class ApiModule {}
-
-// @Module({
-//   imports: [JwtAuthModule, JetstreamModule],
-//   controllers: [TodoController],
-// })
-// export class ApiTodoModule {}
+export class ApiModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+  }
+}

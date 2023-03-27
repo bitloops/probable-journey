@@ -79,7 +79,10 @@ export class NatsPubSubCommandBus
   private generateHeaders(command: Application.Command): MsgHdrs {
     const h = headers();
     for (const [key, value] of Object.entries(command.metadata)) {
-      h.append(key, value.toString());
+      const header = value?.toString();
+      if (header) {
+        h.append(key, header);
+      }
     }
     return h;
   }

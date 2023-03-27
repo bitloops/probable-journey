@@ -1,5 +1,8 @@
+import { Inject } from '@nestjs/common';
 import * as util from 'util';
-import { asyncLocalStorage } from './storage';
+import { AsyncLocalStorageService } from './async-local-storage.service';
+import { MESSAGE_BUS_TOKEN } from './constants';
+// import { asyncLocalStorage } from './async-local-storage.service';
 // target: the constructor or prototype of the class decorated.
 // propertyKey: the name of the key.
 // descriptor(ES6): the descriptor of that property.
@@ -41,9 +44,16 @@ const isAsyncFunction = (fn: any) => {
   return fn && fn.constructor && fn.constructor.name === 'AsyncFunction';
 };
 
+/**
+ *  the traceable decorator accesses the AsyncLocalStorageService
+ *  and gets the correlationId from the store.
+ * */
 export function Traceable() {
+  const asyncLocalStorageInjector = Inject(AsyncLocalStorageService);
+  const messageBusInjector = Inject(MESSAGE_BUS_TOKEN);
+
   return function (
-    target: unknown,
+    target: any,
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ) {
@@ -55,12 +65,21 @@ export function Traceable() {
       );
     }
 
+    const asyncLocalStorageServiceKey = 'asyncLocalStorageService';
+    const messageBusServiceKey = 'messageBusService';
+    asyncLocalStorageInjector(target, asyncLocalStorageServiceKey);
+    messageBusInjector(target, messageBusServiceKey);
+
     descriptor.value = async function (...args: any[]) {
       console.log(
         `Started executing ... [${this.constructor.name}][${propertyKey}]`,
       );
 
-      const store = asyncLocalStorage.getStore();
+      const asyncLocalStorage: AsyncLocalStorageService = this[
+        asyncLocalStorageServiceKey
+      ] as AsyncLocalStorageService;
+
+      const store = asyncLocalStorage.getAsyncLocalStore();
       const correlationId = store?.get('correlationId');
       console.table({
         correlationId,
@@ -76,5 +95,44 @@ export function Traceable() {
         );
       }
     };
+  };
+}
+
+// export function AddCorrelationId() {
+//   return function (target: any) {
+//     // Add the metadata to the class instance
+
+//     const correlationId = AsyncLocalStorageService.asyncLocalStorage
+//       .getStore()
+//       ?.get('correlationId');
+//     if (!target.metadata) {
+//       target.metadata = {};
+//     }
+//     target.metadata.correlationId = correlationId;
+//   };
+// }
+
+export function AddCorrelationId<T extends new (...args: any[]) => {}>(
+  constructor: T,
+) {
+  return class extends constructor {
+    metadata: any;
+
+    constructor(...args: any[]) {
+      super(...args);
+
+      const correlationId = AsyncLocalStorageService.asyncLocalStorage
+        .getStore()
+        ?.get('correlationId');
+      if (!this.metadata) {
+        this.metadata = {};
+      }
+      this.metadata.correlationId = correlationId;
+      Object.setPrototypeOf(this, constructor.prototype);
+    }
+    // @ts-ignore
+    static get name() {
+      return constructor.name;
+    }
   };
 }

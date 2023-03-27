@@ -33,6 +33,7 @@ import {
 } from './domain/commands/Command';
 import { TContext as TContextImport } from './domain/context';
 import { IDomainEvent as IDomainEventImport } from './domain/events/IDomainEvent';
+import { IEvent as IEventImport } from './domain/events/IEvent';
 import {
   IQuery as IQueryImport,
   QueryMetadata as TQueryMetadataImport,
@@ -67,7 +68,6 @@ namespace Domain {
   export class UUIDv4 extends UUIDv4Import {}
   export type IRule = IRuleImport;
   export const applyRules = applyRulesImport;
-  // export type Event<T> = IEvent<T>;
   export type IDomainEvent<T> = IDomainEventImport<T>;
   export namespace StandardVO {
     export namespace Currency {
@@ -134,6 +134,7 @@ namespace Infra {
   export namespace EventBus {
     export type IntegrationEvent<T> = IIntegrationEventImport<T>;
     export type IEventBus = IEventBusImport;
+    export type IEvent<T> = IEventImport<T>;
   }
   export namespace CommandBus {
     export type IPubSubCommandBus = IPubSubCommandBusImport;

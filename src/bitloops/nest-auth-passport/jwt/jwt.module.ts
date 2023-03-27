@@ -5,6 +5,7 @@ import {
   JwtModuleAsyncOptions,
 } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
+import { JWT_SECRET } from './constants';
 
 @Module({})
 export class JwtAuthModule {
@@ -12,7 +13,13 @@ export class JwtAuthModule {
     return {
       module: JwtAuthModule,
       imports: [JwtModule.register(options)],
-      providers: [JwtStrategy],
+      providers: [
+        JwtStrategy,
+        {
+          provide: JWT_SECRET,
+          useValue: options.secret,
+        },
+      ],
       exports: [JwtModule],
     };
   }
@@ -21,7 +28,19 @@ export class JwtAuthModule {
     return {
       module: JwtAuthModule,
       imports: [JwtModule.registerAsync(options)],
-      providers: [JwtStrategy],
+      providers: [
+        JwtStrategy,
+        {
+          provide: JWT_SECRET,
+          useFactory: async (...args: any[]) => {
+            if (!options.useFactory) {
+              throw new Error('No useFactory function provided');
+            }
+            return ((await options.useFactory(...args)) as any).secret;
+          },
+          inject: options.inject,
+        },
+      ],
       exports: [JwtModule],
     };
   }

@@ -1,4 +1,4 @@
-import { Application, Either, ok } from '@bitloops/bl-boilerplate-core';
+import { Application, Either, ok, fail } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
 // import { QueryHandler } from '@nestjs/cqrs';
 import { TTodoReadModelSnapshot } from '../../domain/TodoReadModel';
@@ -10,7 +10,7 @@ import { GetTodosQuery } from '../../queries/get-todos.query';
 
 export type GetTodosQueryHandlerResponse = Either<
   TTodoReadModelSnapshot[],
-  never
+  Application.Repo.Errors.Unexpected
 >;
 
 export class GetTodosHandler

@@ -46,8 +46,11 @@ export class ModifyTodoTitleHandler
     this.ctx = command.ctx;
     const requestId = new Domain.UUIDv4(command.id);
     const todoFound = await this.todoRepo.getById(requestId, this.ctx);
+    if (todoFound.isFail()) {
+      return fail(todoFound.value);
+    }
 
-    if (!todoFound) {
+    if (!todoFound.value) {
       return fail(
         new ApplicationErrors.TodoNotFoundError(command.id.toString()),
       );
@@ -58,8 +61,11 @@ export class ModifyTodoTitleHandler
       return fail(titleToUpdate.value);
     }
 
-    todoFound.modifyTitle(titleToUpdate.value);
-    await this.todoRepo.update(todoFound, this.ctx);
+    todoFound.value.modifyTitle(titleToUpdate.value);
+    const updateResult = await this.todoRepo.update(todoFound.value, this.ctx);
+    if (updateResult.isFail()) {
+      return fail(updateResult.value);
+    }
 
     return ok();
   }

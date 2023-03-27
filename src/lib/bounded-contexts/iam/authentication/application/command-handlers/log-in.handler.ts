@@ -42,19 +42,25 @@ export class LogInHandler
     const userId = new Domain.UUIDv4(command.userId);
 
     const user = await this.userRepo.getById(userId);
+    if (user.isFail()) {
+      return fail(user.value);
+    }
 
-    if (!user) {
+    if (!user.value) {
       return fail(
         new ApplicationErrors.UserNotFoundApplicationError(command.userId),
       );
     }
 
-    const loginOrError = user.login();
+    const loginOrError = user.value.login();
     if (loginOrError.isFail()) {
       return fail(loginOrError.value);
     }
 
-    await this.userRepo.update(user);
+    const saveResult = await this.userRepo.update(user.value);
+    if (saveResult.isFail()) {
+      return fail(saveResult.value);
+    }
     return ok();
   }
 }

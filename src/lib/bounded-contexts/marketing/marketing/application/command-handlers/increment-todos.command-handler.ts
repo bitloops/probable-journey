@@ -39,8 +39,11 @@ export class IncrementTodosCommandHandler
   ): Promise<IncrementDepositsCommandHandlerResponse> {
     const requestUserId = new Domain.UUIDv4(command.userId);
     const user = await this.userRepo.getById(requestUserId);
+    if (user.isFail()) {
+      return fail(user.value);
+    }
 
-    if (!user) {
+    if (!user.value) {
       // Create account with 0 deposits
       const completedTodosVO = CompletedTodosVO.create({ counter: 0 });
       if (completedTodosVO.isFail()) {
@@ -56,11 +59,17 @@ export class IncrementTodosCommandHandler
       }
       const newUser = newUserOrError.value;
       newUser.incrementCompletedTodos();
-      await this.userRepo.save(newUser);
+      const saveResult = await this.userRepo.save(newUser);
+      if (saveResult.isFail()) {
+        return fail(saveResult.value);
+      }
       return ok();
     } else {
-      user.incrementCompletedTodos();
-      await this.userRepo.save(user);
+      user.value.incrementCompletedTodos();
+      const saveResult = await this.userRepo.save(user.value);
+      if (saveResult.isFail()) {
+        return fail(saveResult.value);
+      }
       return ok();
     }
   }

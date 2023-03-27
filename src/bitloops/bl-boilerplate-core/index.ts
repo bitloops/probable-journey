@@ -55,6 +55,7 @@ import {
 import { IErrorEvent as IErrorEventImport } from './application/events/IErrorEvent';
 import { ConflictError } from './errors/repository/ConflictError';
 import { UnexpectedError } from './errors/repository/UnexpectedError';
+import { ReturnUnexpectedError as ReturnUnexpectedErrorImport } from './errors/repository/unexpected-error.decorator';
 
 namespace Domain {
   export class Error extends DomainError {}
@@ -108,6 +109,10 @@ namespace Application {
       export class Conflict extends ConflictError {}
       export class Unexpected extends UnexpectedError {}
     }
+    export namespace Decorators {
+      export const ReturnUnexpectedError = ReturnUnexpectedErrorImport;
+    }
+
     export type ICRUDPort<Aggregate, AggregateId> = CRUDRepoPort<
       Aggregate,
       AggregateId

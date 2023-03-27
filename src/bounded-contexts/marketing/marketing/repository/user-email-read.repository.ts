@@ -1,4 +1,4 @@
-import { Domain } from '@bitloops/bl-boilerplate-core';
+import { Application, Domain, Either, ok } from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
@@ -27,10 +27,11 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
     this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
   }
 
+  @Application.Repo.Decorators.ReturnUnexpectedError()
   async getUserEmail(
     userid: Domain.UUIDv4,
     ctx?: any,
-  ): Promise<UserReadModel | null> {
+  ): Promise<Either<UserReadModel | null, Application.Repo.Errors.Unexpected>> {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -43,7 +44,7 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
     });
 
     if (!result) {
-      return null;
+      return ok(null);
     }
 
     if (result.userId !== jwtPayload.userId) {
@@ -51,21 +52,32 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
     }
 
     const { _id, ...todo } = result as any;
-    return UserReadModel.fromPrimitives({
-      ...todo,
-      id: _id.toString(),
-    });
+    return ok(
+      UserReadModel.fromPrimitives({
+        ...todo,
+        id: _id.toString(),
+      }),
+    );
   }
 
-  async getById(id: string): Promise<UserReadModel | null> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async getById(
+    id: string,
+  ): Promise<Either<UserReadModel | null, Application.Repo.Errors.Unexpected>> {
     throw new Error('Method not implemented.');
   }
 
-  async getAll(): Promise<UserReadModel[]> {
+  async getAll(): Promise<
+    Either<UserReadModel[], Application.Repo.Errors.Unexpected>
+  > {
     throw new Error('Method not implemented.');
   }
 
-  async save(userEmailReadModel: UserReadModel, ctx?: any): Promise<void> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async save(
+    userEmailReadModel: UserReadModel,
+    ctx?: any,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -81,13 +93,18 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
       _id: userEmail.userId as any,
       ...userEmail,
     });
+    return ok();
   }
 
-  async create(userReadModel: UserReadModel): Promise<void> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async create(
+    userReadModel: UserReadModel,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     const userEmail = userReadModel.toPrimitives();
     await this.collection.insertOne({
       _id: userEmail.userId as any,
       ...userEmail,
     });
+    return ok();
   }
 }

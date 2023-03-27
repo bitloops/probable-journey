@@ -5,6 +5,7 @@ import { NotificationTemplateReadRepoPort } from '@src/lib/bounded-contexts/mark
 import { NotificationTemplateReadModel } from '@src/lib/bounded-contexts/marketing/marketing/domain/read-models/notification-template.read-model';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import { ConfigService } from '@nestjs/config';
+import { Application, Either, ok } from '@src/bitloops/bl-boilerplate-core';
 
 @Injectable()
 export class NotificationTemplateReadRepository
@@ -25,10 +26,16 @@ export class NotificationTemplateReadRepository
     this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
   }
 
+  @Application.Repo.Decorators.ReturnUnexpectedError()
   async getByType(
     type: string,
     ctx?: any,
-  ): Promise<NotificationTemplateReadModel | null> {
+  ): Promise<
+    Either<
+      NotificationTemplateReadModel | null,
+      Application.Repo.Errors.Unexpected
+    >
+  > {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -41,7 +48,7 @@ export class NotificationTemplateReadRepository
     });
 
     if (!result) {
-      return null;
+      return ok(null);
     }
 
     //TODO check this because there is no userId in the notification template
@@ -50,19 +57,34 @@ export class NotificationTemplateReadRepository
     // }
 
     const { _id, ...todo } = result as any;
-    return NotificationTemplateReadModel.fromPrimitives({
-      ...todo,
-      id: _id.toString(),
-    });
+    return ok(
+      NotificationTemplateReadModel.fromPrimitives({
+        ...todo,
+        id: _id.toString(),
+      }),
+    );
   }
 
-  async getAll(): Promise<NotificationTemplateReadModel[] | null> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async getAll(): Promise<
+    Either<
+      NotificationTemplateReadModel[] | null,
+      Application.Repo.Errors.Unexpected
+    >
+  > {
     throw new Error('Method not implemented');
   }
+
+  @Application.Repo.Decorators.ReturnUnexpectedError()
   async getById(
     id: string,
     ctx?: any,
-  ): Promise<NotificationTemplateReadModel | null> {
+  ): Promise<
+    Either<
+      NotificationTemplateReadModel | null,
+      Application.Repo.Errors.Unexpected
+    >
+  > {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -75,7 +97,7 @@ export class NotificationTemplateReadRepository
     });
 
     if (!result) {
-      return null;
+      return ok(null);
     }
 
     if (result.userId !== jwtPayload.userId) {
@@ -83,9 +105,11 @@ export class NotificationTemplateReadRepository
     }
 
     const { _id, ...todo } = result as any;
-    return NotificationTemplateReadModel.fromPrimitives({
-      ...todo,
-      id: _id.toString(),
-    });
+    return ok(
+      NotificationTemplateReadModel.fromPrimitives({
+        ...todo,
+        id: _id.toString(),
+      }),
+    );
   }
 }

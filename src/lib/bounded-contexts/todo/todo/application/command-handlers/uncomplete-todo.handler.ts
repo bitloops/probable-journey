@@ -45,16 +45,21 @@ export class UncompleteTodoHandler
   ): Promise<UncompleteTodoUseCaseResponse> {
     console.log('UncompleteTodoHandler');
     const todo = await this.todoRepo.getById(new Domain.UUIDv4(command.id));
-    if (todo === null) {
+    if (todo.isFail()) {
+      return fail(todo.value);
+    }
+    if (todo.value === null) {
       return fail(new ApplicationErrors.TodoNotFoundError(command.id));
     }
 
-    const uncompletedOrError = todo.uncomplete();
+    const uncompletedOrError = todo.value.uncomplete();
     if (uncompletedOrError.isFail()) {
       return fail(uncompletedOrError.value);
     }
-    await this.todoRepo.save(todo);
-
+    const saveResult = await this.todoRepo.save(todo.value);
+    if (saveResult.isFail()) {
+      return fail(saveResult.value);
+    }
     return ok();
   }
 }

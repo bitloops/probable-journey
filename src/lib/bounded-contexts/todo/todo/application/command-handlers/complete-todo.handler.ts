@@ -54,15 +54,21 @@ export class CompleteTodoHandler
       new Domain.UUIDv4(command.id),
       this.ctx,
     );
-    if (todo === null) {
+    if (todo.isFail()) {
+      return fail(todo.value);
+    }
+    if (todo.value === null) {
       return fail(new ApplicationErrors.TodoNotFoundError(command.id));
     }
 
-    const completedOrError = todo.complete();
+    const completedOrError = todo.value.complete();
     if (completedOrError.isFail()) {
       return fail(completedOrError.value);
     }
-    await this.todoRepo.save(todo, this.ctx);
+    const saveResult = await this.todoRepo.save(todo.value, this.ctx);
+    if (saveResult.isFail()) {
+      return fail(saveResult.value);
+    }
 
     return ok();
   }

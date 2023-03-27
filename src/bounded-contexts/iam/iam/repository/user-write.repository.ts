@@ -46,17 +46,25 @@ export class UserWriteRepository implements UserWriteRepoPort {
     this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
   }
 
-  update(aggregate: UserEntity): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-  delete(aggregateRootId: Domain.UUIDv4): Promise<void> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  update(
+    aggregate: UserEntity,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     throw new Error('Method not implemented.');
   }
 
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  delete(
+    aggregateRootId: Domain.UUIDv4,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
+    throw new Error('Method not implemented.');
+  }
+
+  @Application.Repo.Decorators.ReturnUnexpectedError()
   async getById(
     id: Domain.UUIDv4,
     ctx: Application.TContext,
-  ): Promise<UserEntity | null> {
+  ): Promise<Either<UserEntity | null, Application.Repo.Errors.Unexpected>> {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -69,7 +77,7 @@ export class UserWriteRepository implements UserWriteRepoPort {
     });
 
     if (!result) {
-      return null;
+      return ok(null);
     }
 
     if (result.userId !== jwtPayload.sub) {
@@ -77,16 +85,19 @@ export class UserWriteRepository implements UserWriteRepoPort {
     }
 
     const { _id, ...todo } = result as any;
-    return UserEntity.fromPrimitives({
-      ...todo,
-      id: _id.toString(),
-    });
+    return ok(
+      UserEntity.fromPrimitives({
+        ...todo,
+        id: _id.toString(),
+      }),
+    );
   }
 
+  @Application.Repo.Decorators.ReturnUnexpectedError()
   async getByEmail(
     email: EmailVO,
     session?: ClientSession,
-  ): Promise<UserEntity | null> {
+  ): Promise<Either<UserEntity | null, Application.Repo.Errors.Unexpected>> {
     const result = await this.collection.findOne(
       {
         email: email.email,
@@ -97,17 +108,23 @@ export class UserWriteRepository implements UserWriteRepoPort {
     );
 
     if (!result) {
-      return null;
+      return ok(null);
     }
 
     const { _id, ...user } = result as any;
-    return UserEntity.fromPrimitives({
-      ...user,
-      id: _id.toString(),
-    });
+    return ok(
+      UserEntity.fromPrimitives({
+        ...user,
+        id: _id.toString(),
+      }),
+    );
   }
 
-  async save(user: UserEntity, session?: ClientSession): Promise<void> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async save(
+    user: UserEntity,
+    session?: ClientSession,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     const createdUser = user.toPrimitives();
     await this.collection.insertOne(
       {
@@ -118,36 +135,6 @@ export class UserWriteRepository implements UserWriteRepoPort {
         session,
       },
     );
-  }
-
-  async checkDoesNotExistAndCreate(
-    user: UserEntity,
-  ): Promise<Either<void, Application.Repo.Errors.Conflict>> {
-    const session = this.client.startSession();
-    try {
-      // Lock write
-      const transactionOptions: TransactionOptions = {
-        readConcern: { level: 'snapshot' },
-        writeConcern: { w: 'majority' },
-      };
-      session.startTransaction(transactionOptions);
-
-      const alreadyExistedUser = await this.getByEmail(user.email, session);
-      if (alreadyExistedUser)
-        return fail(new Application.Repo.Errors.Conflict(user.email.email));
-
-      await this.save(user, session);
-
-      await session.commitTransaction();
-    } catch (e) {
-      console.log(e);
-      await session.abortTransaction();
-      //throw
-    } finally {
-      session.endSession();
-    }
-
-    this.domainEventBus.publish(user.domainEvents);
     return ok();
   }
 }

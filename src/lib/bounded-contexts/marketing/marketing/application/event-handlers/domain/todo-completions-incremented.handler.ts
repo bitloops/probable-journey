@@ -40,14 +40,19 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
     const emailToBeSentInfoResponse =
       await marketingNotificationService.getNotificationTemplateToBeSent(user);
     if (emailToBeSentInfoResponse.isFail()) {
-      return emailToBeSentInfoResponse.value;
+      return fail(emailToBeSentInfoResponse.value);
     }
     const emailToBeSentInfo = emailToBeSentInfoResponse.value;
     const userid = user.id;
     const userEmail = await this.emailRepoPort.getUserEmail(userid);
+    if (userEmail.isFail()) {
+      //TODO figure out how to return this error to controller
+      // return userEmail.value;
+      return;
+    }
 
     //TODO figure out how to return this error to controller
-    if (!userEmail) {
+    if (!userEmail.value) {
       // this.integrationEventBus().publish(new EmailNotFoundErrorMessage(new ApplicationErrors.EmailNotFoundError(userid.toString())));
       // TODO Error bus
       return;
@@ -55,7 +60,7 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
 
     const command = new SendEmailCommand({
       origin: emailToBeSentInfo.emailOrigin,
-      destination: userEmail.email,
+      destination: userEmail.value.email,
       content: emailToBeSentInfo.notificationTemplate?.template || '',
     });
     await this.commandBus.publish(command);

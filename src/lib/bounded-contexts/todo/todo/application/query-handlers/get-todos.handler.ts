@@ -39,7 +39,8 @@ export class GetTodosHandler
     console.log('GetTodosQuery handler...');
 
     const results = await this.todoRepo.getAll(this.ctx);
-    if (results) return ok(results);
+    if (results.isFail()) return fail(results.value);
+    if (results.value) return ok(results.value);
     return ok([]);
   }
 }

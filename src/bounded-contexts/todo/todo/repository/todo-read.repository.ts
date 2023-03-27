@@ -11,6 +11,7 @@ import {
 } from 'src/lib/bounded-contexts/todo/todo/domain/TodoReadModel';
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
+import { Application, Either, ok } from '@src/bitloops/bl-boilerplate-core';
 
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'todo';
 const MONGO_DB_TODO_COLLECTION =
@@ -33,11 +34,19 @@ export class TodoReadRepository implements TodoReadRepoPort {
     this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
   }
 
-  async getById(id: string): Promise<TodoReadModel | null> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async getById(
+    id: string,
+  ): Promise<Either<TodoReadModel | null, Application.Repo.Errors.Unexpected>> {
     throw new Error('Method not implemented.');
   }
 
-  async getAll(ctx: any): Promise<TTodoReadModelSnapshot[]> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async getAll(
+    ctx: any,
+  ): Promise<
+    Either<TTodoReadModelSnapshot[], Application.Repo.Errors.Unexpected>
+  > {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -50,14 +59,16 @@ export class TodoReadRepository implements TodoReadRepoPort {
       throw new Error('Invalid userId');
     }
     const todos = await this.collection.find({ userId: userId }).toArray();
-    return todos.map((todo) => {
-      const res = {
-        id: todo._id.toString(),
-        userId: todo.userId,
-        title: todo.title,
-        completed: todo.completed,
-      };
-      return res;
-    });
+    return ok(
+      todos.map((todo) => {
+        const res = {
+          id: todo._id.toString(),
+          userId: todo.userId,
+          title: todo.title,
+          completed: todo.completed,
+        };
+        return res;
+      }),
+    );
   }
 }

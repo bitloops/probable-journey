@@ -1,4 +1,10 @@
-import { Application, Domain, Infra } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Domain,
+  Either,
+  Infra,
+  ok,
+} from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
@@ -32,10 +38,11 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
     this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
   }
 
+  @Application.Repo.Decorators.ReturnUnexpectedError()
   async getById(
     id: Domain.UUIDv4,
     ctx: Application.TContext,
-  ): Promise<TodoEntity | null> {
+  ): Promise<Either<TodoEntity | null, Application.Repo.Errors.Unexpected>> {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -48,7 +55,7 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
     });
 
     if (!result) {
-      return null;
+      return ok(null);
     }
 
     if (result.userId !== jwtPayload.sub) {
@@ -56,13 +63,19 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
     }
 
     const { _id, ...todo } = result as any;
-    return TodoEntity.fromPrimitives({
-      ...todo,
-      id: _id.toString(),
-    });
+    return ok(
+      TodoEntity.fromPrimitives({
+        ...todo,
+        id: _id.toString(),
+      }),
+    );
   }
 
-  async update(todo: TodoEntity, ctx?: any): Promise<void> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async update(
+    todo: TodoEntity,
+    ctx?: any,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     const { id, ...todoInfo } = todo.toPrimitives();
     await this.collection.updateOne(
       {
@@ -72,13 +85,22 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
         $set: todoInfo,
       },
     );
+    return ok();
   }
 
-  async delete(id: Domain.UUIDv4, ctx?: any): Promise<void> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async delete(
+    id: Domain.UUIDv4,
+    ctx?: any,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     throw new Error('Method not implemented.');
   }
 
-  async save(todo: TodoEntity, ctx: Application.TContext): Promise<void> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async save(
+    todo: TodoEntity,
+    ctx: Application.TContext,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -97,5 +119,6 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
       ...todoInfo,
     });
     this.domainEventBus.publish(todo.domainEvents);
+    return ok();
   }
 }

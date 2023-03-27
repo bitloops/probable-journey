@@ -50,16 +50,22 @@ export class UpdateEmailHandler
     }
 
     const userFound = await this.userRepo.getById(userId);
+    if (userFound.isFail()) {
+      return fail(userFound.value);
+    }
 
-    if (userFound === null) {
+    if (userFound.value === null) {
       return fail(
         new ApplicationErrors.UserNotFoundApplicationError(command.userId),
       );
     }
 
-    userFound.updateEmail(email.value);
+    userFound.value.updateEmail(email.value);
 
-    await this.userRepo.save(userFound);
+    const saveResult = await this.userRepo.save(userFound.value);
+    if (saveResult.isFail()) {
+      return fail(saveResult.value);
+    }
     return ok();
   }
 }

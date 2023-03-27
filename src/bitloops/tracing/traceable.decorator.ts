@@ -5,7 +5,7 @@ import { Infra } from '../bl-boilerplate-core';
 import { isAsyncFunction } from './utils';
 import { TraceEvent, TraceableDecoratorInput } from './definitons';
 
-const TRACING_TOPIC = 'tracing';
+const TRACING_TOPIC = 'trace_events';
 
 /**
  *  the traceable decorator accesses the AsyncLocalStorageService

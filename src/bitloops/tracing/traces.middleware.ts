@@ -13,7 +13,7 @@ export class CorrelationIdMiddleware implements NestMiddleware {
     const asyncLocalStorage = this.asyncLocalStorageService.asyncLocalStorage;
 
     // req.headers['x-correlation-id'] ||
-    const correlationId: string = randomUUID();
+    const correlationId: string = randomUUID().replace(/-/g, '');
     console.log(`Request... ${correlationId}`);
     asyncLocalStorage.run(
       this.asyncLocalStorageService.returnEmptyStore(),

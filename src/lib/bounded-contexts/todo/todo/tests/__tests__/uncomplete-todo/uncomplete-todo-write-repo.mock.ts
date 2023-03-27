@@ -8,11 +8,11 @@ import {
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 import { TodoWriteRepoPort } from '@src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 import {
-  COMPLETE_TODO_NOT_FOUND_CASE,
-  COMPLETE_TODO_REPO_ERROR_GETBYID_CASE,
-  COMPLETE_TODO_REPO_ERROR_SAVE_CASE,
-  COMPLETE_TODO_SUCCESS_CASE,
-} from './complete-todo.mock';
+  UNCOMPLETE_TODO_NOT_FOUND_CASE,
+  UNCOMPLETE_TODO_REPO_ERROR_GETBYID_CASE,
+  UNCOMPLETE_TODO_REPO_ERROR_SAVE_CASE,
+  UNCOMPLETE_TODO_SUCCESS_CASE,
+} from './uncomplete-todo.mock';
 
 export class MockCompleteTodoWriteRepo {
   public readonly mockSaveMethod: jest.Mock;
@@ -41,7 +41,7 @@ export class MockCompleteTodoWriteRepo {
       ): Promise<Either<void, Application.Repo.Errors.Unexpected>> => {
         if (
           todo.userId.id.equals(
-            new Domain.UUIDv4(COMPLETE_TODO_REPO_ERROR_SAVE_CASE.userId),
+            new Domain.UUIDv4(UNCOMPLETE_TODO_REPO_ERROR_SAVE_CASE.userId),
           )
         ) {
           return Promise.resolve(
@@ -60,25 +60,27 @@ export class MockCompleteTodoWriteRepo {
       ): Promise<
         Either<TodoEntity | null, Application.Repo.Errors.Unexpected>
       > => {
-        if (id.equals(new Domain.UUIDv4(COMPLETE_TODO_SUCCESS_CASE.id))) {
-          const todo = TodoEntity.fromPrimitives(COMPLETE_TODO_SUCCESS_CASE);
+        if (id.equals(new Domain.UUIDv4(UNCOMPLETE_TODO_SUCCESS_CASE.id))) {
+          const todo = TodoEntity.fromPrimitives(UNCOMPLETE_TODO_SUCCESS_CASE);
           return Promise.resolve(ok(todo));
         }
-        if (id.equals(new Domain.UUIDv4(COMPLETE_TODO_NOT_FOUND_CASE.id))) {
+        if (id.equals(new Domain.UUIDv4(UNCOMPLETE_TODO_NOT_FOUND_CASE.id))) {
           return Promise.resolve(ok(null));
         }
         if (
-          id.equals(new Domain.UUIDv4(COMPLETE_TODO_REPO_ERROR_GETBYID_CASE.id))
+          id.equals(
+            new Domain.UUIDv4(UNCOMPLETE_TODO_REPO_ERROR_GETBYID_CASE.id),
+          )
         ) {
           return Promise.resolve(
             fail(new Application.Repo.Errors.Unexpected('Unexpected error')),
           );
         }
         if (
-          id.equals(new Domain.UUIDv4(COMPLETE_TODO_REPO_ERROR_SAVE_CASE.id))
+          id.equals(new Domain.UUIDv4(UNCOMPLETE_TODO_REPO_ERROR_SAVE_CASE.id))
         ) {
           const todo = TodoEntity.fromPrimitives(
-            COMPLETE_TODO_REPO_ERROR_SAVE_CASE,
+            UNCOMPLETE_TODO_REPO_ERROR_SAVE_CASE,
           );
           return Promise.resolve(ok(todo));
         }

@@ -88,11 +88,11 @@ export class UserWriteRepository implements UserWriteRepoPort {
       throw new Error('Invalid JWT!');
     }
     const createdUser = user.toPrimitives();
-    if (createdUser.userId !== jwtPayload.userId) {
+    if (createdUser.id !== jwtPayload.userId) {
       throw new Error('Invalid userId');
     }
     await this.collection.insertOne({
-      _id: createdUser.userId as any,
+      _id: createdUser.id as any,
       ...createdUser,
     });
     return ok();

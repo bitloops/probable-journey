@@ -21,7 +21,7 @@ describe('Todo completions incremented feature test', () => {
       .withCompletedTodos(completedTodos)
       .build();
     const todoCompletionsDomainEvent =
-      new TodoCompletionsIncrementedDomainEvent(user, ctx);
+      new TodoCompletionsIncrementedDomainEvent(user);
 
     // when
     const todoCompletionsIncrementedEventHandler =

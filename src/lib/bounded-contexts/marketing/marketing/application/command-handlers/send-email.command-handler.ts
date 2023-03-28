@@ -28,7 +28,13 @@ export class SendEmailCommandHandler
     return 'Marketing';
   }
 
-  @Traceable()
+  @Traceable({
+    operation: 'SendEmailCommandHandler',
+    metrics: {
+      name: 'SendEmailCommandHandler',
+      category: 'commandHandler',
+    },
+  })
   async execute(
     command: SendEmailCommand,
   ): Promise<SendEmailCommandHandlerResponse> {

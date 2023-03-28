@@ -40,7 +40,13 @@ export class UncompleteTodoHandler
     private readonly todoRepo: TodoWriteRepoPort,
   ) {}
 
-  @Traceable()
+  @Traceable({
+    operation: 'UncompleteTodoCommandHandler',
+    metrics: {
+      name: 'UncompleteTodoCommandHandler',
+      category: 'commandHandler',
+    },
+  })
   async execute(
     command: UncompleteTodoCommand,
   ): Promise<UncompleteTodoUseCaseResponse> {

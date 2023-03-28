@@ -40,7 +40,13 @@ export class UpdateUserEmailCommandHandler
     return 'Marketing';
   }
 
-  @Traceable()
+  @Traceable({
+    operation: 'UpdateUserEmailCommandHandler',
+    metrics: {
+      name: 'UpdateUserEmailCommandHandler',
+      category: 'commandHandler',
+    },
+  })
   async execute(
     command: UpdateUserEmailCommand,
   ): Promise<UpdateUserEmailCommandHandlerResponse> {

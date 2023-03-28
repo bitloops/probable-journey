@@ -41,7 +41,13 @@ export class CompleteTodoHandler
     return 'Todo';
   }
 
-  @Traceable()
+  @Traceable({
+    operation: 'CompleteTodoCommandHandler',
+    metrics: {
+      name: 'CompleteTodoCommandHandler',
+      category: 'commandHandler',
+    },
+  })
   async execute(
     command: CompleteTodoCommand,
   ): Promise<CompleteTodoUseCaseResponse> {

@@ -40,7 +40,13 @@ export class CreateUserCommandHandler
     return 'Marketing';
   }
 
-  @Traceable()
+  @Traceable({
+    operation: 'CreateUserCommandHandler',
+    metrics: {
+      name: 'CreateUserCommandHandler',
+      category: 'commandHandler',
+    },
+  })
   async execute(
     command: CreateUserCommand,
   ): Promise<CreateUserCommandHandlerResponse> {

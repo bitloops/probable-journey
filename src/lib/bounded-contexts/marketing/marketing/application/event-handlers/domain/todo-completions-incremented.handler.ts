@@ -18,7 +18,9 @@ import {
 } from '../../../ports/notification-template-read.repo-port.';
 import { MarketingNotificationService } from '../../../domain/services/marketing-notification.service';
 
-export class TodoCompletionsIncrementedHandler implements Application.IHandle {
+export class TodoCompletionsIncrementedHandler
+  implements Application.IHandleDomainEvent
+{
   private commandBus: Infra.CommandBus.IPubSubCommandBus;
   constructor(
     @Inject(UserEmailReadRepoPortToken)
@@ -67,14 +69,11 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
       return ok(); // TODO change this to fail
     }
 
-    const command = new SendEmailCommand(
-      {
-        origin: emailToBeSentInfo.emailOrigin,
-        destination: userEmail.value.email,
-        content: emailToBeSentInfo.notificationTemplate?.template || '',
-      },
-      metadata.context,
-    );
+    const command = new SendEmailCommand({
+      origin: emailToBeSentInfo.emailOrigin,
+      destination: userEmail.value.email,
+      content: emailToBeSentInfo.notificationTemplate?.template || '',
+    });
     await this.commandBus.publish(command);
     return ok();
   }

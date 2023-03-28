@@ -1,6 +1,6 @@
 export interface TelemetryEvent {
   trace: TraceEvent;
-  metric?: MetricsEvent
+  metric?: MetricsEvent;
 }
 export interface TraceEvent {
   correlationId: string;

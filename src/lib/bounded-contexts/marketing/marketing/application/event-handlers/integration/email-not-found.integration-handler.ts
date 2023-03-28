@@ -2,8 +2,9 @@ import { Infra, Application } from '@src/bitloops/bl-boilerplate-core';
 import { EmailNotFoundIntegrationErrorEvent } from '@src/lib/bounded-contexts/iam/authentication/application/error-events/email-not-found.integration-event';
 
 export class EmailNotFoundIntegrationErrorEventHandler
-  implements Application.IHandle
+  implements Application.IHandleIntegrationEvent
 {
+  version: string;
   constructor(private integrationEventBus: Infra.EventBus.IEventBus) {}
 
   get event() {

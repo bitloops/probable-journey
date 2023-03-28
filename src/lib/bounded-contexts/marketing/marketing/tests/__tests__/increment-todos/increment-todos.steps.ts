@@ -23,7 +23,7 @@ describe('Increment completed todos feature test', () => {
     const mockIncrementTodosWriteRepo =
       new MockIncrementCompletedTodosWriteRepo();
     const ctx = new ContextBuilder().withUserId(id).build();
-    const incrementTodosCommand = new IncrementTodosCommand({ id }, ctx);
+    const incrementTodosCommand = new IncrementTodosCommand({ id });
 
     // when
     const incrementTodosHandler = new IncrementTodosCommandHandler(
@@ -61,7 +61,7 @@ describe('Increment completed todos feature test', () => {
     const mockIncrementTodosWriteRepo =
       new MockIncrementCompletedTodosWriteRepo();
     const ctx = new ContextBuilder().withUserId(id).build();
-    const incrementTodosCommand = new IncrementTodosCommand({ id }, ctx);
+    const incrementTodosCommand = new IncrementTodosCommand({ id });
 
     // when
     const incrementTodosHandler = new IncrementTodosCommandHandler(
@@ -99,7 +99,7 @@ describe('Increment completed todos feature test', () => {
     const mockIncrementTodosWriteRepo =
       new MockIncrementCompletedTodosWriteRepo();
     const ctx = new ContextBuilder().withUserId(id).build();
-    const incrementTodosCommand = new IncrementTodosCommand({ id }, ctx);
+    const incrementTodosCommand = new IncrementTodosCommand({ id });
 
     // when
     const incrementTodosHandler = new IncrementTodosCommandHandler(
@@ -121,7 +121,7 @@ describe('Increment completed todos feature test', () => {
     const mockIncrementTodosWriteRepo =
       new MockIncrementCompletedTodosWriteRepo();
     const ctx = new ContextBuilder().withUserId(id).build();
-    const incrementTodosCommand = new IncrementTodosCommand({ id }, ctx);
+    const incrementTodosCommand = new IncrementTodosCommand({ id });
 
     // when
     const incrementTodosHandler = new IncrementTodosCommandHandler(
@@ -143,7 +143,7 @@ describe('Increment completed todos feature test', () => {
     const mockIncrementTodosWriteRepo =
       new MockIncrementCompletedTodosWriteRepo();
     const ctx = new ContextBuilder().withUserId(id).build();
-    const incrementTodosCommand = new IncrementTodosCommand({ id }, ctx);
+    const incrementTodosCommand = new IncrementTodosCommand({ id });
 
     // when
     const incrementTodosHandler = new IncrementTodosCommandHandler(

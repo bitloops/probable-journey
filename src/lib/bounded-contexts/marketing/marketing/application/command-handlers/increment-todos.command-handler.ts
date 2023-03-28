@@ -41,7 +41,13 @@ export class IncrementTodosCommandHandler
     return 'Marketing';
   }
 
-  @Traceable()
+  @Traceable({
+    operation: 'IncrementTodosCommandHandler',
+    metrics: {
+      name: 'IncrementTodosCommandHandler',
+      category: 'commandHandler',
+    },
+  })
   async execute(
     command: IncrementTodosCommand,
   ): Promise<IncrementDepositsCommandHandlerResponse> {

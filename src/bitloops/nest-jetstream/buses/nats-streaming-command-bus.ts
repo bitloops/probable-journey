@@ -9,8 +9,6 @@ import {
 } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
-import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
-import { EventHandler } from '@src/bitloops/bl-boilerplate-core/domain/events/IEventBus';
 import { ProvidersConstants } from '../jetstream.constants';
 
 const jsonCodec = JSONCodec();
@@ -30,7 +28,7 @@ export class NatsStreamingCommandBus
   }
 
   async publish(command: Application.Command): Promise<void> {
-    const boundedContext = command.metadata.toContextId;
+    const boundedContext = command.metadata.boundedContextId;
     const stream = NatsStreamingCommandBus.getStreamName(boundedContext);
     const subject = `${stream}.${command.constructor.name}`;
     const options: Partial<JetStreamPublishOptions> = { msgID: '' };
@@ -89,9 +87,9 @@ export class NatsStreamingCommandBus
     }
   }
 
-  unsubscribe<T extends IEvent<any>>(
+  unsubscribe(
     topic: string,
-    eventHandler: EventHandler<T>,
+    commandHandler: Application.ICommandHandler<any, any>,
   ): Promise<void> {
     throw new Error('Method not implemented.');
   }
@@ -109,7 +107,7 @@ export class NatsStreamingCommandBus
   static getSubjectFromCommandInstance(
     integrationEvent: Infra.EventBus.IntegrationEvent<any>,
   ): string {
-    const boundedContext = integrationEvent.metadata.fromContextId;
+    const boundedContext = integrationEvent.metadata.boundedContextId;
     const stream = NatsStreamingCommandBus.getStreamName(boundedContext);
     const subject = `${stream}.${integrationEvent.constructor.name}`;
     return subject;

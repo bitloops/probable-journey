@@ -25,7 +25,7 @@ export class TodoCompletedIntegrationEvent
   constructor(public data: IntegrationSchemas, version: string) {
     this.metadata = {
       createdAtTimestamp: Date.now(),
-      fromContextId: TodoCompletedIntegrationEvent.fromContextId,
+      boundedContextId: TodoCompletedIntegrationEvent.fromContextId,
       context: asyncLocalStorage.getStore()?.get('context'),
       messageId: new Domain.UUIDv4().toString(),
       correlationId: asyncLocalStorage.getStore()?.get('correlationId'),

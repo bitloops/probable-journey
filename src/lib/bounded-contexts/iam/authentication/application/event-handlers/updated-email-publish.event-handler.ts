@@ -5,7 +5,7 @@ import { UserUpdatedEmailIntegrationEvent } from '../../contracts/integration-ev
 import { UserUpdatedEmailDomainEvent } from '../../domain/events/user-updated-email.event';
 
 export class UserUpdatedEmailPublishIntegrationEventHandler
-  implements Application.IHandle
+  implements Application.IHandleDomainEvent
 {
   constructor(
     @Inject(StreamingIntegrationEventBusToken)

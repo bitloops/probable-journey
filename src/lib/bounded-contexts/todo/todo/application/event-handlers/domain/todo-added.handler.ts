@@ -5,7 +5,7 @@ import { StreamingIntegrationEventBusToken } from '../../../constants';
 import { TodoAddedIntegrationEvent } from '../../../contracts/integration-events/todo-added.integration-event';
 
 export class TodoAddedDomainToIntegrationEventHandler
-  implements Application.IHandle
+  implements Application.IHandleDomainEvent
 {
   constructor(
     @Inject(StreamingIntegrationEventBusToken)

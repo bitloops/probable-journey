@@ -25,14 +25,11 @@ export class UserRegisteredIntegrationEventHandler
   }
 
   public async handle(event: UserRegisteredIntegrationEvent): Promise<void> {
-    const { data, metadata } = event;
-    const command = new CreateUserCommand(
-      {
-        userId: data.userId,
-        email: data.email,
-      },
-      metadata.ctx,
-    );
+    const { data } = event;
+    const command = new CreateUserCommand({
+      userId: data.userId,
+      email: data.email,
+    });
     await this.commandBus.publish(command);
 
     console.log(

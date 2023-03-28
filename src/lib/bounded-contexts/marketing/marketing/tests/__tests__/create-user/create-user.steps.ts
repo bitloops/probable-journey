@@ -15,7 +15,7 @@ describe('Create user feature test', () => {
     // given
     const mockCreateUserReadRepo = new MockCreateUserReadRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const createUserCommand = new CreateUserCommand({ email, userId }, ctx);
+    const createUserCommand = new CreateUserCommand({ email, userId });
 
     // when
     const createUserHandler = new CreateUserCommandHandler(
@@ -43,7 +43,7 @@ describe('Create user feature test', () => {
     // given
     const mockCreateUserReadRepo = new MockCreateUserReadRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const createUserCommand = new CreateUserCommand({ email, userId }, ctx);
+    const createUserCommand = new CreateUserCommand({ email, userId });
 
     // when
     const createUserHandler = new CreateUserCommandHandler(

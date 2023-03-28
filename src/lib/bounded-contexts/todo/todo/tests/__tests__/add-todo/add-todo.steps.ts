@@ -20,7 +20,7 @@ describe('Add todo feature test', () => {
     // given
     const mockTodoWriteRepo = new MockAddTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const addTodoCommand = new AddTodoCommand({ title }, ctx);
+    const addTodoCommand = new AddTodoCommand({ title });
 
     // when
     const addTodoHandler = new AddTodoCommandHandler(
@@ -50,7 +50,7 @@ describe('Add todo feature test', () => {
     // given
     const mockTodoWriteRepo = new MockAddTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const addTodoCommand = new AddTodoCommand({ title }, ctx);
+    const addTodoCommand = new AddTodoCommand({ title });
 
     // when
     const addTodoHandler = new AddTodoCommandHandler(
@@ -69,7 +69,7 @@ describe('Add todo feature test', () => {
     // given
     const mockTodoWriteRepo = new MockAddTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const addTodoCommand = new AddTodoCommand({ title }, ctx);
+    const addTodoCommand = new AddTodoCommand({ title });
 
     // when
     const addTodoHandler = new AddTodoCommandHandler(

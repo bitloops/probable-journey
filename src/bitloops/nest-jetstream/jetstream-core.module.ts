@@ -126,7 +126,9 @@ export class JetstreamCoreModule {
       },
       {
         provide: HANDLERS_TOKENS.STREAMING_DOMAIN_EVENT_HANDLERS,
-        useFactory: (...domainEventHandlers: Application.IHandle[]) => {
+        useFactory: (
+          ...domainEventHandlers: Application.IHandleDomainEvent[]
+        ) => {
           return domainEventHandlers;
         },
         inject: [...streamingDomainEventHandlers],
@@ -134,7 +136,9 @@ export class JetstreamCoreModule {
 
       {
         provide: HANDLERS_TOKENS.STREAMING_INTEGRATION_EVENT_HANDLERS,
-        useFactory: (...integrationEventHandlers: Application.IHandle[]) => {
+        useFactory: (
+          ...integrationEventHandlers: Application.IHandleIntegrationEvent[]
+        ) => {
           return integrationEventHandlers;
         },
         inject: [...streamingIntegrationEventHandlers],

@@ -18,14 +18,6 @@
 import { Either } from '../Either';
 import { UnexpectedError } from '../errors/repository/UnexpectedError';
 
-export interface CRUDRepoPort<Aggregate, AggregateId> {
-  getAll(ctx?: any): Promise<Aggregate[]>;
-  getById(aggregateRootId: AggregateId, ctx?: any): Promise<Aggregate | null>;
-  save(aggregate: Aggregate, ctx?: any): Promise<void>;
-  update(aggregate: Aggregate, ctx?: any): Promise<void>;
-  delete(aggregateRootId: AggregateId, ctx?: any): Promise<void>;
-}
-
 export interface CRUDWriteRepoPort<Aggregate, AggregateId> {
   getById(
     aggregateRootId: AggregateId,

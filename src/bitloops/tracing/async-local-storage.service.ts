@@ -1,9 +1,9 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { Injectable } from '@nestjs/common';
-
-type AsyncLocalStorageKeys = 'correlationId' | 'userContext' | 'context';
-
-export type AsyncLocalStorageStore = Map<AsyncLocalStorageKeys, any>;
+import {
+  AsyncLocalStorageStore,
+  asyncLocalStorage,
+} from '@bitloops/bl-boilerplate-core';
 
 export interface IAsyncLocalStorageService {
   asyncLocalStorage: AsyncLocalStorage<AsyncLocalStorageStore>;
@@ -19,8 +19,7 @@ export interface IAsyncLocalStorageService {
  */
 @Injectable()
 export class AsyncLocalStorageService implements IAsyncLocalStorageService {
-  private static _asyncLocalStorage =
-    new AsyncLocalStorage<AsyncLocalStorageStore>();
+  private static _asyncLocalStorage = asyncLocalStorage;
   constructor() {
     console.log('AsyncLocalStorageService constructor');
   }

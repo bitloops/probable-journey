@@ -23,13 +23,16 @@ import { IMessage } from '../messages/IMessage';
 export type QueryMetadata = {
   boundedContextId: string;
   createdTimestamp: number;
-  messageId?: string;
-  correlationId?: string;
-  context?: TContext;
+  messageId: string;
+  correlationId: string;
+  context: TContext | null;
 };
 
 export interface IQuery extends IMessage {
-  uuid?: string;
-  // queryTopic: string;
   metadata: QueryMetadata;
+}
+
+export abstract class Query implements IQuery {
+  [x: string]: any;
+  abstract metadata: QueryMetadata;
 }

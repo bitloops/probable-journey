@@ -10,7 +10,6 @@ import {
 import { Application, Domain, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
 import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
-import { EventHandler } from '@src/bitloops/bl-boilerplate-core/domain/events/IEventBus';
 import { ProvidersConstants } from '../jetstream.constants';
 
 const jsonCodec = JSONCodec();
@@ -35,7 +34,7 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
       ? (domainEvents = domainEventsInput)
       : (domainEvents = [domainEventsInput]);
     domainEvents.forEach(async (domainEvent) => {
-      const boundedContext = domainEvent.metadata.fromContextId;
+      const boundedContext = domainEvent.metadata.boundedContextId;
       const stream = NatsStreamingDomainEventBus.getStreamName(boundedContext);
       const subject = `${stream}.${domainEvent.constructor.name}`;
       const options: Partial<JetStreamPublishOptions> = { msgID: '' };
@@ -56,7 +55,7 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
     });
   }
 
-  async subscribe(subject: string, handler: Application.IHandle) {
+  async subscribe(subject: string, handler: Application.IHandleDomainEvent) {
     const durableName = NatsStreamingDomainEventBus.getDurableName(
       subject,
       handler,
@@ -106,14 +105,16 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
     }
   }
 
-  unsubscribe<T extends IEvent<any>>(
+  unsubscribe(
     topic: string,
-    eventHandler: EventHandler<T>,
+    eventHandler: Application.IHandleDomainEvent,
   ): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
-  static getSubjectFromHandler(handler: Application.IHandle): string {
+  static getSubjectFromHandler(
+    handler: Application.IHandleDomainEvent,
+  ): string {
     const event = handler.event;
     const boundedContext = handler.boundedContext;
     const stream = NatsStreamingDomainEventBus.getStreamName(boundedContext);
@@ -124,7 +125,7 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
   static getSubjectFromEventInstance(
     domainEvent: Domain.IDomainEvent<any>,
   ): string {
-    const boundedContext = domainEvent.metadata.fromContextId;
+    const boundedContext = domainEvent.metadata.boundedContextId;
     const stream = NatsStreamingDomainEventBus.getStreamName(boundedContext);
     const subject = `${stream}.${domainEvent.constructor.name}`;
     return subject;
@@ -134,7 +135,10 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
     return `DomainEvents_${boundedContext}`;
   }
 
-  static getDurableName(subject: string, handler: Application.IHandle) {
+  static getDurableName(
+    subject: string,
+    handler: Application.IHandleDomainEvent,
+  ) {
     // Durable name cannot contain a dot
     const subjectWithoutDots = subject.replace(/\./g, '-');
     return `${subjectWithoutDots}-${handler.constructor.name}`;

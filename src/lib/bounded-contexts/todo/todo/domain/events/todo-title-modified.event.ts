@@ -1,4 +1,5 @@
-import { Application, Domain } from '@bitloops/bl-boilerplate-core';
+import { Domain } from '@bitloops/bl-boilerplate-core';
+import { asyncLocalStorage } from '@src/bitloops/tracing';
 import { TodoEntity } from '../TodoEntity';
 
 export class TodoTitleModifiedDomainEvent
@@ -7,13 +8,14 @@ export class TodoTitleModifiedDomainEvent
   public aggregateId: any;
   public metadata: Domain.TDomainEventMetadata;
 
-  constructor(public readonly data: TodoEntity, ctx?: Application.TContext) {
+  constructor(public readonly data: TodoEntity) {
     const uuid = new Domain.UUIDv4();
     this.metadata = {
-      fromContextId: 'Todo',
+      boundedContextId: 'Todo',
       createdAtTimestamp: Date.now(),
-      id: uuid.toString(),
-      context: ctx,
+      messageId: uuid.toString(),
+      context: asyncLocalStorage.getStore()?.get('context'),
+      correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
     };
     this.aggregateId = data.id;
   }

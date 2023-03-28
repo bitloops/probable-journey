@@ -10,7 +10,6 @@ import {
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
 import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
-import { EventHandler } from '@src/bitloops/bl-boilerplate-core/domain/events/IEventBus';
 import { ProvidersConstants } from '../jetstream.constants';
 
 const jsonCodec = JSONCodec();
@@ -64,7 +63,10 @@ export class NatsStreamingIntegrationEventBus
     });
   }
 
-  async subscribe(subject: string, handler: Application.IHandle) {
+  async subscribe(
+    subject: string,
+    handler: Application.IHandleIntegrationEvent,
+  ) {
     const durableName = NatsStreamingIntegrationEventBus.getDurableName(
       subject,
       handler,
@@ -109,7 +111,7 @@ export class NatsStreamingIntegrationEventBus
 
   unsubscribe<T extends IEvent<any>>(
     topic: string,
-    eventHandler: EventHandler<T>,
+    eventHandler: Application.IHandleIntegrationEvent,
   ): Promise<void> {
     throw new Error('Method not implemented.');
   }
@@ -129,7 +131,7 @@ export class NatsStreamingIntegrationEventBus
   static getSubjectFromEventInstance(
     integrationEvent: Infra.EventBus.IntegrationEvent<any>,
   ): string {
-    const boundedContext = integrationEvent.metadata.fromContextId;
+    const boundedContext = integrationEvent.metadata.boundedContextId;
     const stream =
       NatsStreamingIntegrationEventBus.getStreamName(boundedContext);
     const version = integrationEvent.metadata.version;
@@ -141,7 +143,10 @@ export class NatsStreamingIntegrationEventBus
     return `IntegrationEvents_${boundedContext}`;
   }
 
-  static getDurableName(subject: string, handler: Application.IHandle) {
+  static getDurableName(
+    subject: string,
+    handler: Application.IHandleIntegrationEvent,
+  ) {
     // Durable name cannot contain a dot
     const subjectWithoutDots = subject.replace(/\./g, '-');
     return `${subjectWithoutDots}-${handler.constructor.name}`;

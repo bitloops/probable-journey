@@ -1,4 +1,8 @@
-import { Infra } from '@bitloops/bl-boilerplate-core';
+import {
+  Infra,
+  Domain,
+  asyncLocalStorage,
+} from '@bitloops/bl-boilerplate-core';
 import { UserUpdatedEmailDomainEvent } from '../../domain/events/user-updated-email.event';
 
 export type IntegrationSchemaV1 = {
@@ -20,19 +24,17 @@ export class UserUpdatedEmailIntegrationEvent
   static versionMappers: Record<string, ToIntegrationDataMapper> = {
     v1: UserUpdatedEmailIntegrationEvent.toIntegrationDataV1,
   };
-  public metadata: any;
+  public metadata: Infra.EventBus.TIntegrationEventMetadata;
 
-  constructor(public data: IntegrationSchemas, version: string, uuid?: string) {
+  constructor(public data: IntegrationSchemas, version: string) {
     this.metadata = {
-      id: uuid,
-      fromContextId: UserUpdatedEmailIntegrationEvent.fromContextId,
+      messageId: new Domain.UUIDv4().toString(),
+      boundedContextId: UserUpdatedEmailIntegrationEvent.fromContextId,
       version,
+      createdAtTimestamp: Date.now(),
+      correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
+      context: asyncLocalStorage.getStore()?.get('context'),
     };
-    // super(
-    //     UserUpdatedEmailIntegrationEvent.getEventTopic(version),
-    //     data,
-    //     metadata,
-    // );
   }
 
   static create(

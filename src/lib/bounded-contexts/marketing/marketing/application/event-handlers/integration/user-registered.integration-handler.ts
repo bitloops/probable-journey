@@ -1,5 +1,10 @@
 import { Inject } from '@nestjs/common';
-import { Infra, Application } from '@src/bitloops/bl-boilerplate-core';
+import {
+  Infra,
+  Application,
+  Either,
+  ok,
+} from '@src/bitloops/bl-boilerplate-core';
 import { UserRegisteredIntegrationEvent } from '@src/bitloops/nest-auth-passport';
 import { CreateUserCommand } from '../../../commands/create-user.command';
 import { StreamingCommandBusToken } from '../../../constants';
@@ -17,14 +22,16 @@ export class UserRegisteredIntegrationEventHandler
   }
 
   get boundedContext() {
-    return UserRegisteredIntegrationEvent.fromContextId;
+    return UserRegisteredIntegrationEvent.boundedContextId;
   }
 
   get version() {
     return UserRegisteredIntegrationEvent.versions[0];
   }
 
-  public async handle(event: UserRegisteredIntegrationEvent): Promise<void> {
+  public async handle(
+    event: UserRegisteredIntegrationEvent,
+  ): Promise<Either<void, never>> {
     const { data } = event;
     const command = new CreateUserCommand({
       userId: data.userId,
@@ -35,5 +42,6 @@ export class UserRegisteredIntegrationEventHandler
     console.log(
       `[UserRegisteredIntegrationEvent]: Successfully sent CreateUserCommand`,
     );
+    return ok();
   }
 }

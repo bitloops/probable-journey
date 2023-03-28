@@ -1,4 +1,9 @@
-import { Infra, Application } from '@src/bitloops/bl-boilerplate-core';
+import {
+  Infra,
+  Application,
+  Either,
+  ok,
+} from '@src/bitloops/bl-boilerplate-core';
 import { EmailNotFoundIntegrationErrorEvent } from '@src/lib/bounded-contexts/iam/authentication/application/error-events/email-not-found.integration-event';
 
 export class EmailNotFoundIntegrationErrorEventHandler
@@ -17,7 +22,7 @@ export class EmailNotFoundIntegrationErrorEventHandler
 
   public async handle(
     event: EmailNotFoundIntegrationErrorEvent,
-  ): Promise<void> {
+  ): Promise<Either<void, never>> {
     const { data } = event;
     console.log(
       'data received from EmailNotFoundIntegrationErrorEventHandler',
@@ -27,5 +32,6 @@ export class EmailNotFoundIntegrationErrorEventHandler
     console.log(
       `[EmailNotFounIntegrationErrorEvent]: Successfully sent EmailNotFoundCommand`,
     );
+    return ok();
   }
 }

@@ -1,9 +1,9 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { Injectable } from '@nestjs/common';
 
-type AsyncLocalStorageKeys = 'correlationId' | 'userContext';
+type AsyncLocalStorageKeys = 'correlationId' | 'userContext' | 'context';
 
-export type AsyncLocalStorageStore = Map<AsyncLocalStorageKeys, string>;
+export type AsyncLocalStorageStore = Map<AsyncLocalStorageKeys, any>;
 
 export interface IAsyncLocalStorageService {
   asyncLocalStorage: AsyncLocalStorage<AsyncLocalStorageStore>;

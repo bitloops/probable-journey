@@ -17,15 +17,15 @@
  *
  *  For further information you can contact legal(at)bitloops.com.
  */
-import { config } from '../../config';
 import { TContext } from '../context';
 
 export type CommandMetadata = {
   // responseTopic: string;
-  toContextId: string;
+  boundedContextId: string;
   createdTimestamp: number;
   messageId?: string;
   correlationId?: string;
+  context?: TContext;
 };
 
 export interface ICommand {

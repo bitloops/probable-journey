@@ -21,9 +21,8 @@ import { TContext } from '../context';
 import { IMessage } from '../messages/IMessage';
 
 export interface TEventMetadata {
-  id?: string;
   createdAtTimestamp: number;
-  fromContextId: string;
+  boundedContextId: string;
   messageId?: string;
   correlationId?: string;
   context?: TContext;

@@ -68,6 +68,8 @@ export class AuthController {
     // const results = await this.commandBus.request(command);
     if (result.isOk()) return result.value;
     else {
+      const err = result.value;
+      err.nakable;
       switch (result.value.constructor) {
         case Application.Repo.Errors.Conflict:
           throw new HttpException(result.value, HttpStatus.CONFLICT);

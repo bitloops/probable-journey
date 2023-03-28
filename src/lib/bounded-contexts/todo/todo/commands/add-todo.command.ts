@@ -1,24 +1,22 @@
-import { Application } from '@bitloops/bl-boilerplate-core';
-// import { asyncLocalStorage } from '@src/bitloops/tracing';
-import { AddCorrelationId } from '@bitloops/tracing';
+import { Application, Domain } from '@bitloops/bl-boilerplate-core';
+import { asyncLocalStorage } from '@src/bitloops/tracing';
 
 export type TAddTodoCommand = {
   title: string;
 };
 
-@AddCorrelationId
 export class AddTodoCommand extends Application.Command {
   public readonly metadata: Application.TCommandMetadata = {
-    toContextId: 'Todo',
+    boundedContextId: 'Todo',
     createdTimestamp: Date.now(),
+    messageId: new Domain.UUIDv4().toString(),
     // Async localStorage should perhaps be injected or directly used from our library.
-    // correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
+    correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
+    context: asyncLocalStorage.getStore()?.get('context'),
   };
   public title: string;
-  constructor(
-    props: TAddTodoCommand,
-    public readonly ctx: Application.TContext,
-  ) {
+
+  constructor(props: TAddTodoCommand) {
     super();
     this.title = props.title;
   }

@@ -17,14 +17,15 @@
  *
  *  For further information you can contact legal(at)bitloops.com.
  */
+import { TContext } from '../context';
 import { IMessage } from '../messages/IMessage';
 
 export type QueryMetadata = {
-  responseTopic?: string;
-  toContextId: string;
+  boundedContextId: string;
   createdTimestamp: number;
-  // messageId?: string;
+  messageId?: string;
   correlationId?: string;
+  context?: TContext;
 };
 
 export interface IQuery extends IMessage {

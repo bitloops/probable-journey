@@ -48,6 +48,11 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
     if (emailToBeSentInfoResponse.isFail()) {
       return fail(emailToBeSentInfoResponse.value);
     }
+
+    if (!emailToBeSentInfoResponse.value) {
+      return ok();
+    }
+
     const emailToBeSentInfo = emailToBeSentInfoResponse.value;
     const userid = user.id;
     const userEmail = await this.emailRepoPort.getUserEmail(userid);

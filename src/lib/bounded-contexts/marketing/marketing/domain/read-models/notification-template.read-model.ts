@@ -11,7 +11,15 @@ export class NotificationTemplateReadModel {
     public readonly template: string,
   ) {}
 
-  static fromPrimitives(snapshot: TNotificationTemplateSnapshot): NotificationTemplateReadModel {
-    return new NotificationTemplateReadModel(snapshot.id, snapshot.type, snapshot.template);
+  public static readonly firstTodo = 'firstTodo';
+
+  static fromPrimitives(
+    snapshot: TNotificationTemplateSnapshot,
+  ): NotificationTemplateReadModel {
+    return new NotificationTemplateReadModel(
+      snapshot.id,
+      snapshot.type,
+      snapshot.template,
+    );
   }
 }

@@ -21,13 +21,15 @@ export class MarketingNotificationService {
     let notificationTemplate: NotificationTemplateReadModel | null;
     if (user.isFirstTodo()) {
       const notificationTemplateResponse =
-        await this.notificationTemplateRepo.getByType('firstTodo');
+        await this.notificationTemplateRepo.getByType(
+          NotificationTemplateReadModel.firstTodo,
+        );
       if (notificationTemplateResponse.isFail()) {
         return fail(notificationTemplateResponse.value);
       }
       notificationTemplate = notificationTemplateResponse.value;
     } else {
-      throw new Error('No notification template found'); //TODO add a new error
+      notificationTemplate = null;
     }
 
     return ok({ emailOrigin: emailOrigin, notificationTemplate });

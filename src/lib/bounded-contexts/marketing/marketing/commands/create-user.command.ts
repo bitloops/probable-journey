@@ -14,7 +14,7 @@ export class CreateUserCommand extends Application.Command {
 
   constructor(
     props: TCreateUserCommand,
-    public readonly ctx?: Application.TContext,
+    public readonly ctx: Application.TContext,
   ) {
     super();
     this.email = props.email;

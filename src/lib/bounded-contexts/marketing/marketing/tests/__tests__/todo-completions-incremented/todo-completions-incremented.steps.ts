@@ -1,49 +1,53 @@
-// import { IncrementTodosCommand } from '@src/lib/bounded-contexts/marketing/marketing/commands/Increment-todos.command';
-// import { IncrementTodosCommandHandler } from '@src/lib/bounded-contexts/marketing/marketing/application/command-handlers/increment-todos.command-handler';
-// import { ContextBuilder } from '../../builders/context.builder';
-// import { UserPropsBuilder } from '../../builders/user-props.builder';
-// import { UserEntity } from '@src/lib/bounded-contexts/marketing/marketing/domain/user.entity';
-// import { TodoCompletionsIncrementedDomainEvent } from '@src/lib/bounded-contexts/marketing/marketing/domain/events/todo-completions-incremented.event';
+import { ContextBuilder } from '../../builders/context.builder';
+import { TodoCompletionsIncrementedDomainEvent } from '@src/lib/bounded-contexts/marketing/marketing/domain/events/todo-completions-incremented.event';
+import { MockUserEmailReadRepo } from './user-email-read-repo.mock';
+import { TodoCompletionsIncrementedHandler } from '../../../application/event-handlers/domain/todo-completions-incremented.handler';
+import { MockNotificationTemplateReadRepo } from './notification-template-read-repo.mock';
+import { UserEntityBuilder } from '../../builders/user-entity.builder';
+import { Domain } from '@src/bitloops/bl-boilerplate-core';
+import { SUCCESS_CASE } from './todo-completions-incremented.mock';
 
-// describe('Todo completions incremented feature test', () => {
-//   it('Todo completions incremented successfully', async () => {
-//     const { userId, id, completedTodos } =
-//       INCREMENT_TODOS_SUCCESS_USER_EXISTS_CASE;
+describe('Todo completions incremented feature test', () => {
+  it('Todo completions incremented successfully', async () => {
+    const { userId, completedTodos } = SUCCESS_CASE;
 
-//     // given
-//     const mockCompleteTodoWriteRepo =
-//       new MockIncrementCompletedTodosWriteRepo();
-//     const ctx = new ContextBuilder().withUserId(userId).build();
-//     const completeTodoCommand = new IncrementTodosCommand({ userId }, ctx);
+    // given
+    const mockNotificationTemplateReadRepo =
+      new MockNotificationTemplateReadRepo();
+    const mockUserEmailReadRepo = new MockUserEmailReadRepo();
+    const ctx = new ContextBuilder().withUserId(userId).build();
+    const user = new UserEntityBuilder()
+      .withId(userId)
+      .withCompletedTodos(completedTodos)
+      .build();
+    const todoCompletionsDomainEvent =
+      new TodoCompletionsIncrementedDomainEvent(user, ctx);
 
-//     // when
-//     const completeTodoHandler = new IncrementTodosCommandHandler(
-//       mockCompleteTodoWriteRepo.getMockTodoWriteRepo(),
-//     );
-//     const result = await completeTodoHandler.execute(completeTodoCommand);
+    // when
+    const todoCompletionsIncrementedEventHandler =
+      new TodoCompletionsIncrementedHandler(
+        mockUserEmailReadRepo.getMockUserEmailReadRepo(),
+        mockNotificationTemplateReadRepo.getMockNotificationTemplateReadRepo(),
+      );
+    const result = await todoCompletionsIncrementedEventHandler.handle(
+      todoCompletionsDomainEvent,
+    );
 
-//     //then
-//     const userProps = new UserPropsBuilder()
-//       .withUserId(userId)
-//       .withId(id)
-//       .withCompletedTodos(completedTodos + 1)
-//       .build();
+    //then
+    expect(mockUserEmailReadRepo.mockGetUserEmailMethod).toHaveBeenCalledWith(
+      new Domain.UUIDv4(userId),
+      ctx,
+    );
+    expect(
+      mockNotificationTemplateReadRepo.mockGetByTypeMethod,
+    ).toHaveBeenCalledWith('firstTodo', ctx);
 
-//     expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
-//       { value: userId },
-//       ctx,
-//     );
-//     expect(mockCompleteTodoWriteRepo.mockSaveMethod).toHaveBeenCalledWith(
-//       expect.any(UserEntity),
-//       ctx,
-//     );
-
-//     const todoAggregate =
-//       mockCompleteTodoWriteRepo.mockSaveMethod.mock.calls[0][0];
-//     expect(todoAggregate.props).toEqual(userProps);
-//     expect(todoAggregate.domainEvents[0]).toBeInstanceOf(
-//       TodoCompletionsIncrementedDomainEvent,
-//     );
-//     expect(typeof result.value).toBe('undefined');
-//   });
-// });
+    // const todoAggregate =
+    //   mockCompleteTodoWriteRepo.mockSaveMethod.mock.calls[0][0];
+    // expect(todoAggregate.props).toEqual(userProps);
+    // expect(todoAggregate.domainEvents[0]).toBeInstanceOf(
+    //   TodoCompletionsIncrementedDomainEvent,
+    // );
+    expect(typeof result.value).toBe('undefined');
+  });
+});

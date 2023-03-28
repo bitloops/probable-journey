@@ -59,6 +59,7 @@ import { IErrorEvent as IErrorEventImport } from './application/events/IErrorEve
 import { ConflictError } from './errors/repository/ConflictError';
 import { UnexpectedError } from './errors/repository/UnexpectedError';
 import { ReturnUnexpectedError as ReturnUnexpectedErrorImport } from './errors/repository/unexpected-error.decorator';
+import { TEventMetadata } from './domain/events/IEvent';
 
 namespace Domain {
   export class Error extends DomainError {}
@@ -73,6 +74,7 @@ namespace Domain {
   export const applyRules = applyRulesImport;
   // export type Event<T> = IEvent<T>;
   export type IDomainEvent<T> = IDomainEventImport<T>;
+  export type TDomainEventMetadata = TEventMetadata;
   export namespace StandardVO {
     export namespace Currency {
       export class Value extends CurrencyVOImport {}

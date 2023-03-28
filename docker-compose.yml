@@ -166,7 +166,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     restart: unless-stopped
     ports:
-      - "3001:9090"
+      - "3003:9090"
     networks:
       - bitloops
     labels:

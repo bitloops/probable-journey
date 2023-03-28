@@ -1,3 +1,7 @@
+export interface TelemetryEvent {
+  trace: TraceEvent;
+  metric?: MetricsEvent
+}
 export interface TraceEvent {
   correlationId: string;
   processId?: string;

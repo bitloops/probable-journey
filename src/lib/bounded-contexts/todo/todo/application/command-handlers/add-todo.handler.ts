@@ -45,6 +45,10 @@ export class AddTodoCommandHandler
 
   @Traceable({
     operation: 'AddTodoCommandHandler',
+    metrics: {
+      name: 'AddTodoCommandHandler',
+      category: 'commandHandler',
+    },
   })
   async execute(command: AddTodoCommand): Promise<AddTodoUseCaseResponse> {
     this.ctx = command.ctx;

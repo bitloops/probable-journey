@@ -3,7 +3,7 @@ import { AsyncLocalStorageService } from './async-local-storage.service';
 import { MESSAGE_BUS_TOKEN } from './constants';
 import { Infra } from '../bl-boilerplate-core';
 import { isAsyncFunction } from './utils';
-import { TraceEvent, TraceableDecoratorInput } from './definitons';
+import { TelemetryEvent, TraceableDecoratorInput } from './definitons';
 
 const TRACING_TOPIC = 'trace_events';
 
@@ -54,12 +54,17 @@ export function Traceable(input: TraceableDecoratorInput) {
         throw error;
       } finally {
         const endTime = Date.now();
-        const traceEvent: TraceEvent = {
-          correlationId,
-          operation: input.operation,
-          startTime,
-          endTime,
+        const traceEvent: TelemetryEvent = {
+          trace: {
+            correlationId,
+            operation: input.operation,
+            startTime,
+            endTime,
+          },
         };
+        if (input.metrics) {
+          traceEvent.metric = input.metrics;
+        }
         const messageBus = this[
           messageBusServiceKey
         ] as Infra.MessageBus.IMessageBus;

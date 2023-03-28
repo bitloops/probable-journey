@@ -7,6 +7,7 @@ import {
   consumerOpts,
   createInbox,
 } from 'nats';
+import { randomUUID } from 'crypto';
 import { Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
 import { ProvidersConstants } from '../jetstream.constants';
@@ -31,7 +32,7 @@ export class NatsStreamingMessageBus implements Infra.MessageBus.IMessageBus {
     topic: string,
     message: Infra.MessageBus.IMessage,
   ): Promise<void> {
-    const options: Partial<JetStreamPublishOptions> = { msgID: '' };
+    const options: Partial<JetStreamPublishOptions> = { msgID: randomUUID() };
 
     const messageEncoded = jsonCodec.encode(message);
 

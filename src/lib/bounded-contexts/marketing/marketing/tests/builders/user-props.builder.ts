@@ -3,7 +3,6 @@ import { UserProps } from '@src/lib/bounded-contexts/marketing/marketing/domain/
 import { CompletedTodosVO } from '@src/lib/bounded-contexts/marketing/marketing/domain/completed-todos.vo';
 
 export class UserPropsBuilder {
-  private userId: string;
   private completedTodos: number;
   private id?: string;
 

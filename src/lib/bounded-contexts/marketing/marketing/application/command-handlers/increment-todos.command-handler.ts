@@ -10,7 +10,6 @@ import { IncrementTodosCommand } from '../../commands/Increment-todos.command';
 import { CompletedTodosVO } from '../../domain/completed-todos.vo';
 import { DomainErrors } from '../../domain/errors';
 import { UserEntity } from '../../domain/user.entity';
-import { UserIdVO } from '../../domain/user-id.vo';
 import {
   UserWriteRepoPort,
   UserWriteRepoPortToken,
@@ -49,7 +48,7 @@ export class IncrementTodosCommandHandler
     this.ctx = command.ctx;
     console.log('IncrementTodosCommandHandler');
 
-    const requestUserId = new Domain.UUIDv4(command.userId);
+    const requestUserId = new Domain.UUIDv4(command.id);
     const user = await this.userRepo.getById(requestUserId, this.ctx);
     if (user.isFail()) {
       return fail(user.value);
@@ -61,10 +60,10 @@ export class IncrementTodosCommandHandler
       if (completedTodosVO.isFail()) {
         return fail(completedTodosVO.value);
       }
-      const userId = UserIdVO.create({ id: requestUserId });
+      const id = new Domain.UUIDv4(command.id);
       const newUserOrError = UserEntity.create({
         completedTodos: completedTodosVO.value,
-        userId: userId.value,
+        id: id,
       });
       if (newUserOrError.isFail()) {
         return fail(newUserOrError.value);

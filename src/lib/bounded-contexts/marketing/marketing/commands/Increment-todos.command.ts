@@ -1,7 +1,7 @@
 import { Application } from '@bitloops/bl-boilerplate-core';
 
 export type TIncrementTodosCommand = {
-  userId: string;
+  id: string;
 };
 
 export class IncrementTodosCommand extends Application.Command {
@@ -9,13 +9,13 @@ export class IncrementTodosCommand extends Application.Command {
     toContextId: 'Marketing',
     createdTimestamp: Date.now(),
   };
-  public userId: string;
+  public id: string;
 
   constructor(
     props: TIncrementTodosCommand,
     public readonly ctx?: Application.TContext,
   ) {
     super();
-    this.userId = props.userId;
+    this.id = props.id;
   }
 }

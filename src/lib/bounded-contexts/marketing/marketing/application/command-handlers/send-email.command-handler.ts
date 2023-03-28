@@ -14,7 +14,7 @@ export class SendEmailCommandHandler
       Promise<SendEmailCommandHandlerResponse>
     >
 {
-  private ctx: Application.TContext;
+  private ctx?: Application.TContext;
   constructor(
     @Inject(EmailServicePortToken)
     private readonly emailService: EmailServicePort,

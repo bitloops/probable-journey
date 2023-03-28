@@ -43,7 +43,7 @@ export class MockIncrementCompletedTodosWriteRepo {
       ): Promise<Either<void, Application.Repo.Errors.Unexpected>> => {
         if (
           user.id.equals(
-            new Domain.UUIDv4(INCREMENT_TODOS_REPO_ERROR_SAVE_CASE.userId),
+            new Domain.UUIDv4(INCREMENT_TODOS_REPO_ERROR_SAVE_CASE.id),
           )
         ) {
           return Promise.resolve(
@@ -68,7 +68,7 @@ export class MockIncrementCompletedTodosWriteRepo {
       > => {
         if (
           id.equals(
-            new Domain.UUIDv4(INCREMENT_TODOS_SUCCESS_USER_EXISTS_CASE.userId),
+            new Domain.UUIDv4(INCREMENT_TODOS_SUCCESS_USER_EXISTS_CASE.id),
           )
         ) {
           const todo = UserEntity.fromPrimitives(
@@ -79,16 +79,14 @@ export class MockIncrementCompletedTodosWriteRepo {
         if (
           id.equals(
             new Domain.UUIDv4(
-              INCREMENT_TODOS_SUCCESS_USER_DOESNT_EXIST_CASE.userId,
+              INCREMENT_TODOS_SUCCESS_USER_DOESNT_EXIST_CASE.id,
             ),
           )
         ) {
           return Promise.resolve(ok(null));
         }
         if (
-          id.equals(
-            new Domain.UUIDv4(INCREMENT_TODOS_INVALID_COUNTER_CASE.userId),
-          )
+          id.equals(new Domain.UUIDv4(INCREMENT_TODOS_INVALID_COUNTER_CASE.id))
         ) {
           return Promise.resolve(
             fail(new DomainErrors.InvalidTodosCounterError()),
@@ -96,7 +94,7 @@ export class MockIncrementCompletedTodosWriteRepo {
         }
         if (
           id.equals(
-            new Domain.UUIDv4(INCREMENT_TODOS_REPO_ERROR_GETBYID_CASE.userId),
+            new Domain.UUIDv4(INCREMENT_TODOS_REPO_ERROR_GETBYID_CASE.id),
           )
         ) {
           return Promise.resolve(
@@ -104,9 +102,7 @@ export class MockIncrementCompletedTodosWriteRepo {
           );
         }
         if (
-          id.equals(
-            new Domain.UUIDv4(INCREMENT_TODOS_REPO_ERROR_SAVE_CASE.userId),
-          )
+          id.equals(new Domain.UUIDv4(INCREMENT_TODOS_REPO_ERROR_SAVE_CASE.id))
         ) {
           const todo = UserEntity.fromPrimitives(
             INCREMENT_TODOS_REPO_ERROR_SAVE_CASE,

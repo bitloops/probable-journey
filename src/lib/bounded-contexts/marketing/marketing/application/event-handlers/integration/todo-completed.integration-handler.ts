@@ -20,11 +20,8 @@ export class TodoCompletedIntegrationEventHandler
   }
 
   public async handle(event: TodoCompletedIntegrationEvent): Promise<void> {
-    const { data, metadata } = event;
-    const command = new IncrementTodosCommand(
-      { userId: data.userId },
-      metadata.context,
-    );
+    const { data } = event;
+    const command = new IncrementTodosCommand({ id: data.userId });
     await this.commandBus.publish(command);
 
     console.log(

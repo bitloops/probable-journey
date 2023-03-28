@@ -40,7 +40,5 @@ import { TracingModule } from '@bitloops/tracing';
       messageBus: NatsStreamingMessageBus,
     }),
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}

@@ -17,7 +17,10 @@ import {
 import { DomainError } from './domain/DomainError';
 import { Entity as EntityImport } from './domain/Entity';
 import { IEventBus as IEventBusImport } from './domain/events/IEventBus';
-import { IIntegrationEvent as IIntegrationEventImport } from './domain/events/IIntegrationEvent';
+import {
+  IIntegrationEvent as IIntegrationEventImport,
+  IIntegrationEventInputMetadata,
+} from './domain/events/IIntegrationEvent';
 import { IRule as IRuleImport } from './domain/IRule';
 import { IMessageBus as IMessageBusImport } from './domain/messages/IMessageBus';
 import { ReadModel as ReadModelImport } from './domain/ReadModel';
@@ -138,6 +141,7 @@ namespace Infra {
 
   export namespace EventBus {
     export type IntegrationEvent<T> = IIntegrationEventImport<T>;
+    export type TIntegrationEventMetadata = IIntegrationEventInputMetadata;
     export type IEventBus = IEventBusImport;
   }
   export namespace CommandBus {

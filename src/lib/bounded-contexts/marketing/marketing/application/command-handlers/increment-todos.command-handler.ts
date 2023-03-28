@@ -29,7 +29,7 @@ export class IncrementTodosCommandHandler
       Promise<IncrementDepositsCommandHandlerResponse>
     >
 {
-  private ctx: Application.TContext;
+  private ctx?: Application.TContext;
   constructor(
     @Inject(UserWriteRepoPortToken) private userRepo: UserWriteRepoPort,
   ) {}

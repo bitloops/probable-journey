@@ -84,7 +84,8 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
           // domainEvent.data = Domain.EventData.fromPrimitives(domainEvent.data);
 
           const reply = await handler.handle(domainEvent);
-          m.ack();
+          if (reply.isOk && reply.isOk()) m.ack();
+          else m.nak();
 
           console.log(
             `[Domain Event ${sub.getProcessed()}]: ${JSON.stringify(

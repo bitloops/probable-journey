@@ -19,11 +19,12 @@ export class TodoCompletedIntegrationEvent
   static versionMappers: Record<string, ToIntegrationDataMapper> = {
     v1: TodoCompletedIntegrationEvent.toIntegrationDataV1,
   };
-  public metadata: any;
+  public metadata: Infra.EventBus.TIntegrationEventMetadata;
 
   constructor(public data: IntegrationSchemas, version: string, uuid?: string) {
     this.metadata = {
       id: uuid,
+      createdAtTimestamp: Date.now(),
       fromContextId: TodoCompletedIntegrationEvent.fromContextId,
       version,
     };

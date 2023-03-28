@@ -1,4 +1,10 @@
-import { Infra, Application } from '@bitloops/bl-boilerplate-core';
+import {
+  Infra,
+  Application,
+  Either,
+  fail,
+  ok,
+} from '@bitloops/bl-boilerplate-core';
 import { TodoCompletionsIncrementedDomainEvent } from '../../../domain/events/todo-completions-incremented.event';
 import { SendEmailCommand } from '../../../commands/send-email.command';
 import { Inject } from '@nestjs/common';
@@ -31,7 +37,7 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
 
   public async handle(
     event: TodoCompletionsIncrementedDomainEvent,
-  ): Promise<void> {
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     const { data: user } = event;
 
     const marketingNotificationService = new MarketingNotificationService(
@@ -46,16 +52,14 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
     const userid = user.id;
     const userEmail = await this.emailRepoPort.getUserEmail(userid);
     if (userEmail.isFail()) {
-      //TODO figure out how to return this error to controller
       // return userEmail.value;
-      return;
+      return ok(); // TODO change this to fail
     }
 
-    //TODO figure out how to return this error to controller
     if (!userEmail.value) {
       // this.integrationEventBus().publish(new EmailNotFoundErrorMessage(new ApplicationErrors.EmailNotFoundError(userid.toString())));
       // TODO Error bus
-      return;
+      return ok(); // TODO change this to fail
     }
 
     const command = new SendEmailCommand({
@@ -64,5 +68,6 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
       content: emailToBeSentInfo.notificationTemplate?.template || '',
     });
     await this.commandBus.publish(command);
+    return ok();
   }
 }

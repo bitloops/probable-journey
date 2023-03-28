@@ -1,4 +1,4 @@
-import { Domain, Either, ok } from '@bitloops/bl-boilerplate-core';
+import { Domain, Either, ok, fail } from '@bitloops/bl-boilerplate-core';
 import { TitleVO } from './TitleVO';
 import { UserIdVO } from './UserIdVO';
 import { DomainErrors } from './errors';
@@ -6,6 +6,7 @@ import { TodoAddedDomainEvent } from './events/todo-added.event';
 import { TodoTitleModifiedDomainEvent } from './events/todo-title-modified.event';
 import { TodoCompletedDomainEvent } from './events/todo-completed.event';
 import { TodoUncompletedDomainEvent } from './events/todo-uncompleted.event';
+import { Rules } from './rules';
 
 export interface TodoProps {
   userId: UserIdVO;
@@ -54,22 +55,24 @@ export class TodoEntity extends Domain.Aggregate<TodoProps> {
   }
 
   public complete(): Either<void, DomainErrors.TodoAlreadyCompletedError> {
-    if (this.props.completed) {
-      return fail(
-        new DomainErrors.TodoAlreadyCompletedError(this.id.toString()),
-      );
-    }
+    const res = Domain.applyRules([
+      new Rules.TodoAlreadyCompleted(this.props.completed, this.id.toString()),
+    ]);
+    if (res) return fail(res);
+
     this.props.completed = true;
     this.addDomainEvent(new TodoCompletedDomainEvent(this));
     return ok();
   }
 
   public uncomplete(): Either<void, DomainErrors.TodoAlreadyUncompletedError> {
-    if (!this.props.completed) {
-      return fail(
-        new DomainErrors.TodoAlreadyUncompletedError(this.id.toString()),
-      );
-    }
+    const res = Domain.applyRules([
+      new Rules.TodoAlreadyUncompleted(
+        this.props.completed,
+        this.id.toString(),
+      ),
+    ]);
+    if (res) return fail(res);
     this.props.completed = false;
     this.addDomainEvent(new TodoUncompletedDomainEvent(this));
     return ok();

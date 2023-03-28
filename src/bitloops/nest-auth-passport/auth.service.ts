@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { v4 as uuid } from 'uuid';
 import { Application, Either } from '../bl-boilerplate-core';
 import { UsersService } from './users/users.service';
 import { User } from './users/user.model';
-import { Traceable } from '@bitloops/tracing';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -26,7 +25,6 @@ export class AuthService {
     return null;
   }
 
-  @Traceable()
   async login(user: User) {
     const payload = {
       email: user.email,
@@ -41,7 +39,7 @@ export class AuthService {
     user: User,
   ): Promise<Either<void, Application.Repo.Errors.Conflict>> {
     const hashedPassword = await this.hashPassword(user.password);
-    if (!user.id) user.id = uuid();
+    if (!user.id) user.id = randomUUID();
     const userToBeCreated = {
       ...user,
       password: hashedPassword,

@@ -17,7 +17,7 @@
  *
  *  For further information you can contact legal(at)bitloops.com.
  */
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'crypto';
 import { config, TOPIC_PREFIXES } from '../config';
 
 type GetTopicTypeParams = {
@@ -83,5 +83,5 @@ export const getProcessManagerTopic = (integrationEventTopic: string) => {
 };
 
 export const createUUIDv4 = () => {
-  return uuid();
+  return randomUUID();
 };

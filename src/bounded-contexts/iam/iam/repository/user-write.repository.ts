@@ -20,15 +20,10 @@ import { EmailVO } from '@src/lib/bounded-contexts/iam/authentication/domain/Ema
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import { StreamingDomainEventBusToken } from '@src/lib/bounded-contexts/iam/authentication/constants';
-
-const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'iam';
-const MONGO_DB_TODO_COLLECTION =
-  process.env.MONGO_DB_TODO_COLLECTION || 'users';
+import { AppConfig } from '@src/config/configuration';
 
 @Injectable()
 export class UserWriteRepository implements UserWriteRepoPort {
-  private collectionName = MONGO_DB_TODO_COLLECTION;
-  private dbName = MONGO_DB_DATABASE;
   private collection: Collection;
   private JWT_SECRET: string;
   constructor(
@@ -36,13 +31,21 @@ export class UserWriteRepository implements UserWriteRepoPort {
     @Inject(StreamingDomainEventBusToken)
     private readonly domainEventBus: Infra.EventBus.IEventBus,
     private readonly configService: ConfigService<
-      AuthEnvironmentVariables,
+      AuthEnvironmentVariables & AppConfig,
       true
     >,
   ) {
-    this.collection = this.client
-      .db(this.dbName)
-      .collection(this.collectionName);
+    const dbName = this.configService.get('database.iam_mongo.database', {
+      infer: true,
+    });
+
+    const collectionName = this.configService.get(
+      'database.iam_mongo.users_collection',
+      {
+        infer: true,
+      },
+    );
+    this.collection = this.client.db(dbName).collection(collectionName);
     this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
   }
 

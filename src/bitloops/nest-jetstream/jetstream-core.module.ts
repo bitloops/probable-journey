@@ -43,6 +43,11 @@ const streamingCommandBus = {
   useClass: NatsStreamingCommandBus,
 };
 
+const streamingMessageBus = {
+  provide: BUSES_TOKENS.STREAMING_MESSAGE_BUS,
+  useClass: NatsStreamingCommandBus,
+};
+
 @Global()
 @Module({})
 export class JetstreamCoreModule {
@@ -69,6 +74,7 @@ export class JetstreamCoreModule {
         streamingDomainEventBus,
         streamingIntegrationEventBus,
         streamingCommandBus,
+        streamingMessageBus,
         asyncLocalStorageProvider,
       ],
       exports: [
@@ -78,6 +84,7 @@ export class JetstreamCoreModule {
         streamingDomainEventBus,
         streamingIntegrationEventBus,
         streamingCommandBus,
+        streamingMessageBus,
         asyncLocalStorageProvider,
       ],
     };

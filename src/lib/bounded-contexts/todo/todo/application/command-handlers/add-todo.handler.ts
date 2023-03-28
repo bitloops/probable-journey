@@ -22,7 +22,7 @@ type AddTodoUseCaseResponse = Either<
   DomainErrors.TitleOutOfBoundsError | Application.Repo.Errors.Unexpected
 >;
 
-export class AddTodoHandler
+export class AddTodoCommandHandler
   implements
     Application.ICommandHandler<
       AddTodoCommand,
@@ -43,7 +43,13 @@ export class AddTodoHandler
     return 'Todo';
   }
 
-  @Traceable()
+  @Traceable({
+    operation: 'AddTodoCommandHandler',
+    metrics: {
+      name: 'AddTodoCommandHandler',
+      category: 'commandHandler',
+    },
+  })
   async execute(command: AddTodoCommand): Promise<AddTodoUseCaseResponse> {
     this.ctx = command.ctx;
     console.log('AddTodoCommand...');

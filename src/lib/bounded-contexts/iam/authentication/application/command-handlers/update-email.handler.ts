@@ -6,7 +6,6 @@ import {
   Domain,
 } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
-import { CommandHandler } from '@nestjs/cqrs';
 import { UpdateEmailCommand } from '../../commands/update-email.command';
 import { EmailVO } from '../../domain/EmailVO';
 import {
@@ -20,7 +19,6 @@ type UpdateEmailResponse = Either<
   ApplicationErrors.UserNotFoundApplicationError
 >;
 
-@CommandHandler(UpdateEmailCommand)
 export class UpdateEmailHandler
   implements
     Application.ICommandHandler<

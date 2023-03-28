@@ -1,49 +1,22 @@
-import * as util from 'util';
-import { asyncLocalStorage } from './storage';
-// target: the constructor or prototype of the class decorated.
-// propertyKey: the name of the key.
-// descriptor(ES6): the descriptor of that property.
-interface TraceableInput {
-  processId: string;
-  correlationId: string;
-}
+import { Inject } from '@nestjs/common';
+import { AsyncLocalStorageService } from './async-local-storage.service';
+import { MESSAGE_BUS_TOKEN } from './constants';
+import { Infra } from '../bl-boilerplate-core';
+import { isAsyncFunction } from './utils';
+import { TelemetryEvent, TraceableDecoratorInput } from './definitons';
 
-// export function Traceable() {
-//   return function (
-//     target: unknown,
-//     propertyKey: string,
-//     descriptor: PropertyDescriptor,
-//   ) {
-//     console.log('Inserted decorators returned function');
-//     console.log(target, propertyKey, descriptor);
-//     const originalMethod = descriptor.value;
-//     descriptor.value = function (...args: any[]) {
-//       console.log('Started executing: ' + propertyKey);
-//       const correlationId = asyncLocalStorage.getStore();
-//       console.log(
-//         'decorator: correlationId',
-//         correlationId?.get('correlationId'),
-//       );
-//       try {
-//         return originalMethod.apply(this, args);
-//       } catch (error) {
-//         return error;
-//       } finally {
-//         console.log(`${propertyKey} was executed.`);
-//       }
-//     };
-//   };
-// }
+const TRACING_TOPIC = 'trace_events';
 
-const isAsyncFunction = (fn: any) => {
-  // util.types.isAsyncFunction(fn); // Node 10+
-  // Note that the above only reports back what the JavaScript engine is seeing; in particular, the return value may not match the original source code if a transpilation tool was used.
-  return fn && fn.constructor && fn.constructor.name === 'AsyncFunction';
-};
+/**
+ *  the traceable decorator accesses the AsyncLocalStorageService
+ *  and gets the correlationId from the store.
+ * */
+export function Traceable(input: TraceableDecoratorInput) {
+  const asyncLocalStorageInjector = Inject(AsyncLocalStorageService);
+  const messageBusInjector = Inject(MESSAGE_BUS_TOKEN);
 
-export function Traceable() {
   return function (
-    target: unknown,
+    target: any,
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ) {
@@ -55,26 +28,90 @@ export function Traceable() {
       );
     }
 
+    const asyncLocalStorageServiceKey = 'asyncLocalStorageService';
+    const messageBusServiceKey = 'messageBusService';
+    asyncLocalStorageInjector(target, asyncLocalStorageServiceKey);
+    messageBusInjector(target, messageBusServiceKey);
+
     descriptor.value = async function (...args: any[]) {
       console.log(
         `Started executing ... [${this.constructor.name}][${propertyKey}]`,
       );
+      const startTime = Date.now();
 
-      const store = asyncLocalStorage.getStore();
-      const correlationId = store?.get('correlationId');
+      const asyncLocalStorage = this[
+        asyncLocalStorageServiceKey
+      ] as AsyncLocalStorageService;
+
+      const correlationId = asyncLocalStorage.getCorrelationId();
       console.table({
         correlationId,
       });
-      console.log('user context', store?.get('userContext'));
+      // console.log('user context', store?.get('userContext'));
       try {
         return await originalMethod.apply(this, args);
       } catch (error) {
-        return error;
+        throw error;
       } finally {
+        const endTime = Date.now();
+        const traceEvent: TelemetryEvent = {
+          trace: {
+            correlationId,
+            operation: input.operation,
+            startTime,
+            endTime,
+          },
+        };
+        if (input.metrics) {
+          traceEvent.metric = input.metrics;
+        }
+        const messageBus = this[
+          messageBusServiceKey
+        ] as Infra.MessageBus.IMessageBus;
+        await messageBus.publish(TRACING_TOPIC, traceEvent);
         console.log(
           `Finished executing ... [${this.constructor.name}][${propertyKey}].`,
         );
       }
     };
+  };
+}
+
+// export function AddCorrelationId() {
+//   return function (target: any) {
+//     // Add the metadata to the class instance
+
+//     const correlationId = AsyncLocalStorageService.asyncLocalStorage
+//       .getStore()
+//       ?.get('correlationId');
+//     if (!target.metadata) {
+//       target.metadata = {};
+//     }
+//     target.metadata.correlationId = correlationId;
+//   };
+// }
+
+export function AddCorrelationId<T extends new (...args: any[]) => {}>(
+  constructor: T,
+) {
+  return class extends constructor {
+    metadata: any;
+
+    constructor(...args: any[]) {
+      super(...args);
+
+      const correlationId = AsyncLocalStorageService.asyncLocalStorage
+        .getStore()
+        ?.get('correlationId');
+      if (!this.metadata) {
+        this.metadata = {};
+      }
+      this.metadata.correlationId = correlationId;
+      Object.setPrototypeOf(this, constructor.prototype);
+    }
+    // @ts-ignore
+    static get name() {
+      return constructor.name;
+    }
   };
 }

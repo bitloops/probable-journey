@@ -33,7 +33,9 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  @Traceable()
+  @Traceable({
+    operation: 'LoginController',
+  })
   async login(@Request() req) {
     const jwt = this.authService.login(req.user);
     // this.commandBus.execute(

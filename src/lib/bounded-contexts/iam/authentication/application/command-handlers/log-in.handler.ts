@@ -6,7 +6,6 @@ import {
   Domain,
 } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
-import { CommandHandler } from '@nestjs/cqrs';
 import { LogInCommand } from '../../commands/log-in.command';
 import {
   UserWriteRepoPortToken,
@@ -19,7 +18,6 @@ type LogInUseCaseResponse = Either<
   ApplicationErrors.UserNotFoundApplicationError
 >;
 
-@CommandHandler(LogInCommand)
 export class LogInHandler
   implements
     Application.ICommandHandler<LogInCommand, Promise<LogInUseCaseResponse>>

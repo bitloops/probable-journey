@@ -1,3 +1,31 @@
+export interface AppConfig {
+  http: {
+    port: number;
+    ip: string;
+  };
+  grpc: {
+    port: number;
+    ip: string;
+    packageName: string;
+    protoPath: string;
+  };
+  database: {
+    iam_mongo: {
+      database: string;
+      host: string;
+      users_collection: string;
+    };
+    todo_mongo: {
+      database: string;
+      host: string;
+    };
+    marketing_mongo: {
+      database: string;
+      host: string;
+      users_collection: string;
+    };
+  };
+}
 export default () => ({
   http: {
     port: process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT, 10) : 3000,
@@ -11,16 +39,19 @@ export default () => ({
   },
   database: {
     iam_mongo: {
-      database: process.env.IAM_DATABASE_NAME,
+      database: process.env.IAM_DATABASE_NAME || 'iam',
       host: process.env.IAM_DATABASE_HOST,
+      users_collection: process.env.IAM_DATABASE_USERS_COLLECTION || 'users',
     },
     todo_mongo: {
       database: process.env.TODO_DATABASE_NAME,
       host: process.env.TODO_DATABASE_HOST,
     },
     marketing_mongo: {
-      database: process.env.MARKETING_DATABASE_NAME,
+      database: process.env.MARKETING_DATABASE_NAME || 'marketing',
       host: process.env.MARKETING_DATABASE_HOST,
+      users_collection:
+        process.env.MARKETING_DATABASE_USERS_COLLECTION || 'users',
     },
   },
 });

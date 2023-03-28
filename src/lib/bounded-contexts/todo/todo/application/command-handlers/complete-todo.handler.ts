@@ -5,7 +5,6 @@ import {
   ok,
   Domain,
 } from '@bitloops/bl-boilerplate-core';
-import { CommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { CompleteTodoCommand } from '../../commands/complete-todo.command';
 import { DomainErrors } from '../../domain/errors';
@@ -21,7 +20,6 @@ type CompleteTodoUseCaseResponse = Either<
   DomainErrors.TodoAlreadyCompletedError | ApplicationErrors.TodoNotFoundError
 >;
 
-@CommandHandler(CompleteTodoCommand)
 export class CompleteTodoHandler
   implements
     Application.IUseCase<

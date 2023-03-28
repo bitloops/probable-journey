@@ -5,7 +5,6 @@ import {
   ok,
   Domain,
 } from '@bitloops/bl-boilerplate-core';
-import { CommandHandler } from '@nestjs/cqrs';
 import { UncompleteTodoCommand } from '../../commands/uncomplete-todo.command';
 import { DomainErrors } from '../../domain/errors';
 import { Inject } from '@nestjs/common';
@@ -21,7 +20,6 @@ type UncompleteTodoUseCaseResponse = Either<
   DomainErrors.TodoAlreadyUncompletedError | ApplicationErrors.TodoNotFoundError
 >;
 
-@CommandHandler(UncompleteTodoCommand)
 export class UncompleteTodoHandler
   implements
     Application.IUseCase<

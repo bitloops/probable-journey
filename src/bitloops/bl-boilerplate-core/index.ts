@@ -23,6 +23,8 @@ import {
 } from './domain/events/IIntegrationEvent';
 import { IRule as IRuleImport } from './domain/IRule';
 import { IMessageBus as IMessageBusImport } from './domain/messages/IMessageBus';
+import { SubscriberHandler as SubscribeHandlerImport } from './domain/messages/IMessageBus';
+import { IMessage as IMessageImport } from './domain/messages/IMessage';
 import { ReadModel as ReadModelImport } from './domain/ReadModel';
 import { UUIDv4 as UUIDv4Import } from './domain/UUIDv4';
 import {
@@ -36,6 +38,7 @@ import {
 } from './domain/commands/Command';
 import { TContext as TContextImport } from './domain/context';
 import { IDomainEvent as IDomainEventImport } from './domain/events/IDomainEvent';
+import { IEvent as IEventImport } from './domain/events/IEvent';
 import {
   IQuery as IQueryImport,
   QueryMetadata as TQueryMetadataImport,
@@ -72,7 +75,6 @@ namespace Domain {
   export class UUIDv4 extends UUIDv4Import {}
   export type IRule = IRuleImport;
   export const applyRules = applyRulesImport;
-  // export type Event<T> = IEvent<T>;
   export type IDomainEvent<T> = IDomainEventImport<T>;
   export type TDomainEventMetadata = TEventMetadata;
   export namespace StandardVO {
@@ -145,6 +147,7 @@ namespace Infra {
     export type IntegrationEvent<T> = IIntegrationEventImport<T>;
     export type TIntegrationEventMetadata = IIntegrationEventInputMetadata;
     export type IEventBus = IEventBusImport;
+    export type IEvent<T> = IEventImport<T>;
   }
   export namespace CommandBus {
     export type IPubSubCommandBus = IPubSubCommandBusImport;
@@ -157,6 +160,9 @@ namespace Infra {
 
   export namespace MessageBus {
     export type IMessageBus = IMessageBusImport;
+    export type IMessage = IMessageImport;
+    export type SubscriberHandler<T extends IMessage> =
+      SubscribeHandlerImport<T>;
   }
 }
 

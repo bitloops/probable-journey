@@ -17,7 +17,7 @@ import {
 } from '@src/lib/bounded-contexts/iam/authentication/constants';
 import { UserWritePostgresRepository } from './repository/user-write.pg.repository';
 
-const RepoProviders = [
+const providers = [
   {
     provide: UserWriteRepoPortToken,
     useClass: UserWritePostgresRepository,
@@ -34,7 +34,7 @@ const RepoProviders = [
 @Module({
   imports: [
     LibIamModule.register({
-      inject: [...RepoProviders],
+      inject: [...providers],
       imports: [
         MongoModule,
         PostgresModule.forFeature(
@@ -55,7 +55,6 @@ const RepoProviders = [
       streamingDomainEventHandlers: [...StreamingDomainEventHandlers],
     }),
   ],
-  controllers: [],
   exports: [LibIamModule],
 })
 export class IamModule {}

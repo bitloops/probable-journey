@@ -13,3 +13,15 @@ export const INCREMENT_TODOS_INVALID_COUNTER_CASE = {
   id: 'todo2',
   completedTodos: -10,
 };
+
+export const INCREMENT_TODOS_REPO_ERROR_GETBYID_CASE = {
+  userId: '123456',
+  id: 'todo3',
+  completedTodos: 1,
+};
+
+export const INCREMENT_TODOS_REPO_ERROR_SAVE_CASE = {
+  userId: '1234567',
+  id: 'todo4',
+  completedTodos: 1,
+};

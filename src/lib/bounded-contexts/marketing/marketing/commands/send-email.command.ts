@@ -14,7 +14,7 @@ export class SendEmailCommand extends Application.Command {
   };
   constructor(
     sendEmail: TSendEmailCommand,
-    public readonly ctx?: Application.TContext,
+    public readonly ctx: Application.TContext,
   ) {
     super();
     this.destination = sendEmail.destination;

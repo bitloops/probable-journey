@@ -3,6 +3,7 @@ import { SendEmailCommand } from '../../commands/send-email.command';
 import { Inject } from '@nestjs/common';
 import { EmailServicePort } from '../../ports/email-service-port';
 import { EmailServicePortToken } from '../../constants';
+import { Traceable } from '@src/bitloops/tracing';
 
 type SendEmailCommandHandlerResponse = Either<void, void>;
 
@@ -13,6 +14,7 @@ export class SendEmailCommandHandler
       Promise<SendEmailCommandHandlerResponse>
     >
 {
+  private ctx: Application.TContext;
   constructor(
     @Inject(EmailServicePortToken)
     private readonly emailService: EmailServicePort,
@@ -26,15 +28,20 @@ export class SendEmailCommandHandler
     return 'Marketing';
   }
 
+  @Traceable()
   async execute(
     command: SendEmailCommand,
   ): Promise<SendEmailCommandHandlerResponse> {
+    this.ctx = command.ctx;
     console.log('SendEmailHandler');
-    await this.emailService.send({
-      origin: command.origin,
-      destination: command.destination,
-      content: command.content,
-    });
+    await this.emailService.send(
+      {
+        origin: command.origin,
+        destination: command.destination,
+        content: command.content,
+      },
+      this.ctx,
+    );
     return ok();
   }
 }

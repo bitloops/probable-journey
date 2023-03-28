@@ -38,7 +38,7 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
   public async handle(
     event: TodoCompletionsIncrementedDomainEvent,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
-    const { data: user } = event;
+    const { data: user, metadata } = event;
 
     const marketingNotificationService = new MarketingNotificationService(
       this.notificationTemplateRepo,
@@ -62,11 +62,14 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
       return ok(); // TODO change this to fail
     }
 
-    const command = new SendEmailCommand({
-      origin: emailToBeSentInfo.emailOrigin,
-      destination: userEmail.value.email,
-      content: emailToBeSentInfo.notificationTemplate?.template || '',
-    });
+    const command = new SendEmailCommand(
+      {
+        origin: emailToBeSentInfo.emailOrigin,
+        destination: userEmail.value.email,
+        content: emailToBeSentInfo.notificationTemplate?.template || '',
+      },
+      metadata.context,
+    );
     await this.commandBus.publish(command);
     return ok();
   }

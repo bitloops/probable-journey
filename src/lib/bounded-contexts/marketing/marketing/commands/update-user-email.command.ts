@@ -14,7 +14,7 @@ export class UpdateUserEmailCommand extends Application.Command {
 
   constructor(
     props: TUpdateUserEmailCommand,
-    public readonly ctx?: Application.TContext,
+    public readonly ctx: Application.TContext,
   ) {
     super();
     this.email = props.email;

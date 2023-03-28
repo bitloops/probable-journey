@@ -19,12 +19,12 @@ import { DomainErrors } from '@src/lib/bounded-contexts/marketing/marketing/doma
 export class MockIncrementCompletedTodosWriteRepo {
   public readonly mockSaveMethod: jest.Mock;
   public readonly mockGetByIdMethod: jest.Mock;
-  private mockTodoWriteRepo: UserWriteRepoPort;
+  private mockUserWriteRepo: UserWriteRepoPort;
 
   constructor() {
     this.mockSaveMethod = this.getMockSaveMethod();
     this.mockGetByIdMethod = this.getMockGetByIdMethod();
-    this.mockTodoWriteRepo = {
+    this.mockUserWriteRepo = {
       save: this.mockSaveMethod,
       getById: this.mockGetByIdMethod,
       update: jest.fn(),
@@ -32,8 +32,8 @@ export class MockIncrementCompletedTodosWriteRepo {
     };
   }
 
-  getMockTodoWriteRepo(): UserWriteRepoPort {
-    return this.mockTodoWriteRepo;
+  getMockUserWriteRepo(): UserWriteRepoPort {
+    return this.mockUserWriteRepo;
   }
 
   private getMockSaveMethod(): jest.Mock {

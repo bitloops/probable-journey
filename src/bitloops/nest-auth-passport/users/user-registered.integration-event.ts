@@ -22,7 +22,7 @@ export class UserRegisteredIntegrationEvent
       version: UserRegisteredIntegrationEvent.versions[0],
       createdAtTimestamp: Date.now(),
       messageId: new Domain.UUIDv4().toString(),
-      context: null,
+      context: {},
       correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
     };
   }

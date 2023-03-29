@@ -51,11 +51,13 @@ export class TodoCompletionsIncrementedHandler
       return fail(emailToBeSentInfoResponse.value);
     }
 
-    if (!emailToBeSentInfoResponse.value) {
+    if (
+      !emailToBeSentInfoResponse.value ||
+      !emailToBeSentInfoResponse.value.notificationTemplate
+    ) {
       return ok();
     }
 
-    const emailToBeSentInfo = emailToBeSentInfoResponse.value;
     const userid = user.id;
     const userEmail = await this.emailRepoPort.getUserEmail(userid);
     if (userEmail.isFail()) {
@@ -70,9 +72,9 @@ export class TodoCompletionsIncrementedHandler
     }
 
     const command = new SendEmailCommand({
-      origin: emailToBeSentInfo.emailOrigin,
+      origin: emailToBeSentInfoResponse.value.emailOrigin,
       destination: userEmail.value.email,
-      content: emailToBeSentInfo.notificationTemplate?.template || '',
+      content: emailToBeSentInfoResponse.value.notificationTemplate.template,
     });
     await this.commandBus.publish(command);
     return ok();

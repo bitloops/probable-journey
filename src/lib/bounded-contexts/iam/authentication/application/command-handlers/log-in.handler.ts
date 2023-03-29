@@ -19,8 +19,7 @@ type LogInUseCaseResponse = Either<
 >;
 
 export class LogInHandler
-  implements
-    Application.ICommandHandler<LogInCommand, Promise<LogInUseCaseResponse>>
+  implements Application.ICommandHandler<LogInCommand, void>
 {
   constructor(
     @Inject(UserWriteRepoPortToken)

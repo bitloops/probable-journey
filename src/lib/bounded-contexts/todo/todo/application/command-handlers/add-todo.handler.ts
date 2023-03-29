@@ -23,11 +23,7 @@ type AddTodoUseCaseResponse = Either<
 >;
 
 export class AddTodoCommandHandler
-  implements
-    Application.ICommandHandler<
-      AddTodoCommand,
-      Promise<AddTodoUseCaseResponse>
-    >
+  implements Application.ICommandHandler<AddTodoCommand, string>
 {
   private ctx: Application.TContext;
   constructor(
@@ -51,17 +47,15 @@ export class AddTodoCommandHandler
     },
   })
   async execute(command: AddTodoCommand): Promise<AddTodoUseCaseResponse> {
-    if (!command.metadata.context) {
-      throw new Error('Context is not defined');
-    }
-    this.ctx = command.metadata.context;
     console.log('AddTodoCommand...');
 
     const title = TitleVO.create({ title: command.title });
     if (title.isFail()) {
       return fail(title.value);
     }
-    const userId = UserIdVO.create({ id: new Domain.UUIDv4(this.ctx.userId) });
+    const userId = UserIdVO.create({
+      id: new Domain.UUIDv4(command.metadata.context.userId),
+    });
     const todo = TodoEntity.create({
       title: title.value,
       completed: false,
@@ -71,7 +65,7 @@ export class AddTodoCommandHandler
       return fail(todo.value);
     }
 
-    const saveResult = await this.todoRepo.save(todo.value, this.ctx);
+    const saveResult = await this.todoRepo.save(todo.value);
     if (saveResult.isFail()) {
       return fail(saveResult.value);
     }

@@ -115,8 +115,10 @@ export class NatsStreamingIntegrationEventBus
               return handler.handle(integrationEvent);
             },
           );
-          if (reply.isOk && reply.isOk()) m.ack();
-          else m.nak();
+
+          if (reply.isFail && reply.isFail() && reply.value.nakable) {
+            m.nak();
+          } else m.ack();
 
           console.log(
             `[${sub.getProcessed()}]: ${JSON.stringify(

@@ -25,7 +25,7 @@ export type QueryMetadata = {
   createdTimestamp: number;
   messageId: string;
   correlationId: string;
-  context: TContext | null;
+  context: TContext | Record<string, never>; // type of empty object
 };
 
 export interface IQuery extends IMessage {

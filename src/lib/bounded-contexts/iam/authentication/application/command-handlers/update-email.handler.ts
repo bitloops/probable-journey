@@ -20,11 +20,7 @@ type UpdateEmailResponse = Either<
 >;
 
 export class UpdateEmailHandler
-  implements
-    Application.ICommandHandler<
-      UpdateEmailCommand,
-      Promise<UpdateEmailResponse>
-    >
+  implements Application.ICommandHandler<UpdateEmailCommand, void>
 {
   constructor(
     @Inject(UserWriteRepoPortToken)

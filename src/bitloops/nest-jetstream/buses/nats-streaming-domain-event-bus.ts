@@ -11,10 +11,8 @@ import {
 } from 'nats';
 import { Application, Domain, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
-import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
 import {
   ASYNC_LOCAL_STORAGE,
-  METADATA_HEADERS,
   ProvidersConstants,
 } from '../jetstream.constants';
 import { ContextPropagation } from './utils/context-propagation';

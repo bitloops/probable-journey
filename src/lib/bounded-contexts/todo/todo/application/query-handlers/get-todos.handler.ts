@@ -14,11 +14,7 @@ export type GetTodosQueryHandlerResponse = Either<
 >;
 
 export class GetTodosHandler
-  implements
-    Application.IQueryHandler<
-      GetTodosQuery,
-      Promise<GetTodosQueryHandlerResponse>
-    >
+  implements Application.IQueryHandler<GetTodosQuery, TTodoReadModelSnapshot[]>
 {
   private ctx: any;
   constructor(

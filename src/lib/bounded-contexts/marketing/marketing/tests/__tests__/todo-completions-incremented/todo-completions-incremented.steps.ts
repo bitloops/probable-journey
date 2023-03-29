@@ -6,6 +6,7 @@ import { MockNotificationTemplateReadRepo } from './notification-template-read-r
 import { UserEntityBuilder } from '../../builders/user-entity.builder';
 import { Domain } from '@src/bitloops/bl-boilerplate-core';
 import { SUCCESS_CASE } from './todo-completions-incremented.mock';
+import { NotificationTemplateReadModel } from '../../../domain/read-models/notification-template.read-model';
 
 describe('Todo completions incremented feature test', () => {
   it('Todo completions incremented successfully', async () => {
@@ -40,7 +41,7 @@ describe('Todo completions incremented feature test', () => {
     );
     expect(
       mockNotificationTemplateReadRepo.mockGetByTypeMethod,
-    ).toHaveBeenCalledWith('firstTodo', ctx);
+    ).toHaveBeenCalledWith(NotificationTemplateReadModel.firstTodo, ctx);
 
     // const todoAggregate =
     //   mockCompleteTodoWriteRepo.mockSaveMethod.mock.calls[0][0];
@@ -48,6 +49,6 @@ describe('Todo completions incremented feature test', () => {
     // expect(todoAggregate.domainEvents[0]).toBeInstanceOf(
     //   TodoCompletionsIncrementedDomainEvent,
     // );
-    expect(typeof result.value).toBe('undefined');
+    expect(result.value).toBe(undefined);
   });
 });

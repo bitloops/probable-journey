@@ -5,6 +5,8 @@ package newtodo;
 service TodoApp {
 	rpc AddTodo(AddTodoRequest) returns (AddTodoResponse);
   rpc CompleteTodo (CompleteTodoRequest) returns (CompleteTodoResponse);
+  rpc UncompleteTodo (UncompleteTodoRequest) returns (UncompleteTodoResponse);
+  rpc ModifyTitle (ModifyTodoRequest) returns (ModifyTodoResponse);
 	rpc GetAllMyTodos(GetAllMyTodosRequest) returns (GetAllMyTodosResponse);
 }
 
@@ -27,8 +29,8 @@ message AddTodoResponse {
 message AddTodoErrorResponse {
   oneof error {
     ErrorResponse unauthorizedError = 1;
-    ErrorResponse invalidTitleLengthError = 2;
-    ErrorResponse systemUnavailableError = 3;
+    ErrorResponse systemUnavailableError = 2;
+    ErrorResponse invalidTitleLengthError = 3;
   }
 }
 
@@ -50,8 +52,8 @@ message CompleteTodoResponse {
 message CompleteTodoErrorResponse {
   oneof error {
     ErrorResponse unauthorizedError = 1;
-    ErrorResponse todoAlreadyExistsError = 2;
-    ErrorResponse systemUnavailableError = 3;
+    ErrorResponse systemUnavailableError = 2;
+    ErrorResponse todoAlreadyExistsError = 3;
   }
 }
 
@@ -77,6 +79,49 @@ message GetAllMyTodosOKResponse {
   repeated Todo todos = 1;
 }
 
+message ModifyTodoRequest {
+  string id = 1;
+  string title = 2;
+}
+
+message ModifyTodoResponse {
+  oneof result {
+    ModifyTodoOKResponse ok = 1;
+    ModifyTodoErrorResponse error = 2;
+  }
+}
+
+message ModifyTodoErrorResponse {
+  oneof error {
+    ErrorResponse unauthorizedError = 1;
+    ErrorResponse systemUnavailableError = 2;
+    ErrorResponse todoDoesNotExistError = 3;
+    ErrorResponse invalidTitleLengthError = 4;
+  }
+}
+
+message ModifyTodoOKResponse {}
+
+message UncompleteTodoRequest {
+  string id = 1;
+}
+
+message UncompleteTodoResponse {
+  oneof result {
+    UncompleteTodoOKResponse ok = 1;
+    UncompleteTodoErrorResponse error = 2;
+  }
+}
+
+message UncompleteTodoErrorResponse {
+  oneof error {
+    ErrorResponse unauthorizedError = 1;
+    ErrorResponse systemUnavailableError = 2;
+    ErrorResponse todoAlreadyExistsError = 3;
+  }
+}
+
+message UncompleteTodoOKResponse {}
 
 message Todo {
   string id = 1;

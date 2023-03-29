@@ -27,7 +27,6 @@ export class CompleteTodoHandler
       Promise<CompleteTodoUseCaseResponse>
     >
 {
-  private ctx: Application.TContext;
   constructor(
     @Inject(TodoWriteRepoPortToken)
     private readonly todoRepo: TodoWriteRepoPort,
@@ -51,13 +50,9 @@ export class CompleteTodoHandler
   async execute(
     command: CompleteTodoCommand,
   ): Promise<CompleteTodoUseCaseResponse> {
-    this.ctx = command.metadata.context!;
     console.log('CompleteTodoHandler');
 
-    const todo = await this.todoRepo.getById(
-      new Domain.UUIDv4(command.id),
-      this.ctx,
-    );
+    const todo = await this.todoRepo.getById(new Domain.UUIDv4(command.id));
 
     if (todo.isFail()) {
       return fail(todo.value);
@@ -69,7 +64,7 @@ export class CompleteTodoHandler
     if (completedOrError.isFail()) {
       return fail(completedOrError.value);
     }
-    const saveResult = await this.todoRepo.update(todo.value, this.ctx);
+    const saveResult = await this.todoRepo.update(todo.value);
     if (saveResult.isFail()) {
       return fail(saveResult.value);
     }

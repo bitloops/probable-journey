@@ -5,5 +5,5 @@ export type SendEmailRequest = {
 };
 
 export interface EmailServicePort {
-  send(data: SendEmailRequest, ctx?: any): void;
+  send(data: SendEmailRequest): void;
 }

@@ -25,7 +25,7 @@ export interface TEventMetadata {
   boundedContextId: string;
   messageId: string;
   correlationId: string;
-  context: TContext | null;
+  context: TContext | Record<string, never>;
 }
 
 export interface IEvent<T> extends IMessage {

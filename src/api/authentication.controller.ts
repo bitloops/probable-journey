@@ -19,7 +19,7 @@ import {
   JwtAuthGuard,
   LocalAuthGuard,
 } from '@src/bitloops/nest-auth-passport';
-import { Traceable } from '@bitloops/tracing';
+import { Traceable, asyncLocalStorage } from '@bitloops/tracing';
 
 @Controller('auth')
 export class AuthController {
@@ -37,6 +37,7 @@ export class AuthController {
     operation: 'LoginController',
   })
   async login(@Request() req) {
+    const store = asyncLocalStorage.getStore();
     const jwt = this.authService.login(req.user);
     // this.commandBus.execute(
     //         new LogInCommand({ userId: dto.userId }),

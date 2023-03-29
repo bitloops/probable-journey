@@ -46,10 +46,10 @@ export class TodoGrpcController {
     // console.log('call', call);
     const command = new AddTodoCommand(
       { title: data.title },
-      {
-        jwt: authData.jwt,
-        userId: authData.user.id,
-      },
+      // {
+      //   jwt: authData.jwt,
+      //   userId: authData.user.id,
+      // },
     );
     const results = await this.commandBus.request(command);
     if (results.isOk) {

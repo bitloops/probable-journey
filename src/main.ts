@@ -10,6 +10,7 @@ import { AppModule } from './app.module';
 import { ApiModule } from './api/api.module';
 import config from './config/configuration';
 import { AsyncLocalStorageInterceptor } from './bitloops/nest-auth-passport/jwt/async-local-storage.interceptor';
+import { CorrelationIdInterceptor } from './bitloops/tracing/correlationId.interceptor';
 
 // gRPC microservice configuration
 const grpcMicroserviceOptions: () => GrpcOptions = () => {
@@ -35,7 +36,10 @@ async function bootstrap() {
     { abortOnError: false },
   );
   const appConfig = config();
-  api.useGlobalInterceptors(new AsyncLocalStorageInterceptor());
+  api.useGlobalInterceptors(
+    new CorrelationIdInterceptor(),
+    new AsyncLocalStorageInterceptor(),
+  );
   api.useGlobalPipes(new ValidationPipe());
   await api.listen(appConfig.http.port, appConfig.http.ip, () => {
     console.log(

@@ -6,12 +6,17 @@ import {
   JetStreamPublishOptions,
   consumerOpts,
   createInbox,
+  headers,
+  MsgHdrs,
 } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
-import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
-import { EventHandler } from '@src/bitloops/bl-boilerplate-core/domain/events/IEventBus';
-import { ProvidersConstants } from '../jetstream.constants';
+import {
+  ASYNC_LOCAL_STORAGE,
+  METADATA_HEADERS,
+  ProvidersConstants,
+} from '../jetstream.constants';
+import { ContextPropagation } from './utils/context-propagation';
 
 const jsonCodec = JSONCodec();
 
@@ -24,16 +29,19 @@ export class NatsStreamingCommandBus
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER)
     private readonly jetStreamProvider: NestjsJetstream,
+    @Inject(ASYNC_LOCAL_STORAGE)
+    private readonly asyncLocalStorage: any,
   ) {
     this.nc = this.jetStreamProvider.getConnection();
     this.js = this.nc.jetstream();
   }
 
   async publish(command: Application.Command): Promise<void> {
-    const boundedContext = command.metadata.toContextId;
+    const boundedContext = command.metadata.boundedContextId;
     const stream = NatsStreamingCommandBus.getStreamName(boundedContext);
     const subject = `${stream}.${command.constructor.name}`;
-    const options: Partial<JetStreamPublishOptions> = { msgID: '' };
+    const headers = this.generateHeaders(command);
+    const options: Partial<JetStreamPublishOptions> = { msgID: '', headers };
     // console.log('serializedDomainEvent', domainEvent);
     const message = jsonCodec.encode(command);
     console.log('publishing command to:', subject);
@@ -70,8 +78,19 @@ export class NatsStreamingCommandBus
           console.log('Received command::');
           const command = jsonCodec.decode(m.data) as any;
 
-          const reply = await handler.execute(command);
-          m.ack();
+          const contextData = ContextPropagation.createStoreFromMessageHeaders(
+            m.headers,
+          );
+
+          const reply = await this.asyncLocalStorage.run(
+            contextData,
+            async () => {
+              return handler.execute(command);
+            },
+          );
+          if (reply.isFail && reply.isFail() && reply.value.nakable) {
+            m.nak();
+          } else m.ack();
 
           console.log(
             `[Command ${sub.getProcessed()}]: ${JSON.stringify(
@@ -88,11 +107,26 @@ export class NatsStreamingCommandBus
     }
   }
 
-  unsubscribe<T extends IEvent<any>>(
+  unsubscribe(
     topic: string,
-    eventHandler: EventHandler<T>,
+    commandHandler: Application.ICommandHandler<any, any>,
   ): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  private generateHeaders(command: Application.Command): MsgHdrs {
+    const h = headers();
+    for (const [key, value] of Object.entries(command.metadata)) {
+      if (key === 'context' && value) {
+        h.append(key, JSON.stringify(value));
+        continue;
+      }
+      const header = value?.toString();
+      if (header) {
+        h.append(key, header);
+      }
+    }
+    return h;
   }
 
   static getSubjectFromHandler(
@@ -108,7 +142,7 @@ export class NatsStreamingCommandBus
   static getSubjectFromCommandInstance(
     integrationEvent: Infra.EventBus.IntegrationEvent<any>,
   ): string {
-    const boundedContext = integrationEvent.metadata.fromContextId;
+    const boundedContext = integrationEvent.metadata.boundedContextId;
     const stream = NatsStreamingCommandBus.getStreamName(boundedContext);
     const subject = `${stream}.${integrationEvent.constructor.name}`;
     return subject;

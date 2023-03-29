@@ -15,7 +15,10 @@ import {
 } from '../../ports/TodoWriteRepoPort';
 import { ApplicationErrors } from '../errors';
 
-type ModifyTodoTitleResponse = Either<void, DomainErrors.TitleOutOfBoundsError>;
+type ModifyTodoTitleResponse = Either<
+  void,
+  DomainErrors.TitleOutOfBoundsError | Application.Repo.Errors.Unexpected
+>;
 
 export class ModifyTodoTitleHandler
   implements
@@ -24,6 +27,7 @@ export class ModifyTodoTitleHandler
       Promise<ModifyTodoTitleResponse>
     >
 {
+  private ctx: Application.TContext;
   constructor(
     @Inject(TodoWriteRepoPortToken)
     private readonly todoRepo: TodoWriteRepoPort,
@@ -40,10 +44,14 @@ export class ModifyTodoTitleHandler
   async execute(
     command: ModifyTodoTitleCommand,
   ): Promise<ModifyTodoTitleResponse> {
+    this.ctx = command.ctx;
     const requestId = new Domain.UUIDv4(command.id);
-    const todoFound = await this.todoRepo.getById(requestId);
+    const todoFound = await this.todoRepo.getById(requestId, this.ctx);
+    if (todoFound.isFail()) {
+      return fail(todoFound.value);
+    }
 
-    if (!todoFound) {
+    if (!todoFound.value) {
       return fail(
         new ApplicationErrors.TodoNotFoundError(command.id.toString()),
       );
@@ -54,8 +62,11 @@ export class ModifyTodoTitleHandler
       return fail(titleToUpdate.value);
     }
 
-    todoFound.modifyTitle(titleToUpdate.value);
-    await this.todoRepo.save(todoFound);
+    todoFound.value.modifyTitle(titleToUpdate.value);
+    const updateResult = await this.todoRepo.update(todoFound.value, this.ctx);
+    if (updateResult.isFail()) {
+      return fail(updateResult.value);
+    }
 
     return ok();
   }

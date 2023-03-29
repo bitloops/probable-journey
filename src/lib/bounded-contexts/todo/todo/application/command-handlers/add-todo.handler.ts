@@ -19,15 +19,11 @@ import { Traceable } from '@src/bitloops/tracing';
 
 type AddTodoUseCaseResponse = Either<
   string,
-  DomainErrors.TitleOutOfBoundsError /*| Application.Repo.Errors.Unexpected*/
+  DomainErrors.TitleOutOfBoundsError | Application.Repo.Errors.Unexpected
 >;
 
 export class AddTodoCommandHandler
-  implements
-    Application.ICommandHandler<
-      AddTodoCommand,
-      Promise<AddTodoUseCaseResponse>
-    >
+  implements Application.ICommandHandler<AddTodoCommand, string>
 {
   private ctx: Application.TContext;
   constructor(
@@ -51,14 +47,15 @@ export class AddTodoCommandHandler
     },
   })
   async execute(command: AddTodoCommand): Promise<AddTodoUseCaseResponse> {
-    this.ctx = command.ctx;
     console.log('AddTodoCommand...');
 
     const title = TitleVO.create({ title: command.title });
     if (title.isFail()) {
       return fail(title.value);
     }
-    const userId = UserIdVO.create({ id: new Domain.UUIDv4(this.ctx.userId) });
+    const userId = UserIdVO.create({
+      id: new Domain.UUIDv4(command.metadata.context.userId),
+    });
     const todo = TodoEntity.create({
       title: title.value,
       completed: false,
@@ -68,10 +65,10 @@ export class AddTodoCommandHandler
       return fail(todo.value);
     }
 
-    await this.todoRepo.save(todo.value, this.ctx);
-    // if (saved.isFail()) {
-    //   return fail(saved.value);
-    // }
+    const saveResult = await this.todoRepo.save(todo.value);
+    if (saveResult.isFail()) {
+      return fail(saveResult.value);
+    }
 
     return ok(todo.value.id.toString());
   }

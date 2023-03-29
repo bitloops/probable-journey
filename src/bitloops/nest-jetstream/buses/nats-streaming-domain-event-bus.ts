@@ -6,12 +6,16 @@ import {
   JetStreamPublishOptions,
   consumerOpts,
   createInbox,
+  headers,
+  MsgHdrs,
 } from 'nats';
 import { Application, Domain, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
-import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
-import { EventHandler } from '@src/bitloops/bl-boilerplate-core/domain/events/IEventBus';
-import { ProvidersConstants } from '../jetstream.constants';
+import {
+  ASYNC_LOCAL_STORAGE,
+  ProvidersConstants,
+} from '../jetstream.constants';
+import { ContextPropagation } from './utils/context-propagation';
 
 const jsonCodec = JSONCodec();
 
@@ -22,6 +26,8 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER)
     private readonly jetStreamProvider: NestjsJetstream,
+    @Inject(ASYNC_LOCAL_STORAGE)
+    private readonly asyncLocalStorage: any,
   ) {
     this.nc = this.jetStreamProvider.getConnection();
     this.js = this.nc.jetstream();
@@ -35,10 +41,15 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
       ? (domainEvents = domainEventsInput)
       : (domainEvents = [domainEventsInput]);
     domainEvents.forEach(async (domainEvent) => {
-      const boundedContext = domainEvent.metadata.fromContextId;
+      const boundedContext = domainEvent.metadata.boundedContextId;
       const stream = NatsStreamingDomainEventBus.getStreamName(boundedContext);
       const subject = `${stream}.${domainEvent.constructor.name}`;
-      const options: Partial<JetStreamPublishOptions> = { msgID: '' };
+
+      const headers = this.generateHeaders(domainEvent);
+      const options: Partial<JetStreamPublishOptions> = {
+        msgID: domainEvent.metadata.messageId,
+        headers,
+      };
       // const pubAck =
       domainEvent.data = domainEvent.data.toPrimitives();
       // console.log('serializedDomainEvent', domainEvent);
@@ -56,7 +67,7 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
     });
   }
 
-  async subscribe(subject: string, handler: Application.IHandle) {
+  async subscribe(subject: string, handler: Application.IHandleDomainEvent) {
     const durableName = NatsStreamingDomainEventBus.getDurableName(
       subject,
       handler,
@@ -83,8 +94,19 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
           const domainEvent = jsonCodec.decode(m.data) as any;
           // domainEvent.data = Domain.EventData.fromPrimitives(domainEvent.data);
 
-          const reply = await handler.handle(domainEvent);
-          m.ack();
+          const contextData = ContextPropagation.createStoreFromMessageHeaders(
+            m.headers,
+          );
+          const reply = await this.asyncLocalStorage.run(
+            contextData,
+            async () => {
+              return handler.handle(domainEvent);
+            },
+          );
+          // TODO check type
+          if (reply.isFail && reply.isFail() && reply.value.nakable) {
+            m.nak();
+          } else m.ack();
 
           console.log(
             `[Domain Event ${sub.getProcessed()}]: ${JSON.stringify(
@@ -103,14 +125,31 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
     }
   }
 
-  unsubscribe<T extends IEvent<any>>(
+  unsubscribe(
     topic: string,
-    eventHandler: EventHandler<T>,
+    eventHandler: Application.IHandleDomainEvent,
   ): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
-  static getSubjectFromHandler(handler: Application.IHandle): string {
+  private generateHeaders(domainEvent: Domain.IDomainEvent<any>): MsgHdrs {
+    const h = headers();
+    for (const [key, value] of Object.entries(domainEvent.metadata)) {
+      if (key === 'context' && value) {
+        h.append(key, JSON.stringify(value));
+        continue;
+      }
+      const header = value?.toString();
+      if (header) {
+        h.append(key, header);
+      }
+    }
+    return h;
+  }
+
+  static getSubjectFromHandler(
+    handler: Application.IHandleDomainEvent,
+  ): string {
     const event = handler.event;
     const boundedContext = handler.boundedContext;
     const stream = NatsStreamingDomainEventBus.getStreamName(boundedContext);
@@ -121,7 +160,7 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
   static getSubjectFromEventInstance(
     domainEvent: Domain.IDomainEvent<any>,
   ): string {
-    const boundedContext = domainEvent.metadata.fromContextId;
+    const boundedContext = domainEvent.metadata.boundedContextId;
     const stream = NatsStreamingDomainEventBus.getStreamName(boundedContext);
     const subject = `${stream}.${domainEvent.constructor.name}`;
     return subject;
@@ -131,7 +170,10 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
     return `DomainEvents_${boundedContext}`;
   }
 
-  static getDurableName(subject: string, handler: Application.IHandle) {
+  static getDurableName(
+    subject: string,
+    handler: Application.IHandleDomainEvent,
+  ) {
     // Durable name cannot contain a dot
     const subjectWithoutDots = subject.replace(/\./g, '-');
     return `${subjectWithoutDots}-${handler.constructor.name}`;

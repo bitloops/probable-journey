@@ -12,12 +12,14 @@ import { Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
 import { ProvidersConstants } from '../jetstream.constants';
 import { IMessage } from '@src/bitloops/bl-boilerplate-core/domain/messages/IMessage';
-import { SubscriberHandler } from '@src/bitloops/bl-boilerplate-core/domain/messages/IMessageBus';
+import { SubscriberHandler } from '@src/bitloops/bl-boilerplate-core/domain/messages/ISystemMessageBus';
 
 const jsonCodec = JSONCodec();
 
 @Injectable()
-export class NatsStreamingMessageBus implements Infra.MessageBus.IMessageBus {
+export class NatsStreamingMessageBus
+  implements Infra.MessageBus.ISystemMessageBus
+{
   private nc: NatsConnection;
   private js: JetStreamClient;
   constructor(

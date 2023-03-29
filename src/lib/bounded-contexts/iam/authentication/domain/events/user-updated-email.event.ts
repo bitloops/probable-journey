@@ -1,29 +1,20 @@
-import { Domain } from '@bitloops/bl-boilerplate-core';
+import { asyncLocalStorage, Domain } from '@bitloops/bl-boilerplate-core';
 import { UserEntity } from '../UserEntity';
 
 export class UserUpdatedEmailDomainEvent
   implements Domain.IDomainEvent<UserEntity>
 {
-  public metadata: any;
+  public metadata: Domain.TDomainEventMetadata;
   public aggregateId: any;
 
-  constructor(public readonly data: UserEntity, uuid?: string) {
+  constructor(public readonly data: UserEntity) {
     this.metadata = {
-      fromContextId: 'IAM',
-      id: uuid,
+      boundedContextId: 'IAM',
+      messageId: new Domain.UUIDv4().toString(),
+      createdAtTimestamp: Date.now(),
+      correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
+      context: asyncLocalStorage.getStore()?.get('context'),
     };
     this.aggregateId = data.id.toString();
   }
-
-  //   constructor(public readonly user: UserEntity, uuid?: string) {
-  //     const metadata = {
-  //       fromContextId: UserUpdatedEmailDomainEvent.fromContextId,
-  //       id: uuid,
-  //     };
-  //     super(UserUpdatedEmailDomainEvent.getEventTopic(), user, metadata, user.id);
-  //   }
-
-  //   static getEventTopic() {
-  //     return UserUpdatedEmailDomainEvent.eventName;
-  //   }
 }

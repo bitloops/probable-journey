@@ -4,6 +4,9 @@ export class InvalidTodosCounterError extends Domain.Error {
   static readonly errorId = '';
 
   constructor() {
-    super(`Completed Todos counter is invalid`, InvalidTodosCounterError.errorId);
+    super(
+      `Completed Todos counter is invalid`,
+      InvalidTodosCounterError.errorId,
+    );
   }
 }

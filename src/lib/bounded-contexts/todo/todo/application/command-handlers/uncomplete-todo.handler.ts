@@ -13,6 +13,7 @@ import {
   TodoWriteRepoPort,
   TodoWriteRepoPortToken,
 } from '../../ports/TodoWriteRepoPort';
+import { Traceable } from '@src/bitloops/tracing';
 
 type UncompleteTodoUseCaseResponse = Either<
   void,
@@ -33,26 +34,43 @@ export class UncompleteTodoHandler
   get boundedContext() {
     return 'Todo';
   }
+  private ctx: Application.TContext;
   constructor(
     @Inject(TodoWriteRepoPortToken)
     private readonly todoRepo: TodoWriteRepoPort,
   ) {}
 
+  @Traceable({
+    operation: 'UncompleteTodoCommandHandler',
+    metrics: {
+      name: 'UncompleteTodoCommandHandler',
+      category: 'commandHandler',
+    },
+  })
   async execute(
     command: UncompleteTodoCommand,
   ): Promise<UncompleteTodoUseCaseResponse> {
+    this.ctx = command.ctx;
     console.log('UncompleteTodoHandler');
-    const todo = await this.todoRepo.getById(new Domain.UUIDv4(command.id));
-    if (todo === null) {
+    const todo = await this.todoRepo.getById(
+      new Domain.UUIDv4(command.id),
+      this.ctx,
+    );
+    if (todo.isFail()) {
+      return fail(todo.value);
+    }
+    if (!todo.value) {
       return fail(new ApplicationErrors.TodoNotFoundError(command.id));
     }
 
-    const uncompletedOrError = todo.uncomplete();
+    const uncompletedOrError = todo.value.uncomplete();
     if (uncompletedOrError.isFail()) {
       return fail(uncompletedOrError.value);
     }
-    await this.todoRepo.save(todo);
-
+    const saveResult = await this.todoRepo.update(todo.value, this.ctx);
+    if (saveResult.isFail()) {
+      return fail(saveResult.value);
+    }
     return ok();
   }
 }

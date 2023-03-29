@@ -1,4 +1,5 @@
-import { Infra } from '@bitloops/bl-boilerplate-core';
+import { Domain, Infra } from '@bitloops/bl-boilerplate-core';
+import { asyncLocalStorage } from '@src/bitloops/tracing';
 import { TodoCompletedDomainEvent } from '../../domain/events/todo-completed.event';
 
 export type IntegrationSchemaV1 = {
@@ -15,19 +16,21 @@ export class TodoCompletedIntegrationEvent
   implements Infra.EventBus.IntegrationEvent<IntegrationSchemas>
 {
   static versions = ['v1'];
-  public static readonly fromContextId = 'Todo'; // TodoCompletedDomainEvent.fromContextId; // get from it's own context in case we have some props as input
+  public static readonly fromContextId = 'Todo';
   static versionMappers: Record<string, ToIntegrationDataMapper> = {
     v1: TodoCompletedIntegrationEvent.toIntegrationDataV1,
   };
-  public metadata: any;
+  public metadata: Infra.EventBus.TIntegrationEventMetadata;
 
-  constructor(public data: IntegrationSchemas, version: string, uuid?: string) {
+  constructor(public data: IntegrationSchemas, version: string) {
     this.metadata = {
-      id: uuid,
-      fromContextId: TodoCompletedIntegrationEvent.fromContextId,
+      createdAtTimestamp: Date.now(),
+      boundedContextId: TodoCompletedIntegrationEvent.fromContextId,
+      context: asyncLocalStorage.getStore()?.get('context'),
+      messageId: new Domain.UUIDv4().toString(),
+      correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
       version,
     };
-    // super(TodoCompletedIntegrationEvent.getEventTopic(version), data, metadata);
   }
 
   static create(
@@ -47,12 +50,5 @@ export class TodoCompletedIntegrationEvent
       todoId: event.data.id.toString(),
       userId: event.data.userId.toString(),
     };
-  }
-
-  static getEventTopic(version?: string) {
-    const topic = `integration.${TodoCompletedIntegrationEvent.name}`;
-
-    const eventTopic = version === undefined ? topic : `${topic}.${version}`;
-    return eventTopic;
   }
 }

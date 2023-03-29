@@ -1,4 +1,10 @@
-import { Domain } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Domain,
+  Either,
+  asyncLocalStorage,
+  ok,
+} from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
@@ -27,10 +33,11 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
     this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
   }
 
+  @Application.Repo.Decorators.ReturnUnexpectedError()
   async getUserEmail(
     userid: Domain.UUIDv4,
-    ctx?: any,
-  ): Promise<UserReadModel | null> {
+  ): Promise<Either<UserReadModel | null, Application.Repo.Errors.Unexpected>> {
+    const ctx = asyncLocalStorage.getStore()?.get('context');
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -43,30 +50,42 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
     });
 
     if (!result) {
-      return null;
+      return ok(null);
     }
 
-    if (result.userId !== jwtPayload.userId) {
+    if (result.userId !== jwtPayload.sub) {
       throw new Error('Invalid userId');
     }
 
     const { _id, ...todo } = result as any;
-    return UserReadModel.fromPrimitives({
-      ...todo,
-      id: _id.toString(),
-    });
+    return ok(
+      UserReadModel.fromPrimitives({
+        ...todo,
+        id: _id.toString(),
+      }),
+    );
   }
 
-  async getById(id: string): Promise<UserReadModel | null> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async getById(
+    id: string,
+  ): Promise<Either<UserReadModel | null, Application.Repo.Errors.Unexpected>> {
     throw new Error('Method not implemented.');
   }
 
-  async getAll(): Promise<UserReadModel[]> {
+  async getAll(): Promise<
+    Either<UserReadModel[], Application.Repo.Errors.Unexpected>
+  > {
     throw new Error('Method not implemented.');
   }
 
-  async save(userEmailReadModel: UserReadModel, ctx?: any): Promise<void> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async save(
+    userEmailReadModel: UserReadModel,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
+    const ctx = asyncLocalStorage.getStore()?.get('context');
     const { jwt } = ctx;
+
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
@@ -74,20 +93,25 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
       throw new Error('Invalid JWT!');
     }
     const userEmail = userEmailReadModel.toPrimitives();
-    if (userEmail.userId !== jwtPayload.userId) {
+    if (userEmail.userId !== jwtPayload.sub) {
       throw new Error('Invalid userId');
     }
     await this.collection.insertOne({
       _id: userEmail.userId as any,
       ...userEmail,
     });
+    return ok();
   }
 
-  async create(userReadModel: UserReadModel): Promise<void> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async create(
+    userReadModel: UserReadModel,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     const userEmail = userReadModel.toPrimitives();
     await this.collection.insertOne({
       _id: userEmail.userId as any,
       ...userEmail,
     });
+    return ok();
   }
 }

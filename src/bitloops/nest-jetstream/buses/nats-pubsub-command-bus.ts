@@ -6,6 +6,7 @@ import {
   METADATA_HEADERS,
   ProvidersConstants,
 } from '../jetstream.constants';
+import { ContextPropagation } from './utils/context-propagation';
 
 const jsonCodec = JSONCodec();
 
@@ -14,6 +15,8 @@ export class NatsPubSubCommandBus
   implements Infra.CommandBus.IPubSubCommandBus
 {
   private nc: NatsConnection;
+  private static commandPrefix = 'Commands_';
+
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER) private readonly nats: any,
     @Inject(ASYNC_LOCAL_STORAGE)
@@ -59,15 +62,12 @@ export class NatsPubSubCommandBus
         for await (const m of sub) {
           const command = jsonCodec.decode(m.data);
 
-          const correlationId = m.headers?.get(METADATA_HEADERS.CORRELATION_ID);
-          if (correlationId === undefined) {
-            await this.handleReceivedCommand(handler, command, m);
-            continue;
-          }
+          const contextData = ContextPropagation.createStoreFromMessageHeaders(
+            m.headers,
+          );
 
-          const contextData: any = new Map(Object.entries({ correlationId }));
-          this.asyncLocalStorage.run(contextData, async () => {
-            this.handleReceivedCommand(handler, command, m);
+          await this.asyncLocalStorage.run(contextData, async () => {
+            return this.handleReceivedCommand(handler, command, m);
           });
         }
       })();
@@ -79,6 +79,10 @@ export class NatsPubSubCommandBus
   private generateHeaders(command: Application.Command): MsgHdrs {
     const h = headers();
     for (const [key, value] of Object.entries(command.metadata)) {
+      if (key === 'context' && value) {
+        h.append(key, JSON.stringify(value));
+        continue;
+      }
       const header = value?.toString();
       if (header) {
         h.append(key, header);
@@ -93,12 +97,12 @@ export class NatsPubSubCommandBus
     const command = handler.command;
     const boundedContext = handler.boundedContext;
 
-    return `${boundedContext}.${command.name}`;
+    return `${this.commandPrefix}${boundedContext}.${command.name}`;
   }
 
   static getTopicFromCommandInstance(command: Application.Command): string {
-    const boundedContext = command.metadata.toContextId;
-    const topic = `${boundedContext}.${command.constructor.name}`;
+    const boundedContext = command.metadata.boundedContextId;
+    const topic = `${this.commandPrefix}${boundedContext}.${command.constructor.name}`;
     return topic;
   }
 

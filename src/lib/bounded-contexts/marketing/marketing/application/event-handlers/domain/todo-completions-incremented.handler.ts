@@ -1,4 +1,10 @@
-import { Infra, Application } from '@bitloops/bl-boilerplate-core';
+import {
+  Infra,
+  Application,
+  Either,
+  fail,
+  ok,
+} from '@bitloops/bl-boilerplate-core';
 import { TodoCompletionsIncrementedDomainEvent } from '../../../domain/events/todo-completions-incremented.event';
 import { SendEmailCommand } from '../../../commands/send-email.command';
 import { Inject } from '@nestjs/common';
@@ -12,7 +18,9 @@ import {
 } from '../../../ports/notification-template-read.repo-port.';
 import { MarketingNotificationService } from '../../../domain/services/marketing-notification.service';
 
-export class TodoCompletionsIncrementedHandler implements Application.IHandle {
+export class TodoCompletionsIncrementedHandler
+  implements Application.IHandleDomainEvent
+{
   private commandBus: Infra.CommandBus.IPubSubCommandBus;
   constructor(
     @Inject(UserEmailReadRepoPortToken)
@@ -31,8 +39,8 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
 
   public async handle(
     event: TodoCompletionsIncrementedDomainEvent,
-  ): Promise<void> {
-    const { data: user } = event;
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
+    const { data: user, metadata } = event;
 
     const marketingNotificationService = new MarketingNotificationService(
       this.notificationTemplateRepo,
@@ -40,24 +48,35 @@ export class TodoCompletionsIncrementedHandler implements Application.IHandle {
     const emailToBeSentInfoResponse =
       await marketingNotificationService.getNotificationTemplateToBeSent(user);
     if (emailToBeSentInfoResponse.isFail()) {
-      return emailToBeSentInfoResponse.value;
+      return fail(emailToBeSentInfoResponse.value);
     }
-    const emailToBeSentInfo = emailToBeSentInfoResponse.value;
+
+    if (
+      !emailToBeSentInfoResponse.value ||
+      !emailToBeSentInfoResponse.value.notificationTemplate
+    ) {
+      return ok();
+    }
+
     const userid = user.id;
     const userEmail = await this.emailRepoPort.getUserEmail(userid);
+    if (userEmail.isFail()) {
+      // return userEmail.value;
+      return ok(); // TODO change this to fail
+    }
 
-    //TODO figure out how to return this error to controller
-    if (!userEmail) {
+    if (!userEmail.value) {
       // this.integrationEventBus().publish(new EmailNotFoundErrorMessage(new ApplicationErrors.EmailNotFoundError(userid.toString())));
       // TODO Error bus
-      return;
+      return ok(); // TODO change this to fail
     }
 
     const command = new SendEmailCommand({
-      origin: emailToBeSentInfo.emailOrigin,
-      destination: userEmail.email,
-      content: emailToBeSentInfo.notificationTemplate?.template || '',
+      origin: emailToBeSentInfoResponse.value.emailOrigin,
+      destination: userEmail.value.email,
+      content: emailToBeSentInfoResponse.value.notificationTemplate.template,
     });
     await this.commandBus.publish(command);
+    return ok();
   }
 }

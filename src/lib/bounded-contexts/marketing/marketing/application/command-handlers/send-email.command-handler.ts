@@ -3,15 +3,12 @@ import { SendEmailCommand } from '../../commands/send-email.command';
 import { Inject } from '@nestjs/common';
 import { EmailServicePort } from '../../ports/email-service-port';
 import { EmailServicePortToken } from '../../constants';
+import { Traceable } from '@src/bitloops/tracing';
 
-type SendEmailCommandHandlerResponse = Either<void, void>;
+type SendEmailCommandHandlerResponse = Either<void, never>;
 
 export class SendEmailCommandHandler
-  implements
-    Application.ICommandHandler<
-      SendEmailCommand,
-      Promise<SendEmailCommandHandlerResponse>
-    >
+  implements Application.ICommandHandler<SendEmailCommand, void>
 {
   constructor(
     @Inject(EmailServicePortToken)
@@ -26,6 +23,13 @@ export class SendEmailCommandHandler
     return 'Marketing';
   }
 
+  @Traceable({
+    operation: 'SendEmailCommandHandler',
+    metrics: {
+      name: 'SendEmailCommandHandler',
+      category: 'commandHandler',
+    },
+  })
   async execute(
     command: SendEmailCommand,
   ): Promise<SendEmailCommandHandlerResponse> {

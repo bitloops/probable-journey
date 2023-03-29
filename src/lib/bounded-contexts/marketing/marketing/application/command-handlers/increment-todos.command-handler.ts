@@ -1,14 +1,20 @@
-import { Application, ok, Either, Domain } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  ok,
+  Either,
+  Domain,
+  fail,
+} from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
 import { IncrementTodosCommand } from '../../commands/Increment-todos.command';
 import { CompletedTodosVO } from '../../domain/completed-todos.vo';
 import { DomainErrors } from '../../domain/errors';
 import { UserEntity } from '../../domain/user.entity';
-import { UserIdVO } from '../../domain/user-id.vo';
 import {
   UserWriteRepoPort,
   UserWriteRepoPortToken,
 } from '../../ports/user-write.repo-port';
+import { Traceable } from '@src/bitloops/tracing';
 
 type IncrementDepositsCommandHandlerResponse = Either<
   void,
@@ -34,33 +40,54 @@ export class IncrementTodosCommandHandler
     return 'Marketing';
   }
 
+  @Traceable({
+    operation: 'IncrementTodosCommandHandler',
+    metrics: {
+      name: 'IncrementTodosCommandHandler',
+      category: 'commandHandler',
+    },
+  })
   async execute(
     command: IncrementTodosCommand,
   ): Promise<IncrementDepositsCommandHandlerResponse> {
-    const requestUserId = new Domain.UUIDv4(command.userId);
-    const user = await this.userRepo.getById(requestUserId);
+    console.log('IncrementTodosCommandHandler');
 
-    if (!user) {
+    const requestUserId = new Domain.UUIDv4(command.id);
+    const user = await this.userRepo.getById(requestUserId);
+    if (user.isFail()) {
+      return fail(user.value);
+    }
+
+    if (!user.value) {
       // Create account with 0 deposits
       const completedTodosVO = CompletedTodosVO.create({ counter: 0 });
       if (completedTodosVO.isFail()) {
         return fail(completedTodosVO.value);
       }
-      const userId = UserIdVO.create({ id: requestUserId });
+      const id = new Domain.UUIDv4(command.id);
       const newUserOrError = UserEntity.create({
         completedTodos: completedTodosVO.value,
-        userId: userId.value,
+        id: id,
       });
       if (newUserOrError.isFail()) {
         return fail(newUserOrError.value);
       }
       const newUser = newUserOrError.value;
       newUser.incrementCompletedTodos();
-      await this.userRepo.save(newUser);
+      const saveResult = await this.userRepo.save(newUser);
+      if (saveResult.isFail()) {
+        return fail(saveResult.value);
+      }
       return ok();
     } else {
-      user.incrementCompletedTodos();
-      await this.userRepo.save(user);
+      const incrementedOrError = user.value.incrementCompletedTodos();
+      if (incrementedOrError.isFail()) {
+        return fail(incrementedOrError.value);
+      }
+      const saveResult = await this.userRepo.update(user.value);
+      if (saveResult.isFail()) {
+        return fail(saveResult.value);
+      }
       return ok();
     }
   }

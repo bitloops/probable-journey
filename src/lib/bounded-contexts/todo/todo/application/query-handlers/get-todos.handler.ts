@@ -1,4 +1,4 @@
-import { Application, Either, ok } from '@bitloops/bl-boilerplate-core';
+import { Application, Either, ok, fail } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
 // import { QueryHandler } from '@nestjs/cqrs';
 import { TTodoReadModelSnapshot } from '../../domain/TodoReadModel';
@@ -10,15 +10,11 @@ import { GetTodosQuery } from '../../queries/get-todos.query';
 
 export type GetTodosQueryHandlerResponse = Either<
   TTodoReadModelSnapshot[],
-  never
+  Application.Repo.Errors.Unexpected
 >;
 
 export class GetTodosHandler
-  implements
-    Application.IQueryHandler<
-      GetTodosQuery,
-      Promise<GetTodosQueryHandlerResponse>
-    >
+  implements Application.IQueryHandler<GetTodosQuery, TTodoReadModelSnapshot[]>
 {
   private ctx: any;
   constructor(
@@ -35,11 +31,12 @@ export class GetTodosHandler
   }
 
   async execute(command: GetTodosQuery): Promise<GetTodosQueryHandlerResponse> {
-    this.ctx = command.ctx;
+    this.ctx = command.metadata.context;
     console.log('GetTodosQuery handler...');
 
     const results = await this.todoRepo.getAll(this.ctx);
-    if (results) return ok(results);
+    if (results.isFail()) return fail(results.value);
+    if (results.value) return ok(results.value);
     return ok([]);
   }
 }

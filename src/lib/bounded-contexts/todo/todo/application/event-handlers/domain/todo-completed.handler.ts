@@ -1,11 +1,11 @@
-import { Infra, Application } from '@bitloops/bl-boilerplate-core';
+import { Infra, Application, Either, ok } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
 import { TodoCompletedDomainEvent } from '../../../domain/events/todo-completed.event';
 import { TodoCompletedIntegrationEvent } from '../../../contracts/integration-events/todo-completed.integration-event';
 import { StreamingIntegrationEventBusToken } from '../../../constants';
 
 export class TodoCompletedDomainToIntegrationEventHandler
-  implements Application.IHandle
+  implements Application.IHandleDomainEvent
 {
   constructor(
     @Inject(StreamingIntegrationEventBusToken)
@@ -19,7 +19,9 @@ export class TodoCompletedDomainToIntegrationEventHandler
     return 'Todo';
   }
 
-  public async handle(event: TodoCompletedDomainEvent): Promise<void> {
+  public async handle(
+    event: TodoCompletedDomainEvent,
+  ): Promise<Either<void, never>> {
     const events = TodoCompletedIntegrationEvent.create(event);
 
     await this.integrationEventBus.publish(events);
@@ -27,5 +29,6 @@ export class TodoCompletedDomainToIntegrationEventHandler
     console.log(
       `[TodoCompletedDomainEventHandler]: Successfully published TodoCompletedIntegrationEvent`,
     );
+    return ok();
   }
 }

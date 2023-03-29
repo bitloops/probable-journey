@@ -67,51 +67,12 @@ export function Traceable(input: TraceableDecoratorInput) {
         }
         const messageBus = this[
           messageBusServiceKey
-        ] as Infra.MessageBus.IMessageBus;
+        ] as Infra.MessageBus.ISystemMessageBus;
         await messageBus.publish(TRACING_TOPIC, traceEvent);
         console.log(
           `Finished executing ... [${this.constructor.name}][${propertyKey}].`,
         );
       }
     };
-  };
-}
-
-// export function AddCorrelationId() {
-//   return function (target: any) {
-//     // Add the metadata to the class instance
-
-//     const correlationId = AsyncLocalStorageService.asyncLocalStorage
-//       .getStore()
-//       ?.get('correlationId');
-//     if (!target.metadata) {
-//       target.metadata = {};
-//     }
-//     target.metadata.correlationId = correlationId;
-//   };
-// }
-
-export function AddCorrelationId<T extends new (...args: any[]) => {}>(
-  constructor: T,
-) {
-  return class extends constructor {
-    metadata: any;
-
-    constructor(...args: any[]) {
-      super(...args);
-
-      const correlationId = AsyncLocalStorageService.asyncLocalStorage
-        .getStore()
-        ?.get('correlationId');
-      if (!this.metadata) {
-        this.metadata = {};
-      }
-      this.metadata.correlationId = correlationId;
-      Object.setPrototypeOf(this, constructor.prototype);
-    }
-    // @ts-ignore
-    static get name() {
-      return constructor.name;
-    }
   };
 }

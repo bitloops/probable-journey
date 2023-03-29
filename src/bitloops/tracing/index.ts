@@ -1,6 +1,6 @@
 import { AsyncLocalStorageService } from './async-local-storage.service';
 
-export { Traceable, AddCorrelationId } from './traceable.decorator';
+export { Traceable } from './traceable.decorator';
 export { CorrelationIdMiddleware } from './traces.middleware';
 export { TracingModule } from './tracing.module';
 

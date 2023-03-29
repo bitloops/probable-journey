@@ -4,10 +4,9 @@ import { UserEntity } from '../domain/UserEntity.js';
 
 export interface UserWriteRepoPort
   extends Application.Repo.ICRUDWritePort<UserEntity, Domain.UUIDv4> {
-  getByEmail(email: EmailVO): Promise<UserEntity | null>;
-  checkDoesNotExistAndCreate(
-    user: UserEntity,
-  ): Promise<Either<void, Application.Repo.Errors.Conflict>>;
+  getByEmail(
+    email: EmailVO,
+  ): Promise<Either<UserEntity | null, Application.Repo.Errors.Unexpected>>;
 }
 
 export const UserWriteRepoPortToken = Symbol('UserWriteRepoPort');

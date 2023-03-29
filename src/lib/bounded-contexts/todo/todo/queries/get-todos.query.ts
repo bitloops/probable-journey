@@ -1,13 +1,17 @@
-import { Application } from '@bitloops/bl-boilerplate-core';
+import { Application, Domain } from '@bitloops/bl-boilerplate-core';
+import { asyncLocalStorage } from '@src/bitloops/tracing';
 
 export class GetTodosQuery implements Application.IQuery {
   public metadata: Application.TQueryMetadata;
   public readonly boundedContext = 'Todo';
 
-  constructor(public ctx: any) {
+  constructor() {
     this.metadata = {
-      toContextId: 'Todo',
+      boundedContextId: 'Todo',
       createdTimestamp: Date.now(),
+      correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
+      context: asyncLocalStorage.getStore()?.get('context'),
+      messageId: new Domain.UUIDv4().toString(),
     };
   }
 }

@@ -1,4 +1,4 @@
-import { Inject, Injectable, Optional } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { NatsConnection, JSONCodec, headers, MsgHdrs } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import {
@@ -7,12 +7,14 @@ import {
   ProvidersConstants,
 } from '../jetstream.constants';
 import { AsyncLocalStorage } from 'node:async_hooks';
+import { ContextPropagation } from './utils/context-propagation';
 
 const jsonCodec = JSONCodec();
 
 @Injectable()
 export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
   private nc: NatsConnection;
+  private static queryPrefix = 'Query_';
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER) private readonly nats: any,
     // @Optional()
@@ -56,35 +58,30 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
         for await (const m of sub) {
           const query = jsonCodec.decode(m.data);
 
-          const correlationId = m.headers?.get(METADATA_HEADERS.CORRELATION_ID);
-
-          if (correlationId) {
-            const contextData: any = new Map(Object.entries({ correlationId }));
-            const reply = await this.asyncLocalStorage.run(contextData, () => {
-              return handler.execute(query);
-            });
-            if (reply.isOk && m.reply) {
-              this.nc.publish(
-                m.reply,
-                jsonCodec.encode({
-                  isOk: true,
-                  data: reply.value,
-                }),
-              );
-            }
-            continue;
-          }
-
-          const reply = await handler.execute(query);
-          if (reply.isOk && m.reply) {
-            this.nc.publish(
+          const contextData = ContextPropagation.createStoreFromMessageHeaders(
+            m.headers,
+          );
+          const reply = await this.asyncLocalStorage.run(contextData, () => {
+            return handler.execute(query);
+          });
+          if (reply.isOk && reply.isOk() && m.reply) {
+            return this.nc.publish(
               m.reply,
               jsonCodec.encode({
                 isOk: true,
                 data: reply.value,
               }),
             );
+          } else if (reply.isFail && reply.isFail() && m.reply) {
+            return this.nc.publish(
+              m.reply,
+              jsonCodec.encode({
+                isOk: false,
+                error: reply.value,
+              }),
+            );
           }
+
           console.log(
             `[${sub.getProcessed()}]: ${JSON.stringify(
               jsonCodec.decode(m.data),
@@ -101,7 +98,13 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
   private generateHeaders(query: Application.IQuery): MsgHdrs {
     const h = headers();
     for (const [key, value] of Object.entries(query.metadata)) {
-      h.append(key, value.toString());
+      if (key === 'context' && value) {
+        h.append(key, JSON.stringify(value));
+        continue;
+      }
+      if (value) {
+        h.append(key, value.toString());
+      }
     }
     return h;
   }
@@ -112,12 +115,12 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
     const query = handler.query;
     const boundedContext = handler.boundedContext;
 
-    return `${boundedContext}.${query.name}`;
+    return `${this.queryPrefix}${boundedContext}.${query.name}`;
   }
 
   static getTopicFromQueryInstance(query: Application.IQuery): string {
-    const boundedContext = query.metadata.toContextId;
-    const topic = `${boundedContext}.${query.constructor.name}`;
+    const boundedContext = query.metadata.boundedContextId;
+    const topic = `${this.queryPrefix}${boundedContext}.${query.constructor.name}`;
     return topic;
   }
 }

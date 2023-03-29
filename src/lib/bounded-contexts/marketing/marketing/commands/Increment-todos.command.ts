@@ -1,21 +1,25 @@
-import { Application } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  asyncLocalStorage,
+  Domain,
+} from '@bitloops/bl-boilerplate-core';
 
 export type TIncrementTodosCommand = {
-  userId: string;
+  id: string;
 };
 
 export class IncrementTodosCommand extends Application.Command {
   public readonly metadata: Application.TCommandMetadata = {
-    toContextId: 'Marketing',
+    boundedContextId: 'Marketing',
     createdTimestamp: Date.now(),
+    correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
+    context: asyncLocalStorage.getStore()?.get('context'),
+    messageId: new Domain.UUIDv4().toString(),
   };
-  public userId: string;
+  public id: string;
 
-  constructor(
-    props: TIncrementTodosCommand,
-    public readonly ctx?: Application.TContext,
-  ) {
+  constructor(props: TIncrementTodosCommand) {
     super();
-    this.userId = props.userId;
+    this.id = props.id;
   }
 }

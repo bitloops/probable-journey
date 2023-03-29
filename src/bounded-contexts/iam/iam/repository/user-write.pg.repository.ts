@@ -3,8 +3,8 @@ import {
   Domain,
   Either,
   Infra,
+  asyncLocalStorage,
   ok,
-  fail,
 } from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import * as jwtwebtoken from 'jsonwebtoken';
@@ -29,7 +29,10 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
     this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
   }
 
-  async update(aggregate: UserEntity): Promise<void> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async update(
+    aggregate: UserEntity,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     const userPrimitives = aggregate.toPrimitives();
     const { id, email, password, lastLogin } = userPrimitives;
     const sqlStatement = `UPDATE ${this.tableName}
@@ -37,18 +40,24 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
     WHERE id = $1`;
     await this.connection.query(sqlStatement, [id, email, password, lastLogin]);
     this.domainEventBus.publish(aggregate.domainEvents);
+    return ok();
   }
 
-  async delete(aggregateRootId: Domain.UUIDv4): Promise<void> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async delete(
+    aggregateRootId: Domain.UUIDv4,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     // We probably need also aggregate here in order to dispatch Events
     const sqlStatement = `DELETE FROM ${this.tableName} WHERE id = $1`;
     await this.connection.query(sqlStatement, [aggregateRootId.toString()]);
+    return ok();
   }
 
+  @Application.Repo.Decorators.ReturnUnexpectedError()
   async getById(
     id: Domain.UUIDv4,
-    ctx: Application.TContext,
-  ): Promise<UserEntity | null> {
+  ): Promise<Either<UserEntity | null, Application.Repo.Errors.Unexpected>> {
+    const ctx = asyncLocalStorage.getStore()?.get('context');
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -62,7 +71,7 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
     );
 
     if (!result.rows.length) {
-      return null;
+      return ok(null);
     }
 
     const userPrimitives = result.rows[0];
@@ -71,68 +80,47 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
     }
     const { last_login, ...user } = userPrimitives;
 
-    return UserEntity.fromPrimitives({
-      ...user,
-      lastLogin: new Date(last_login),
-    });
+    return ok(
+      UserEntity.fromPrimitives({
+        ...user,
+        lastLogin: new Date(last_login),
+      }),
+    );
   }
 
-  async getByEmail(email: EmailVO): Promise<UserEntity | null> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async getByEmail(
+    email: EmailVO,
+  ): Promise<Either<UserEntity | null, Application.Repo.Errors.Unexpected>> {
     const result = await this.connection.query(
       `SELECT * FROM ${this.tableName} WHERE email = $1`,
       [email.email],
     );
 
     if (!result.rows.length) {
-      return null;
+      return ok(null);
     }
 
     const userPrimitives = result.rows[0];
     const { last_login, ...user } = userPrimitives;
 
-    return UserEntity.fromPrimitives({
-      ...user,
-      lastLogin: new Date(last_login),
-    });
+    return ok(
+      UserEntity.fromPrimitives({
+        ...user,
+        lastLogin: new Date(last_login),
+      }),
+    );
   }
 
-  async save(user: UserEntity): Promise<void> {
+  @Application.Repo.Decorators.ReturnUnexpectedError()
+  async save(
+    user: UserEntity,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     const sqlStatement = `INSERT INTO ${this.tableName} (id, email, password, last_login) VALUES ($1, $2, $3, $4);`;
     const userPrimitives = user.toPrimitives();
     const { id, email, password, lastLogin } = userPrimitives;
     await this.connection.query(sqlStatement, [id, email, password, lastLogin]);
     this.domainEventBus.publish(user.domainEvents);
-  }
-
-  async checkDoesNotExistAndCreate(
-    user: UserEntity,
-  ): Promise<Either<void, Application.Repo.Errors.Conflict>> {
-    // note: we don't try/catch this because if connecting throws an exception
-    // we don't need to dispose of the client (it will be undefined)
-    const client = await this.connection.connect();
-
-    try {
-      await client.query('BEGIN');
-
-      const userExistsQuery = `SELECT * FROM ${this.tableName} WHERE email = $1`;
-      const res = await client.query(userExistsQuery, [user.email.email]);
-      if (res.rows.length > 0) {
-        throw new Error('User already exists');
-      }
-
-      const insertUserText = `INSERT INTO ${this.tableName} (id, email, password, last_login) VALUES ($1, $2, $3, $4);`;
-
-      const { id, email, password, lastLogin } = user.toPrimitives();
-      const insertUserValues = [id, email, password, lastLogin];
-      await this.connection.query(insertUserText, insertUserValues);
-      await client.query('COMMIT');
-      return ok();
-    } catch (e) {
-      await client.query('ROLLBACK');
-      console.log('Error in transaction', e);
-      return fail(new Application.Repo.Errors.Conflict(user.email.email));
-    } finally {
-      client.release();
-    }
+    return ok();
   }
 }

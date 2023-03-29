@@ -1,17 +1,20 @@
 import { Domain } from '@bitloops/bl-boilerplate-core';
+import { asyncLocalStorage } from '@bitloops/tracing';
 import { TodoEntity } from '../TodoEntity';
 
 export class TodoAddedDomainEvent implements Domain.IDomainEvent<TodoEntity> {
   public aggregateId: string;
-  public metadata: any;
+  public metadata: Domain.TDomainEventMetadata;
 
-  constructor(public readonly data: TodoEntity, uuid?: string) {
+  constructor(public readonly data: TodoEntity) {
+    const uuid = new Domain.UUIDv4();
     this.metadata = {
-      fromContextId: 'Todo',
+      boundedContextId: 'Todo',
+      createdAtTimestamp: Date.now(),
+      messageId: uuid.toString(),
+      context: asyncLocalStorage.getStore()?.get('context'),
+      correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
     };
-    if (uuid) {
-      this.metadata.id = uuid;
-    }
     this.aggregateId = data.id.toString();
   }
 }

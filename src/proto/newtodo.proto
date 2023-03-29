@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package newtodo;
+
+service TodoApp {
+	rpc AddTodo(AddTodoRequest) returns (AddTodoResponse);
+  rpc CompleteTodo (CompleteTodoRequest) returns (CompleteTodoResponse);
+	rpc GetAllMyTodos(GetAllMyTodosRequest) returns (GetAllMyTodosResponse);
+}
+
+message ErrorResponse {
+  string code = 1;
+  string message = 2;
+}
+
+message AddTodoRequest {
+	string title = 1;
+}
+
+message AddTodoResponse {
+  oneof result {
+    AddTodoOKResponse ok = 1;
+    AddTodoErrorResponse error = 2;
+  }
+}
+
+message AddTodoErrorResponse {
+  oneof error {
+    ErrorResponse unauthorizedError = 1;
+    ErrorResponse invalidTitleLengthError = 2;
+    ErrorResponse systemUnavailableError = 3;
+  }
+}
+
+message AddTodoOKResponse {
+  string id = 1;
+}
+
+message CompleteTodoRequest {
+  string id = 1;
+}
+
+message CompleteTodoResponse {
+  oneof result {
+    CompleteTodoOKResponse ok = 1;
+    CompleteTodoErrorResponse error = 2;
+  }
+}
+
+message CompleteTodoErrorResponse {
+  oneof error {
+    ErrorResponse unauthorizedError = 1;
+    ErrorResponse todoAlreadyExistsError = 2;
+    ErrorResponse systemUnavailableError = 3;
+  }
+}
+
+message CompleteTodoOKResponse {}
+
+message GetAllMyTodosRequest {}
+
+message GetAllMyTodosResponse {
+  oneof result {
+    GetAllMyTodosOKResponse ok = 1;
+    GetAllMyTodosErrorResponse error = 2;
+  }
+}
+
+message GetAllMyTodosErrorResponse {
+  oneof error {
+    ErrorResponse unauthorizedError = 1;
+    ErrorResponse systemUnavailableError = 2;
+  }
+}
+
+message GetAllMyTodosOKResponse {
+  repeated Todo todos = 1;
+}
+
+
+message Todo {
+  string id = 1;
+  string text = 2;
+  bool completed = 3;
+}

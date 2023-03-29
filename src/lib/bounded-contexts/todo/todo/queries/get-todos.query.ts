@@ -5,7 +5,7 @@ export class GetTodosQuery implements Application.IQuery {
   public metadata: Application.TQueryMetadata;
   public readonly boundedContext = 'Todo';
 
-  constructor(public ctx: any) {
+  constructor() {
     this.metadata = {
       boundedContextId: 'Todo',
       createdTimestamp: Date.now(),

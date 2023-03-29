@@ -25,7 +25,7 @@ describe('Uncomplete todo feature test', () => {
     // given
     const mockCompleteTodoWriteRepo = new MockCompleteTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const completeTodoCommand = new CompleteTodoCommand({ todoId }, ctx);
+    const completeTodoCommand = new CompleteTodoCommand({ todoId });
 
     // when
     const completeTodoHandler = new UncompleteTodoHandler(
@@ -66,7 +66,7 @@ describe('Uncomplete todo feature test', () => {
     // given
     const mockCompleteTodoWriteRepo = new MockCompleteTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const completeTodoCommand = new CompleteTodoCommand({ todoId }, ctx);
+    const completeTodoCommand = new CompleteTodoCommand({ todoId });
 
     // when
     const completeTodoHandler = new UncompleteTodoHandler(
@@ -88,7 +88,7 @@ describe('Uncomplete todo feature test', () => {
     // given
     const mockCompleteTodoWriteRepo = new MockCompleteTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const completeTodoCommand = new CompleteTodoCommand({ todoId }, ctx);
+    const completeTodoCommand = new CompleteTodoCommand({ todoId });
 
     // when
     const completeTodoHandler = new UncompleteTodoHandler(
@@ -113,7 +113,7 @@ describe('Uncomplete todo feature test', () => {
     // given
     const mockCompleteTodoWriteRepo = new MockCompleteTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const completeTodoCommand = new CompleteTodoCommand({ todoId }, ctx);
+    const completeTodoCommand = new CompleteTodoCommand({ todoId });
 
     // when
     const completeTodoHandler = new UncompleteTodoHandler(
@@ -135,7 +135,7 @@ describe('Uncomplete todo feature test', () => {
     // given
     const mockCompleteTodoWriteRepo = new MockCompleteTodoWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const completeTodoCommand = new CompleteTodoCommand({ todoId }, ctx);
+    const completeTodoCommand = new CompleteTodoCommand({ todoId });
 
     // when
     const completeTodoHandler = new UncompleteTodoHandler(

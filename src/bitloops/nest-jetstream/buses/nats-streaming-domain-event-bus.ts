@@ -6,11 +6,18 @@ import {
   JetStreamPublishOptions,
   consumerOpts,
   createInbox,
+  headers,
+  MsgHdrs,
 } from 'nats';
 import { Application, Domain, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
 import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
-import { ProvidersConstants } from '../jetstream.constants';
+import {
+  ASYNC_LOCAL_STORAGE,
+  METADATA_HEADERS,
+  ProvidersConstants,
+} from '../jetstream.constants';
+import { ContextPropagation } from './utils/context-propagation';
 
 const jsonCodec = JSONCodec();
 
@@ -21,6 +28,8 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER)
     private readonly jetStreamProvider: NestjsJetstream,
+    @Inject(ASYNC_LOCAL_STORAGE)
+    private readonly asyncLocalStorage: any,
   ) {
     this.nc = this.jetStreamProvider.getConnection();
     this.js = this.nc.jetstream();
@@ -37,7 +46,12 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
       const boundedContext = domainEvent.metadata.boundedContextId;
       const stream = NatsStreamingDomainEventBus.getStreamName(boundedContext);
       const subject = `${stream}.${domainEvent.constructor.name}`;
-      const options: Partial<JetStreamPublishOptions> = { msgID: '' };
+
+      const headers = this.generateHeaders(domainEvent);
+      const options: Partial<JetStreamPublishOptions> = {
+        msgID: domainEvent.metadata.messageId,
+        headers,
+      };
       // const pubAck =
       domainEvent.data = domainEvent.data.toPrimitives();
       // console.log('serializedDomainEvent', domainEvent);
@@ -82,7 +96,15 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
           const domainEvent = jsonCodec.decode(m.data) as any;
           // domainEvent.data = Domain.EventData.fromPrimitives(domainEvent.data);
 
-          const reply = await handler.handle(domainEvent);
+          const contextData = ContextPropagation.createStoreFromMessageHeaders(
+            m.headers,
+          );
+          const reply = await this.asyncLocalStorage.run(
+            contextData,
+            async () => {
+              return handler.handle(domainEvent);
+            },
+          );
           // TODO check type
           if (reply.isFail && reply.isFail() && reply.value.nakable) {
             m.nak();
@@ -110,6 +132,21 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
     eventHandler: Application.IHandleDomainEvent,
   ): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  private generateHeaders(domainEvent: Domain.IDomainEvent<any>): MsgHdrs {
+    const h = headers();
+    for (const [key, value] of Object.entries(domainEvent.metadata)) {
+      if (key === 'context' && value) {
+        h.append(key, JSON.stringify(value));
+        continue;
+      }
+      const header = value?.toString();
+      if (header) {
+        h.append(key, header);
+      }
+    }
+    return h;
   }
 
   static getSubjectFromHandler(

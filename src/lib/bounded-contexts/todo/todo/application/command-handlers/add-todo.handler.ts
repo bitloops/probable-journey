@@ -51,7 +51,10 @@ export class AddTodoCommandHandler
     },
   })
   async execute(command: AddTodoCommand): Promise<AddTodoUseCaseResponse> {
-    this.ctx = command.ctx;
+    if (!command.metadata.context) {
+      throw new Error('Context is not defined');
+    }
+    this.ctx = command.metadata.context;
     console.log('AddTodoCommand...');
 
     const title = TitleVO.create({ title: command.title });

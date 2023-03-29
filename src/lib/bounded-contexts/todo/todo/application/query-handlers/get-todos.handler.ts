@@ -35,7 +35,7 @@ export class GetTodosHandler
   }
 
   async execute(command: GetTodosQuery): Promise<GetTodosQueryHandlerResponse> {
-    this.ctx = command.ctx;
+    this.ctx = command.metadata.context;
     console.log('GetTodosQuery handler...');
 
     const results = await this.todoRepo.getAll(this.ctx);

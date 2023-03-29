@@ -13,4 +13,5 @@ export const ASYNC_LOCAL_STORAGE = Symbol('ASYNC_LOCAL_STORAGE');
 
 export const METADATA_HEADERS = {
   CORRELATION_ID: 'correlationId',
+  CONTEXT: 'context',
 };

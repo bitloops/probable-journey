@@ -17,7 +17,7 @@ describe('Get todos feature test', () => {
     // given
     const mockTodoReadRepo = new MockGetTodosReadRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const getTodosQuery = new GetTodosQuery(ctx);
+    const getTodosQuery = new GetTodosQuery();
 
     // when
     const getTodosHandler = new GetTodosHandler(
@@ -43,7 +43,7 @@ describe('Get todos feature test', () => {
     // given
     const mockTodoReadRepo = new MockGetTodosReadRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const getTodosQuery = new GetTodosQuery(ctx);
+    const getTodosQuery = new GetTodosQuery();
 
     // when
     const getTodosHandler = new GetTodosHandler(
@@ -62,7 +62,7 @@ describe('Get todos feature test', () => {
     // given
     const mockTodoReadRepo = new MockGetTodosReadRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const getTodosQuery = new GetTodosQuery(ctx);
+    const getTodosQuery = new GetTodosQuery();
 
     // when
     const getTodosHandler = new GetTodosHandler(

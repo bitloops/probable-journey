@@ -6,11 +6,18 @@ import {
   JetStreamPublishOptions,
   consumerOpts,
   createInbox,
+  MsgHdrs,
+  headers,
 } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
 import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
-import { ProvidersConstants } from '../jetstream.constants';
+import {
+  ASYNC_LOCAL_STORAGE,
+  METADATA_HEADERS,
+  ProvidersConstants,
+} from '../jetstream.constants';
+import { ContextPropagation } from './utils/context-propagation';
 
 const jsonCodec = JSONCodec();
 
@@ -23,22 +30,28 @@ export class NatsStreamingIntegrationEventBus
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER)
     private readonly jetStreamProvider: NestjsJetstream,
+    @Inject(ASYNC_LOCAL_STORAGE)
+    private readonly asyncLocalStorage: any,
   ) {
     this.nc = this.jetStreamProvider.getConnection();
     this.js = this.nc.jetstream();
   }
 
   async publish(
-    domainEventsInput:
+    eventsInput:
       | Infra.EventBus.IntegrationEvent<any>
       | Infra.EventBus.IntegrationEvent<any>[],
   ): Promise<void> {
     let integrationEvents: Infra.EventBus.IntegrationEvent<any>[];
-    Array.isArray(domainEventsInput)
-      ? (integrationEvents = domainEventsInput)
-      : (integrationEvents = [domainEventsInput]);
+    Array.isArray(eventsInput)
+      ? (integrationEvents = eventsInput)
+      : (integrationEvents = [eventsInput]);
     integrationEvents.forEach(async (integrationEvent) => {
-      const options: Partial<JetStreamPublishOptions> = { msgID: '' };
+      const headers = this.generateHeaders(integrationEvent);
+      const options: Partial<JetStreamPublishOptions> = {
+        msgID: integrationEvent.metadata.messageId,
+        headers,
+      };
 
       const message = jsonCodec.encode(integrationEvent);
       const subject =
@@ -93,7 +106,15 @@ export class NatsStreamingIntegrationEventBus
         for await (const m of sub) {
           const integrationEvent = jsonCodec.decode(m.data) as any;
 
-          const reply = await handler.handle(integrationEvent);
+          const contextData = ContextPropagation.createStoreFromMessageHeaders(
+            m.headers,
+          );
+          const reply = await this.asyncLocalStorage.run(
+            contextData,
+            async () => {
+              return handler.handle(integrationEvent);
+            },
+          );
           if (reply.isOk && reply.isOk()) m.ack();
           else m.nak();
 
@@ -114,6 +135,23 @@ export class NatsStreamingIntegrationEventBus
     eventHandler: Application.IHandleIntegrationEvent,
   ): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  private generateHeaders(
+    domainEvent: Infra.EventBus.IntegrationEvent<any>,
+  ): MsgHdrs {
+    const h = headers();
+    for (const [key, value] of Object.entries(domainEvent.metadata)) {
+      if (key === 'context' && value) {
+        h.append(key, JSON.stringify(value));
+        continue;
+      }
+      const header = value?.toString();
+      if (header) {
+        h.append(key, header);
+      }
+    }
+    return h;
   }
 
   static getSubjectFromHandler(

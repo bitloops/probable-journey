@@ -69,8 +69,9 @@ export class NatsStreamingCommandBus
           const command = jsonCodec.decode(m.data) as any;
 
           const reply = await handler.execute(command);
-          if (reply.isOk && reply.isOk()) m.ack();
-          else m.nak();
+          if (reply.isFail && reply.isFail() && reply.value.nakable) {
+            m.nak();
+          } else m.ack();
 
           console.log(
             `[Command ${sub.getProcessed()}]: ${JSON.stringify(

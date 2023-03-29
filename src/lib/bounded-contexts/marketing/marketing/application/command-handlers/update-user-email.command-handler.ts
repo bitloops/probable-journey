@@ -20,11 +20,7 @@ type UpdateUserEmailCommandHandlerResponse = Either<
 >;
 
 export class UpdateUserEmailCommandHandler
-  implements
-    Application.ICommandHandler<
-      UpdateUserEmailCommand,
-      Promise<UpdateUserEmailCommandHandlerResponse>
-    >
+  implements Application.ICommandHandler<UpdateUserEmailCommand, void>
 {
   private ctx: Application.TContext;
   constructor(

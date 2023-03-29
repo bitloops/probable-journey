@@ -23,11 +23,7 @@ type AddTodoUseCaseResponse = Either<
 >;
 
 export class AddTodoCommandHandler
-  implements
-    Application.ICommandHandler<
-      AddTodoCommand,
-      Promise<AddTodoUseCaseResponse>
-    >
+  implements Application.ICommandHandler<AddTodoCommand, string>
 {
   private ctx: Application.TContext;
   constructor(

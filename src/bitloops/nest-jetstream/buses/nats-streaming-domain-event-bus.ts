@@ -9,7 +9,6 @@ import {
 } from 'nats';
 import { Application, Domain, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
-import { IEvent } from '@src/bitloops/bl-boilerplate-core/domain/events/IEvent';
 import { ProvidersConstants } from '../jetstream.constants';
 
 const jsonCodec = JSONCodec();
@@ -83,7 +82,6 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
           // domainEvent.data = Domain.EventData.fromPrimitives(domainEvent.data);
 
           const reply = await handler.handle(domainEvent);
-          // TODO check type
           if (reply.isFail && reply.isFail() && reply.value.nakable) {
             m.nak();
           } else m.ack();

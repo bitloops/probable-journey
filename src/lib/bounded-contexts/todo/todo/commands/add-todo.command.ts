@@ -12,7 +12,7 @@ export class AddTodoCommand extends Application.Command {
     messageId: new Domain.UUIDv4().toString(),
     // Async localStorage should perhaps be injected or directly used from our library.
     correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
-    context: asyncLocalStorage.getStore()?.get('context'),
+    context: asyncLocalStorage.getStore()?.get('context') || {},
   };
   public title: string;
 

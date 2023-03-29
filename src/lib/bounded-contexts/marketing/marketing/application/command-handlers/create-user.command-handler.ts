@@ -20,11 +20,7 @@ type CreateUserCommandHandlerResponse = Either<
 >;
 
 export class CreateUserCommandHandler
-  implements
-    Application.ICommandHandler<
-      CreateUserCommand,
-      Promise<CreateUserCommandHandlerResponse>
-    >
+  implements Application.ICommandHandler<CreateUserCommand, void>
 {
   private ctx: Application.TContext;
   constructor(

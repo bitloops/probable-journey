@@ -47,7 +47,14 @@ import { CorrelationIdMiddleware, TracingModule } from '@src/bitloops/tracing';
       },
       integrationEventBus: NatsStreamingIntegrationEventBus,
     }),
-    JetstreamModule.forRoot({}),
+    JetstreamModule.forRoot({
+      servers: [
+        `nats://${process.env.NATS_HOST ?? 'localhost'}:${
+          process.env.NATS_PORT ?? 4222
+        }`,
+      ],
+    }),
+
     TracingModule.register({
       messageBus: NatsStreamingMessageBus,
     }),

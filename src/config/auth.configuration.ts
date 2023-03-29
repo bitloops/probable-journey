@@ -9,12 +9,12 @@ export interface AuthEnvironmentVariables {
   };
 }
 
-const missingJwtEnv = () => {
-  throw new Error('JWT_SECRET is not defined in env!');
-};
-
 export default () => ({
-  jwtSecret: process.env.JWT_SECRET || missingJwtEnv(),
+  jwtSecret:
+    process.env.JWT_SECRET ||
+    (() => {
+      throw new Error('JWT_SECRET is required');
+    })(),
   database: {
     host: process.env.PG_HOST ?? 'localhost',
     port: process.env.PG_PORT ? +process.env.PG_PORT : 5432,

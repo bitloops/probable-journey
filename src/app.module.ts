@@ -17,7 +17,7 @@ import { TracingModule } from '@bitloops/tracing';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.development.env',
+      envFilePath: process.env.ENV_FILE || '.development.env',
       load: [configuration, authConfiguration],
     }),
     JetstreamModule.forRoot({
@@ -36,7 +36,9 @@ import { TracingModule } from '@bitloops/tracing';
       max: 20,
     }),
     MongoModule.forRoot({
-      url: 'mongodb://localhost:30001/?directConnection=true&replicaSet=my-replica-set',
+      url: `mongodb://${process.env.MONGO_HOST || 'localhost'}:${
+        process.env.MONGO_PORT || 30001
+      }/?directConnection=true&replicaSet=my-replica-set`,
     }),
 
     TodoModule,

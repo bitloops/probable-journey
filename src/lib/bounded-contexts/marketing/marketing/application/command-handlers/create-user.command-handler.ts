@@ -50,7 +50,7 @@ export class CreateUserCommandHandler
   async execute(
     command: CreateUserCommand,
   ): Promise<CreateUserCommandHandlerResponse> {
-    this.ctx = command.ctx;
+    this.ctx = command.metadata.context!;
     console.log('CreateUserCommandHandler');
     const requestUserId = new Domain.UUIDv4(command.userId);
     const userIdEmail = new UserReadModel(

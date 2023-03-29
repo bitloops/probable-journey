@@ -50,7 +50,7 @@ export class UpdateUserEmailCommandHandler
   async execute(
     command: UpdateUserEmailCommand,
   ): Promise<UpdateUserEmailCommandHandlerResponse> {
-    this.ctx = command.ctx;
+    this.ctx = command.metadata.context!;
     console.log('UpdateUserEmailCommandHandler');
     const requestUserId = new Domain.UUIDv4(command.userId);
     const userIdEmail = new UserReadModel(

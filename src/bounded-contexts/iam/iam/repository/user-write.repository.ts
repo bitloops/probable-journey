@@ -5,6 +5,7 @@ import {
   Infra,
   ok,
   fail,
+  asyncLocalStorage,
 } from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import {
@@ -66,8 +67,8 @@ export class UserWriteRepository implements UserWriteRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async getById(
     id: Domain.UUIDv4,
-    ctx: Application.TContext,
   ): Promise<Either<UserEntity | null, Application.Repo.Errors.Unexpected>> {
+    const ctx = asyncLocalStorage.getStore()?.get('context');
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {

@@ -51,7 +51,7 @@ export class IncrementTodosCommandHandler
   async execute(
     command: IncrementTodosCommand,
   ): Promise<IncrementDepositsCommandHandlerResponse> {
-    this.ctx = command.ctx;
+    this.ctx = command.metadata.context!;
     console.log('IncrementTodosCommandHandler');
 
     const requestUserId = new Domain.UUIDv4(command.id);
@@ -86,7 +86,7 @@ export class IncrementTodosCommandHandler
       if (incrementedOrError.isFail()) {
         return fail(incrementedOrError.value);
       }
-      const saveResult = await this.userRepo.save(user.value, this.ctx);
+      const saveResult = await this.userRepo.update(user.value, this.ctx);
       if (saveResult.isFail()) {
         return fail(saveResult.value);
       }

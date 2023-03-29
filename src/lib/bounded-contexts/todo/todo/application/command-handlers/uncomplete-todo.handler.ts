@@ -67,7 +67,7 @@ export class UncompleteTodoHandler
     if (uncompletedOrError.isFail()) {
       return fail(uncompletedOrError.value);
     }
-    const saveResult = await this.todoRepo.save(todo.value, this.ctx);
+    const saveResult = await this.todoRepo.update(todo.value, this.ctx);
     if (saveResult.isFail()) {
       return fail(saveResult.value);
     }

@@ -3,6 +3,7 @@ import {
   Domain,
   Either,
   Infra,
+  asyncLocalStorage,
   ok,
 } from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
@@ -41,8 +42,8 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async getById(
     id: Domain.UUIDv4,
-    ctx: Application.TContext,
   ): Promise<Either<TodoEntity | null, Application.Repo.Errors.Unexpected>> {
+    const ctx = asyncLocalStorage.getStore()?.get('context');
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -74,8 +75,8 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async update(
     todo: TodoEntity,
-    ctx?: any,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
+    const ctx = asyncLocalStorage.getStore()?.get('context');
     const { id, ...todoInfo } = todo.toPrimitives();
     await this.collection.updateOne(
       {
@@ -85,13 +86,13 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
         $set: todoInfo,
       },
     );
+    this.domainEventBus.publish(todo.domainEvents);
     return ok();
   }
 
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async delete(
     id: Domain.UUIDv4,
-    ctx?: any,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     throw new Error('Method not implemented.');
   }
@@ -99,8 +100,8 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async save(
     todo: TodoEntity,
-    ctx: Application.TContext,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
+    const ctx = asyncLocalStorage.getStore()?.get('context');
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {

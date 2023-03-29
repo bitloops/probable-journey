@@ -24,10 +24,10 @@ describe('Modify title todo feature test', () => {
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const modifyTodoTitleCommand = new ModifyTodoTitleCommand(
-      { title: titleAfterUpdate, id: titleId },
-      ctx,
-    );
+    const modifyTodoTitleCommand = new ModifyTodoTitleCommand({
+      title: titleAfterUpdate,
+      id: titleId,
+    });
 
     // when
     const modifyTodoTitleHandler = new ModifyTodoTitleHandler(
@@ -65,10 +65,10 @@ describe('Modify title todo feature test', () => {
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const modifyTodoTitleCommand = new ModifyTodoTitleCommand(
-      { title: titleAfterUpdate, id: titleId },
-      ctx,
-    );
+    const modifyTodoTitleCommand = new ModifyTodoTitleCommand({
+      title: titleAfterUpdate,
+      id: titleId,
+    });
 
     // when
     const modifyTodoTitleHandler = new ModifyTodoTitleHandler(
@@ -91,10 +91,10 @@ describe('Modify title todo feature test', () => {
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const modifyTodoTitleCommand = new ModifyTodoTitleCommand(
-      { title: titleAfterUpdate, id: titleId },
-      ctx,
-    );
+    const modifyTodoTitleCommand = new ModifyTodoTitleCommand({
+      title: titleAfterUpdate,
+      id: titleId,
+    });
 
     // when
     const modifyTodoTitleHandler = new ModifyTodoTitleHandler(
@@ -118,10 +118,10 @@ describe('Modify title todo feature test', () => {
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const modifyTodoTitleCommand = new ModifyTodoTitleCommand(
-      { title: titleAfterUpdate, id: titleId },
-      ctx,
-    );
+    const modifyTodoTitleCommand = new ModifyTodoTitleCommand({
+      title: titleAfterUpdate,
+      id: titleId,
+    });
 
     // when
     const modifyTodoTitleHandler = new ModifyTodoTitleHandler(
@@ -145,10 +145,10 @@ describe('Modify title todo feature test', () => {
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();
     const ctx = new ContextBuilder().withUserId(userId).build();
-    const modifyTodoTitleCommand = new ModifyTodoTitleCommand(
-      { title: titleAfterUpdate, id: titleId },
-      ctx,
-    );
+    const modifyTodoTitleCommand = new ModifyTodoTitleCommand({
+      title: titleAfterUpdate,
+      id: titleId,
+    });
 
     // when
     const modifyTodoTitleHandler = new ModifyTodoTitleHandler(

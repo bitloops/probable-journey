@@ -38,7 +38,7 @@ export class SendEmailCommandHandler
   async execute(
     command: SendEmailCommand,
   ): Promise<SendEmailCommandHandlerResponse> {
-    this.ctx = command.ctx;
+    this.ctx = command.metadata.context!;
     console.log('SendEmailHandler');
     await this.emailService.send(
       {

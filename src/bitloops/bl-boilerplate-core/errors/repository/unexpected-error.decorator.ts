@@ -1,4 +1,5 @@
 import { UnexpectedError } from './UnexpectedError';
+import { fail } from '../../Either';
 
 export function ReturnUnexpectedError() {
   return function (

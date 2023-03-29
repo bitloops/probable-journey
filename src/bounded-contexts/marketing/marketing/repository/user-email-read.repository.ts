@@ -1,4 +1,10 @@
-import { Application, Domain, Either, ok } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Domain,
+  Either,
+  asyncLocalStorage,
+  ok,
+} from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
@@ -30,8 +36,8 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async getUserEmail(
     userid: Domain.UUIDv4,
-    ctx?: any,
   ): Promise<Either<UserReadModel | null, Application.Repo.Errors.Unexpected>> {
+    const ctx = asyncLocalStorage.getStore()?.get('context');
     const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
@@ -47,7 +53,7 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
       return ok(null);
     }
 
-    if (result.userId !== jwtPayload.userId) {
+    if (result.userId !== jwtPayload.sub) {
       throw new Error('Invalid userId');
     }
 
@@ -76,9 +82,10 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async save(
     userEmailReadModel: UserReadModel,
-    ctx?: any,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
+    const ctx = asyncLocalStorage.getStore()?.get('context');
     const { jwt } = ctx;
+
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
@@ -86,7 +93,7 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
       throw new Error('Invalid JWT!');
     }
     const userEmail = userEmailReadModel.toPrimitives();
-    if (userEmail.userId !== jwtPayload.userId) {
+    if (userEmail.userId !== jwtPayload.sub) {
       throw new Error('Invalid userId');
     }
     await this.collection.insertOne({

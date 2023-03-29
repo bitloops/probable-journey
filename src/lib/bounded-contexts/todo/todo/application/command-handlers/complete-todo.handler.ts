@@ -51,7 +51,7 @@ export class CompleteTodoHandler
   async execute(
     command: CompleteTodoCommand,
   ): Promise<CompleteTodoUseCaseResponse> {
-    this.ctx = command.ctx;
+    this.ctx = command.metadata.context!;
     console.log('CompleteTodoHandler');
 
     const todo = await this.todoRepo.getById(
@@ -69,7 +69,7 @@ export class CompleteTodoHandler
     if (completedOrError.isFail()) {
       return fail(completedOrError.value);
     }
-    const saveResult = await this.todoRepo.save(todo.value, this.ctx);
+    const saveResult = await this.todoRepo.update(todo.value, this.ctx);
     if (saveResult.isFail()) {
       return fail(saveResult.value);
     }

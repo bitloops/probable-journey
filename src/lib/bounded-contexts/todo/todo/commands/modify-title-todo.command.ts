@@ -16,10 +16,7 @@ export class ModifyTodoTitleCommand extends Application.Command {
     messageId: new Domain.UUIDv4().toString(),
   };
 
-  constructor(
-    modifyTitleTodo: TModifyTodoTitleCommand,
-    public readonly ctx: Application.TContext,
-  ) {
+  constructor(modifyTitleTodo: TModifyTodoTitleCommand) {
     super();
     this.id = modifyTitleTodo.id;
     this.title = modifyTitleTodo.title;

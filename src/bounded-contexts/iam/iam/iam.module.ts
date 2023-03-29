@@ -35,19 +35,7 @@ const providers = [
   imports: [
     LibIamModule.register({
       inject: [...providers],
-      imports: [
-        MongoModule,
-        PostgresModule.forFeature(
-          `-- DROP TABLE users;
-          CREATE TABLE IF NOT EXISTS users (
-            "id" UUID,
-            "email" VARCHAR(100) NOT NULL,
-            "password" VARCHAR(100) NOT NULL,
-            "last_login" TIMESTAMP,
-            PRIMARY KEY ("id")
-          );`,
-        ),
-      ],
+      imports: [MongoModule, PostgresModule],
     }),
     JetstreamModule.forFeature({
       moduleOfHandlers: IamModule,

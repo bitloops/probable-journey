@@ -20,7 +20,13 @@ import { TracingModule } from '@bitloops/tracing';
       envFilePath: '.development.env',
       load: [configuration, authConfiguration],
     }),
-    JetstreamModule.forRoot({}),
+    JetstreamModule.forRoot({
+      servers: [
+        `nats://${process.env.NATS_HOST ?? 'localhost'}:${
+          process.env.NATS_PORT ?? 4222
+        }`,
+      ],
+    }),
     PostgresModule.forRoot({
       database: process.env.PG_IAM_DATABASE ?? 'iam',
       host: process.env.PG_IAM_HOST ?? 'localhost',

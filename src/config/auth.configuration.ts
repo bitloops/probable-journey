@@ -10,7 +10,11 @@ export interface AuthEnvironmentVariables {
 }
 
 export default () => ({
-  jwtSecret: process.env.JWT_SECRET ?? 'p2s5v8x/A?D(G+KbPeShVmYq3t6w9z$B',
+  jwtSecret:
+    process.env.JWT_SECRET ||
+    (() => {
+      throw new Error('JWT_SECRET is required');
+    })(),
   database: {
     host: process.env.PG_HOST ?? 'localhost',
     port: process.env.PG_PORT ? +process.env.PG_PORT : 5432,

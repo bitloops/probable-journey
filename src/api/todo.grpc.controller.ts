@@ -3,7 +3,7 @@ import { RpcException, GrpcMethod, Payload } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
 
-import { todo } from '../proto/todo';
+import { todo } from '../proto/generated/todo';
 
 import { AddTodoCommand } from '../lib/bounded-contexts/todo/todo/commands/add-todo.command';
 
@@ -14,6 +14,7 @@ import {
   JwtGrpcAuthGuard,
 } from '@src/bitloops/nest-auth-passport';
 import { Infra } from '@src/bitloops/bl-boilerplate-core';
+
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
 @Injectable()
@@ -52,14 +53,24 @@ export class TodoGrpcController {
     );
     const results = await this.commandBus.request(command);
     if (results.isOk) {
-      return new todo.AddTodoResponse({ id: results.data });
+      return new todo.AddTodoResponse({
+        ok: new todo.AddTodoOKResponse({ id: results.data }),
+      });
     } else {
       const error = results.error;
       console.error('Error while creating todo:', error?.message);
-      throw new RpcException({
-        code: error?.message || 'Failed to create the todo',
-        message: error?.message || 'Failed to create the todo',
+      return new todo.AddTodoResponse({
+        error: new todo.AddTodoErrorResponse({
+          invalidTitleLengthError: new todo.ErrorResponse({
+            code: error?.code || 'INVALID_TITLE_LENGTH_ERROR',
+            message: error?.message || 'The title is too long.',
+          }),
+        }),
       });
+      // throw new RpcException({
+      //   code: error?.message || 'Failed to create the todo',
+      //   message: error?.message || 'Failed to create the todo',
+      // });
     }
   }
 }

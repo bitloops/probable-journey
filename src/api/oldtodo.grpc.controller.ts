@@ -3,7 +3,7 @@ import { RpcException, GrpcMethod, Payload } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
 
-import { newtodo } from '../proto/generated/newtodo';
+import { todo } from '../proto/todo';
 
 import { AddTodoCommand } from '../lib/bounded-contexts/todo/todo/commands/add-todo.command';
 
@@ -14,7 +14,6 @@ import {
   JwtGrpcAuthGuard,
 } from '@src/bitloops/nest-auth-passport';
 import { Infra } from '@src/bitloops/bl-boilerplate-core';
-
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
 @Injectable()
@@ -37,11 +36,12 @@ export class TodoGrpcController {
 
   @GrpcMethod('TodoApp', 'AddTodo')
   async addTodo(
-    @Payload() data: newtodo.AddTodoRequest,
+    @Payload() data: todo.AddTodoRequest,
     metadata: Metadata, // @TODO figure out how to get the metadata https://github.com/nestjs/nest/issues/4851
-    call: ServerUnaryCall<newtodo.AddTodoRequest, newtodo.AddTodoResponse>, // @TODO figure out how to get the call
+    call: ServerUnaryCall<todo.AddTodoRequest, todo.AddTodoResponse>, // @TODO figure out how to get the call
     @GetAuthData() authData: any,
-  ): Promise<newtodo.AddTodoResponse> {
+  ): Promise<todo.AddTodoResponse> {
+    console.table([{ addTodo: 'here' }]);
     // console.log('metadata', metadata);
     // console.log('call', call);
     const command = new AddTodoCommand(
@@ -53,24 +53,14 @@ export class TodoGrpcController {
     );
     const results = await this.commandBus.request(command);
     if (results.isOk) {
-      return new newtodo.AddTodoResponse({
-        ok: new newtodo.AddTodoOKResponse({ id: results.data }),
-      });
+      return new todo.AddTodoResponse({ id: results.data });
     } else {
       const error = results.error;
       console.error('Error while creating todo:', error?.message);
-      return new newtodo.AddTodoResponse({
-        error: new newtodo.AddTodoErrorResponse({
-          invalidTitleLengthError: new newtodo.ErrorResponse({
-            code: error?.code || 'INVALID_TITLE_LENGTH_ERROR',
-            message: error?.message || 'The title is too long.',
-          }),
-        }),
+      throw new RpcException({
+        code: error?.message || 'Failed to create the todo',
+        message: error?.message || 'Failed to create the todo',
       });
-      // throw new RpcException({
-      //   code: error?.message || 'Failed to create the todo',
-      //   message: error?.message || 'Failed to create the todo',
-      // });
     }
   }
 }

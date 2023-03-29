@@ -6,6 +6,96 @@
 import * as pb_1 from "google-protobuf";
 import * as grpc_1 from "@grpc/grpc-js";
 export namespace todo {
+    export class ErrorResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            code?: string;
+            message?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("code" in data && data.code != undefined) {
+                    this.code = data.code;
+                }
+                if ("message" in data && data.message != undefined) {
+                    this.message = data.message;
+                }
+            }
+        }
+        get code() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set code(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get message() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set message(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        static fromObject(data: {
+            code?: string;
+            message?: string;
+        }): ErrorResponse {
+            const message = new ErrorResponse({});
+            if (data.code != null) {
+                message.code = data.code;
+            }
+            if (data.message != null) {
+                message.message = data.message;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                code?: string;
+                message?: string;
+            } = {};
+            if (this.code != null) {
+                data.code = this.code;
+            }
+            if (this.message != null) {
+                data.message = this.message;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.code.length)
+                writer.writeString(1, this.code);
+            if (this.message.length)
+                writer.writeString(2, this.message);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ErrorResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ErrorResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.code = reader.readString();
+                        break;
+                    case 2:
+                        message.message = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ErrorResponse {
+            return ErrorResponse.deserialize(bytes);
+        }
+    }
     export class AddTodoRequest extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
@@ -20,10 +110,10 @@ export namespace todo {
             }
         }
         get title() {
-            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
         }
         set title(value: string) {
-            pb_1.Message.setField(this, 2, value);
+            pb_1.Message.setField(this, 1, value);
         }
         static fromObject(data: {
             title?: string;
@@ -48,7 +138,7 @@ export namespace todo {
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
             if (this.title.length)
-                writer.writeString(2, this.title);
+                writer.writeString(1, this.title);
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -58,7 +148,7 @@ export namespace todo {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 2:
+                    case 1:
                         message.title = reader.readString();
                         break;
                     default: reader.skipField();
@@ -74,6 +164,256 @@ export namespace todo {
         }
     }
     export class AddTodoResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            ok?: AddTodoOKResponse;
+            error?: never;
+        } | {
+            ok?: never;
+            error?: AddTodoErrorResponse;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("ok" in data && data.ok != undefined) {
+                    this.ok = data.ok;
+                }
+                if ("error" in data && data.error != undefined) {
+                    this.error = data.error;
+                }
+            }
+        }
+        get ok() {
+            return pb_1.Message.getWrapperField(this, AddTodoOKResponse, 1) as AddTodoOKResponse;
+        }
+        set ok(value: AddTodoOKResponse) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_ok() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get error() {
+            return pb_1.Message.getWrapperField(this, AddTodoErrorResponse, 2) as AddTodoErrorResponse;
+        }
+        set error(value: AddTodoErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_error() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get result() {
+            const cases: {
+                [index: number]: "none" | "ok" | "error";
+            } = {
+                0: "none",
+                1: "ok",
+                2: "error"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
+        static fromObject(data: {
+            ok?: ReturnType<typeof AddTodoOKResponse.prototype.toObject>;
+            error?: ReturnType<typeof AddTodoErrorResponse.prototype.toObject>;
+        }): AddTodoResponse {
+            const message = new AddTodoResponse({});
+            if (data.ok != null) {
+                message.ok = AddTodoOKResponse.fromObject(data.ok);
+            }
+            if (data.error != null) {
+                message.error = AddTodoErrorResponse.fromObject(data.error);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                ok?: ReturnType<typeof AddTodoOKResponse.prototype.toObject>;
+                error?: ReturnType<typeof AddTodoErrorResponse.prototype.toObject>;
+            } = {};
+            if (this.ok != null) {
+                data.ok = this.ok.toObject();
+            }
+            if (this.error != null) {
+                data.error = this.error.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_ok)
+                writer.writeMessage(1, this.ok, () => this.ok.serialize(writer));
+            if (this.has_error)
+                writer.writeMessage(2, this.error, () => this.error.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AddTodoResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AddTodoResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.ok, () => message.ok = AddTodoOKResponse.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.error, () => message.error = AddTodoErrorResponse.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): AddTodoResponse {
+            return AddTodoResponse.deserialize(bytes);
+        }
+    }
+    export class AddTodoErrorResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2, 3]];
+        constructor(data?: any[] | ({} & (({
+            unauthorizedError?: ErrorResponse;
+            systemUnavailableError?: never;
+            invalidTitleLengthError?: never;
+        } | {
+            unauthorizedError?: never;
+            systemUnavailableError?: ErrorResponse;
+            invalidTitleLengthError?: never;
+        } | {
+            unauthorizedError?: never;
+            systemUnavailableError?: never;
+            invalidTitleLengthError?: ErrorResponse;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("unauthorizedError" in data && data.unauthorizedError != undefined) {
+                    this.unauthorizedError = data.unauthorizedError;
+                }
+                if ("systemUnavailableError" in data && data.systemUnavailableError != undefined) {
+                    this.systemUnavailableError = data.systemUnavailableError;
+                }
+                if ("invalidTitleLengthError" in data && data.invalidTitleLengthError != undefined) {
+                    this.invalidTitleLengthError = data.invalidTitleLengthError;
+                }
+            }
+        }
+        get unauthorizedError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 1) as ErrorResponse;
+        }
+        set unauthorizedError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_unauthorizedError() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get systemUnavailableError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 2) as ErrorResponse;
+        }
+        set systemUnavailableError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_systemUnavailableError() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get invalidTitleLengthError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 3) as ErrorResponse;
+        }
+        set invalidTitleLengthError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_invalidTitleLengthError() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get error() {
+            const cases: {
+                [index: number]: "none" | "unauthorizedError" | "systemUnavailableError" | "invalidTitleLengthError";
+            } = {
+                0: "none",
+                1: "unauthorizedError",
+                2: "systemUnavailableError",
+                3: "invalidTitleLengthError"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2, 3])];
+        }
+        static fromObject(data: {
+            unauthorizedError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            systemUnavailableError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            invalidTitleLengthError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+        }): AddTodoErrorResponse {
+            const message = new AddTodoErrorResponse({});
+            if (data.unauthorizedError != null) {
+                message.unauthorizedError = ErrorResponse.fromObject(data.unauthorizedError);
+            }
+            if (data.systemUnavailableError != null) {
+                message.systemUnavailableError = ErrorResponse.fromObject(data.systemUnavailableError);
+            }
+            if (data.invalidTitleLengthError != null) {
+                message.invalidTitleLengthError = ErrorResponse.fromObject(data.invalidTitleLengthError);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                unauthorizedError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+                systemUnavailableError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+                invalidTitleLengthError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            } = {};
+            if (this.unauthorizedError != null) {
+                data.unauthorizedError = this.unauthorizedError.toObject();
+            }
+            if (this.systemUnavailableError != null) {
+                data.systemUnavailableError = this.systemUnavailableError.toObject();
+            }
+            if (this.invalidTitleLengthError != null) {
+                data.invalidTitleLengthError = this.invalidTitleLengthError.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_unauthorizedError)
+                writer.writeMessage(1, this.unauthorizedError, () => this.unauthorizedError.serialize(writer));
+            if (this.has_systemUnavailableError)
+                writer.writeMessage(2, this.systemUnavailableError, () => this.systemUnavailableError.serialize(writer));
+            if (this.has_invalidTitleLengthError)
+                writer.writeMessage(3, this.invalidTitleLengthError, () => this.invalidTitleLengthError.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AddTodoErrorResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AddTodoErrorResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.unauthorizedError, () => message.unauthorizedError = ErrorResponse.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.systemUnavailableError, () => message.systemUnavailableError = ErrorResponse.deserialize(reader));
+                        break;
+                    case 3:
+                        reader.readMessage(message.invalidTitleLengthError, () => message.invalidTitleLengthError = ErrorResponse.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): AddTodoErrorResponse {
+            return AddTodoErrorResponse.deserialize(bytes);
+        }
+    }
+    export class AddTodoOKResponse extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
             id?: string;
@@ -94,8 +434,8 @@ export namespace todo {
         }
         static fromObject(data: {
             id?: string;
-        }): AddTodoResponse {
-            const message = new AddTodoResponse({});
+        }): AddTodoOKResponse {
+            const message = new AddTodoOKResponse({});
             if (data.id != null) {
                 message.id = data.id;
             }
@@ -119,8 +459,8 @@ export namespace todo {
             if (!w)
                 return writer.getResultBuffer();
         }
-        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AddTodoResponse {
-            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AddTodoResponse();
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AddTodoOKResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new AddTodoOKResponse();
             while (reader.nextField()) {
                 if (reader.isEndGroup())
                     break;
@@ -136,8 +476,8 @@ export namespace todo {
         serializeBinary(): Uint8Array {
             return this.serialize();
         }
-        static deserializeBinary(bytes: Uint8Array): AddTodoResponse {
-            return AddTodoResponse.deserialize(bytes);
+        static deserializeBinary(bytes: Uint8Array): AddTodoOKResponse {
+            return AddTodoOKResponse.deserialize(bytes);
         }
     }
     export class CompleteTodoRequest extends pb_1.Message {
@@ -208,14 +548,264 @@ export namespace todo {
         }
     }
     export class CompleteTodoResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            ok?: CompleteTodoOKResponse;
+            error?: never;
+        } | {
+            ok?: never;
+            error?: CompleteTodoErrorResponse;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("ok" in data && data.ok != undefined) {
+                    this.ok = data.ok;
+                }
+                if ("error" in data && data.error != undefined) {
+                    this.error = data.error;
+                }
+            }
+        }
+        get ok() {
+            return pb_1.Message.getWrapperField(this, CompleteTodoOKResponse, 1) as CompleteTodoOKResponse;
+        }
+        set ok(value: CompleteTodoOKResponse) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_ok() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get error() {
+            return pb_1.Message.getWrapperField(this, CompleteTodoErrorResponse, 2) as CompleteTodoErrorResponse;
+        }
+        set error(value: CompleteTodoErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_error() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get result() {
+            const cases: {
+                [index: number]: "none" | "ok" | "error";
+            } = {
+                0: "none",
+                1: "ok",
+                2: "error"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
+        static fromObject(data: {
+            ok?: ReturnType<typeof CompleteTodoOKResponse.prototype.toObject>;
+            error?: ReturnType<typeof CompleteTodoErrorResponse.prototype.toObject>;
+        }): CompleteTodoResponse {
+            const message = new CompleteTodoResponse({});
+            if (data.ok != null) {
+                message.ok = CompleteTodoOKResponse.fromObject(data.ok);
+            }
+            if (data.error != null) {
+                message.error = CompleteTodoErrorResponse.fromObject(data.error);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                ok?: ReturnType<typeof CompleteTodoOKResponse.prototype.toObject>;
+                error?: ReturnType<typeof CompleteTodoErrorResponse.prototype.toObject>;
+            } = {};
+            if (this.ok != null) {
+                data.ok = this.ok.toObject();
+            }
+            if (this.error != null) {
+                data.error = this.error.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_ok)
+                writer.writeMessage(1, this.ok, () => this.ok.serialize(writer));
+            if (this.has_error)
+                writer.writeMessage(2, this.error, () => this.error.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): CompleteTodoResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new CompleteTodoResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.ok, () => message.ok = CompleteTodoOKResponse.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.error, () => message.error = CompleteTodoErrorResponse.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): CompleteTodoResponse {
+            return CompleteTodoResponse.deserialize(bytes);
+        }
+    }
+    export class CompleteTodoErrorResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2, 3]];
+        constructor(data?: any[] | ({} & (({
+            unauthorizedError?: ErrorResponse;
+            systemUnavailableError?: never;
+            todoAlreadyExistsError?: never;
+        } | {
+            unauthorizedError?: never;
+            systemUnavailableError?: ErrorResponse;
+            todoAlreadyExistsError?: never;
+        } | {
+            unauthorizedError?: never;
+            systemUnavailableError?: never;
+            todoAlreadyExistsError?: ErrorResponse;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("unauthorizedError" in data && data.unauthorizedError != undefined) {
+                    this.unauthorizedError = data.unauthorizedError;
+                }
+                if ("systemUnavailableError" in data && data.systemUnavailableError != undefined) {
+                    this.systemUnavailableError = data.systemUnavailableError;
+                }
+                if ("todoAlreadyExistsError" in data && data.todoAlreadyExistsError != undefined) {
+                    this.todoAlreadyExistsError = data.todoAlreadyExistsError;
+                }
+            }
+        }
+        get unauthorizedError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 1) as ErrorResponse;
+        }
+        set unauthorizedError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_unauthorizedError() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get systemUnavailableError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 2) as ErrorResponse;
+        }
+        set systemUnavailableError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_systemUnavailableError() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get todoAlreadyExistsError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 3) as ErrorResponse;
+        }
+        set todoAlreadyExistsError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_todoAlreadyExistsError() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get error() {
+            const cases: {
+                [index: number]: "none" | "unauthorizedError" | "systemUnavailableError" | "todoAlreadyExistsError";
+            } = {
+                0: "none",
+                1: "unauthorizedError",
+                2: "systemUnavailableError",
+                3: "todoAlreadyExistsError"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2, 3])];
+        }
+        static fromObject(data: {
+            unauthorizedError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            systemUnavailableError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            todoAlreadyExistsError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+        }): CompleteTodoErrorResponse {
+            const message = new CompleteTodoErrorResponse({});
+            if (data.unauthorizedError != null) {
+                message.unauthorizedError = ErrorResponse.fromObject(data.unauthorizedError);
+            }
+            if (data.systemUnavailableError != null) {
+                message.systemUnavailableError = ErrorResponse.fromObject(data.systemUnavailableError);
+            }
+            if (data.todoAlreadyExistsError != null) {
+                message.todoAlreadyExistsError = ErrorResponse.fromObject(data.todoAlreadyExistsError);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                unauthorizedError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+                systemUnavailableError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+                todoAlreadyExistsError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            } = {};
+            if (this.unauthorizedError != null) {
+                data.unauthorizedError = this.unauthorizedError.toObject();
+            }
+            if (this.systemUnavailableError != null) {
+                data.systemUnavailableError = this.systemUnavailableError.toObject();
+            }
+            if (this.todoAlreadyExistsError != null) {
+                data.todoAlreadyExistsError = this.todoAlreadyExistsError.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_unauthorizedError)
+                writer.writeMessage(1, this.unauthorizedError, () => this.unauthorizedError.serialize(writer));
+            if (this.has_systemUnavailableError)
+                writer.writeMessage(2, this.systemUnavailableError, () => this.systemUnavailableError.serialize(writer));
+            if (this.has_todoAlreadyExistsError)
+                writer.writeMessage(3, this.todoAlreadyExistsError, () => this.todoAlreadyExistsError.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): CompleteTodoErrorResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new CompleteTodoErrorResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.unauthorizedError, () => message.unauthorizedError = ErrorResponse.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.systemUnavailableError, () => message.systemUnavailableError = ErrorResponse.deserialize(reader));
+                        break;
+                    case 3:
+                        reader.readMessage(message.todoAlreadyExistsError, () => message.todoAlreadyExistsError = ErrorResponse.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): CompleteTodoErrorResponse {
+            return CompleteTodoErrorResponse.deserialize(bytes);
+        }
+    }
+    export class CompleteTodoOKResponse extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {}) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") { }
         }
-        static fromObject(data: {}): CompleteTodoResponse {
-            const message = new CompleteTodoResponse({});
+        static fromObject(data: {}): CompleteTodoOKResponse {
+            const message = new CompleteTodoOKResponse({});
             return message;
         }
         toObject() {
@@ -229,8 +819,8 @@ export namespace todo {
             if (!w)
                 return writer.getResultBuffer();
         }
-        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): CompleteTodoResponse {
-            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new CompleteTodoResponse();
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): CompleteTodoOKResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new CompleteTodoOKResponse();
             while (reader.nextField()) {
                 if (reader.isEndGroup())
                     break;
@@ -243,8 +833,8 @@ export namespace todo {
         serializeBinary(): Uint8Array {
             return this.serialize();
         }
-        static deserializeBinary(bytes: Uint8Array): CompleteTodoResponse {
-            return CompleteTodoResponse.deserialize(bytes);
+        static deserializeBinary(bytes: Uint8Array): CompleteTodoOKResponse {
+            return CompleteTodoOKResponse.deserialize(bytes);
         }
     }
     export class GetAllMyTodosRequest extends pb_1.Message {
@@ -288,6 +878,224 @@ export namespace todo {
         }
     }
     export class GetAllMyTodosResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            ok?: GetAllMyTodosOKResponse;
+            error?: never;
+        } | {
+            ok?: never;
+            error?: GetAllMyTodosErrorResponse;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("ok" in data && data.ok != undefined) {
+                    this.ok = data.ok;
+                }
+                if ("error" in data && data.error != undefined) {
+                    this.error = data.error;
+                }
+            }
+        }
+        get ok() {
+            return pb_1.Message.getWrapperField(this, GetAllMyTodosOKResponse, 1) as GetAllMyTodosOKResponse;
+        }
+        set ok(value: GetAllMyTodosOKResponse) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_ok() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get error() {
+            return pb_1.Message.getWrapperField(this, GetAllMyTodosErrorResponse, 2) as GetAllMyTodosErrorResponse;
+        }
+        set error(value: GetAllMyTodosErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_error() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get result() {
+            const cases: {
+                [index: number]: "none" | "ok" | "error";
+            } = {
+                0: "none",
+                1: "ok",
+                2: "error"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
+        static fromObject(data: {
+            ok?: ReturnType<typeof GetAllMyTodosOKResponse.prototype.toObject>;
+            error?: ReturnType<typeof GetAllMyTodosErrorResponse.prototype.toObject>;
+        }): GetAllMyTodosResponse {
+            const message = new GetAllMyTodosResponse({});
+            if (data.ok != null) {
+                message.ok = GetAllMyTodosOKResponse.fromObject(data.ok);
+            }
+            if (data.error != null) {
+                message.error = GetAllMyTodosErrorResponse.fromObject(data.error);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                ok?: ReturnType<typeof GetAllMyTodosOKResponse.prototype.toObject>;
+                error?: ReturnType<typeof GetAllMyTodosErrorResponse.prototype.toObject>;
+            } = {};
+            if (this.ok != null) {
+                data.ok = this.ok.toObject();
+            }
+            if (this.error != null) {
+                data.error = this.error.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_ok)
+                writer.writeMessage(1, this.ok, () => this.ok.serialize(writer));
+            if (this.has_error)
+                writer.writeMessage(2, this.error, () => this.error.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetAllMyTodosResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetAllMyTodosResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.ok, () => message.ok = GetAllMyTodosOKResponse.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.error, () => message.error = GetAllMyTodosErrorResponse.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetAllMyTodosResponse {
+            return GetAllMyTodosResponse.deserialize(bytes);
+        }
+    }
+    export class GetAllMyTodosErrorResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            unauthorizedError?: ErrorResponse;
+            systemUnavailableError?: never;
+        } | {
+            unauthorizedError?: never;
+            systemUnavailableError?: ErrorResponse;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("unauthorizedError" in data && data.unauthorizedError != undefined) {
+                    this.unauthorizedError = data.unauthorizedError;
+                }
+                if ("systemUnavailableError" in data && data.systemUnavailableError != undefined) {
+                    this.systemUnavailableError = data.systemUnavailableError;
+                }
+            }
+        }
+        get unauthorizedError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 1) as ErrorResponse;
+        }
+        set unauthorizedError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_unauthorizedError() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get systemUnavailableError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 2) as ErrorResponse;
+        }
+        set systemUnavailableError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_systemUnavailableError() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get error() {
+            const cases: {
+                [index: number]: "none" | "unauthorizedError" | "systemUnavailableError";
+            } = {
+                0: "none",
+                1: "unauthorizedError",
+                2: "systemUnavailableError"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
+        static fromObject(data: {
+            unauthorizedError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            systemUnavailableError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+        }): GetAllMyTodosErrorResponse {
+            const message = new GetAllMyTodosErrorResponse({});
+            if (data.unauthorizedError != null) {
+                message.unauthorizedError = ErrorResponse.fromObject(data.unauthorizedError);
+            }
+            if (data.systemUnavailableError != null) {
+                message.systemUnavailableError = ErrorResponse.fromObject(data.systemUnavailableError);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                unauthorizedError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+                systemUnavailableError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            } = {};
+            if (this.unauthorizedError != null) {
+                data.unauthorizedError = this.unauthorizedError.toObject();
+            }
+            if (this.systemUnavailableError != null) {
+                data.systemUnavailableError = this.systemUnavailableError.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_unauthorizedError)
+                writer.writeMessage(1, this.unauthorizedError, () => this.unauthorizedError.serialize(writer));
+            if (this.has_systemUnavailableError)
+                writer.writeMessage(2, this.systemUnavailableError, () => this.systemUnavailableError.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetAllMyTodosErrorResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetAllMyTodosErrorResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.unauthorizedError, () => message.unauthorizedError = ErrorResponse.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.systemUnavailableError, () => message.systemUnavailableError = ErrorResponse.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetAllMyTodosErrorResponse {
+            return GetAllMyTodosErrorResponse.deserialize(bytes);
+        }
+    }
+    export class GetAllMyTodosOKResponse extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
             todos?: Todo[];
@@ -308,8 +1116,8 @@ export namespace todo {
         }
         static fromObject(data: {
             todos?: ReturnType<typeof Todo.prototype.toObject>[];
-        }): GetAllMyTodosResponse {
-            const message = new GetAllMyTodosResponse({});
+        }): GetAllMyTodosOKResponse {
+            const message = new GetAllMyTodosOKResponse({});
             if (data.todos != null) {
                 message.todos = data.todos.map(item => Todo.fromObject(item));
             }
@@ -333,8 +1141,8 @@ export namespace todo {
             if (!w)
                 return writer.getResultBuffer();
         }
-        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetAllMyTodosResponse {
-            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetAllMyTodosResponse();
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetAllMyTodosOKResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetAllMyTodosOKResponse();
             while (reader.nextField()) {
                 if (reader.isEndGroup())
                     break;
@@ -350,62 +1158,62 @@ export namespace todo {
         serializeBinary(): Uint8Array {
             return this.serialize();
         }
-        static deserializeBinary(bytes: Uint8Array): GetAllMyTodosResponse {
-            return GetAllMyTodosResponse.deserialize(bytes);
+        static deserializeBinary(bytes: Uint8Array): GetAllMyTodosOKResponse {
+            return GetAllMyTodosOKResponse.deserialize(bytes);
         }
     }
-    export class RegisterRequest extends pb_1.Message {
+    export class ModifyTodoRequest extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            email?: string;
-            password?: string;
+            id?: string;
+            title?: string;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("email" in data && data.email != undefined) {
-                    this.email = data.email;
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
                 }
-                if ("password" in data && data.password != undefined) {
-                    this.password = data.password;
+                if ("title" in data && data.title != undefined) {
+                    this.title = data.title;
                 }
             }
         }
-        get email() {
+        get id() {
             return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
         }
-        set email(value: string) {
+        set id(value: string) {
             pb_1.Message.setField(this, 1, value);
         }
-        get password() {
+        get title() {
             return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
         }
-        set password(value: string) {
+        set title(value: string) {
             pb_1.Message.setField(this, 2, value);
         }
         static fromObject(data: {
-            email?: string;
-            password?: string;
-        }): RegisterRequest {
-            const message = new RegisterRequest({});
-            if (data.email != null) {
-                message.email = data.email;
+            id?: string;
+            title?: string;
+        }): ModifyTodoRequest {
+            const message = new ModifyTodoRequest({});
+            if (data.id != null) {
+                message.id = data.id;
             }
-            if (data.password != null) {
-                message.password = data.password;
+            if (data.title != null) {
+                message.title = data.title;
             }
             return message;
         }
         toObject() {
             const data: {
-                email?: string;
-                password?: string;
+                id?: string;
+                title?: string;
             } = {};
-            if (this.email != null) {
-                data.email = this.email;
+            if (this.id != null) {
+                data.id = this.id;
             }
-            if (this.password != null) {
-                data.password = this.password;
+            if (this.title != null) {
+                data.title = this.title;
             }
             return data;
         }
@@ -413,24 +1221,24 @@ export namespace todo {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.email.length)
-                writer.writeString(1, this.email);
-            if (this.password.length)
-                writer.writeString(2, this.password);
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (this.title.length)
+                writer.writeString(2, this.title);
             if (!w)
                 return writer.getResultBuffer();
         }
-        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): RegisterRequest {
-            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new RegisterRequest();
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ModifyTodoRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ModifyTodoRequest();
             while (reader.nextField()) {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        message.email = reader.readString();
+                        message.id = reader.readString();
                         break;
                     case 2:
-                        message.password = reader.readString();
+                        message.title = reader.readString();
                         break;
                     default: reader.skipField();
                 }
@@ -440,19 +1248,303 @@ export namespace todo {
         serializeBinary(): Uint8Array {
             return this.serialize();
         }
-        static deserializeBinary(bytes: Uint8Array): RegisterRequest {
-            return RegisterRequest.deserialize(bytes);
+        static deserializeBinary(bytes: Uint8Array): ModifyTodoRequest {
+            return ModifyTodoRequest.deserialize(bytes);
         }
     }
-    export class RegisterResponse extends pb_1.Message {
+    export class ModifyTodoResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            ok?: ModifyTodoOKResponse;
+            error?: never;
+        } | {
+            ok?: never;
+            error?: ModifyTodoErrorResponse;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("ok" in data && data.ok != undefined) {
+                    this.ok = data.ok;
+                }
+                if ("error" in data && data.error != undefined) {
+                    this.error = data.error;
+                }
+            }
+        }
+        get ok() {
+            return pb_1.Message.getWrapperField(this, ModifyTodoOKResponse, 1) as ModifyTodoOKResponse;
+        }
+        set ok(value: ModifyTodoOKResponse) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_ok() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get error() {
+            return pb_1.Message.getWrapperField(this, ModifyTodoErrorResponse, 2) as ModifyTodoErrorResponse;
+        }
+        set error(value: ModifyTodoErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_error() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get result() {
+            const cases: {
+                [index: number]: "none" | "ok" | "error";
+            } = {
+                0: "none",
+                1: "ok",
+                2: "error"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
+        static fromObject(data: {
+            ok?: ReturnType<typeof ModifyTodoOKResponse.prototype.toObject>;
+            error?: ReturnType<typeof ModifyTodoErrorResponse.prototype.toObject>;
+        }): ModifyTodoResponse {
+            const message = new ModifyTodoResponse({});
+            if (data.ok != null) {
+                message.ok = ModifyTodoOKResponse.fromObject(data.ok);
+            }
+            if (data.error != null) {
+                message.error = ModifyTodoErrorResponse.fromObject(data.error);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                ok?: ReturnType<typeof ModifyTodoOKResponse.prototype.toObject>;
+                error?: ReturnType<typeof ModifyTodoErrorResponse.prototype.toObject>;
+            } = {};
+            if (this.ok != null) {
+                data.ok = this.ok.toObject();
+            }
+            if (this.error != null) {
+                data.error = this.error.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_ok)
+                writer.writeMessage(1, this.ok, () => this.ok.serialize(writer));
+            if (this.has_error)
+                writer.writeMessage(2, this.error, () => this.error.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ModifyTodoResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ModifyTodoResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.ok, () => message.ok = ModifyTodoOKResponse.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.error, () => message.error = ModifyTodoErrorResponse.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ModifyTodoResponse {
+            return ModifyTodoResponse.deserialize(bytes);
+        }
+    }
+    export class ModifyTodoErrorResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2, 3, 4]];
+        constructor(data?: any[] | ({} & (({
+            unauthorizedError?: ErrorResponse;
+            systemUnavailableError?: never;
+            todoDoesNotExistError?: never;
+            invalidTitleLengthError?: never;
+        } | {
+            unauthorizedError?: never;
+            systemUnavailableError?: ErrorResponse;
+            todoDoesNotExistError?: never;
+            invalidTitleLengthError?: never;
+        } | {
+            unauthorizedError?: never;
+            systemUnavailableError?: never;
+            todoDoesNotExistError?: ErrorResponse;
+            invalidTitleLengthError?: never;
+        } | {
+            unauthorizedError?: never;
+            systemUnavailableError?: never;
+            todoDoesNotExistError?: never;
+            invalidTitleLengthError?: ErrorResponse;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("unauthorizedError" in data && data.unauthorizedError != undefined) {
+                    this.unauthorizedError = data.unauthorizedError;
+                }
+                if ("systemUnavailableError" in data && data.systemUnavailableError != undefined) {
+                    this.systemUnavailableError = data.systemUnavailableError;
+                }
+                if ("todoDoesNotExistError" in data && data.todoDoesNotExistError != undefined) {
+                    this.todoDoesNotExistError = data.todoDoesNotExistError;
+                }
+                if ("invalidTitleLengthError" in data && data.invalidTitleLengthError != undefined) {
+                    this.invalidTitleLengthError = data.invalidTitleLengthError;
+                }
+            }
+        }
+        get unauthorizedError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 1) as ErrorResponse;
+        }
+        set unauthorizedError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_unauthorizedError() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get systemUnavailableError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 2) as ErrorResponse;
+        }
+        set systemUnavailableError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_systemUnavailableError() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get todoDoesNotExistError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 3) as ErrorResponse;
+        }
+        set todoDoesNotExistError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_todoDoesNotExistError() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get invalidTitleLengthError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 4) as ErrorResponse;
+        }
+        set invalidTitleLengthError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 4, this.#one_of_decls[0], value);
+        }
+        get has_invalidTitleLengthError() {
+            return pb_1.Message.getField(this, 4) != null;
+        }
+        get error() {
+            const cases: {
+                [index: number]: "none" | "unauthorizedError" | "systemUnavailableError" | "todoDoesNotExistError" | "invalidTitleLengthError";
+            } = {
+                0: "none",
+                1: "unauthorizedError",
+                2: "systemUnavailableError",
+                3: "todoDoesNotExistError",
+                4: "invalidTitleLengthError"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2, 3, 4])];
+        }
+        static fromObject(data: {
+            unauthorizedError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            systemUnavailableError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            todoDoesNotExistError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            invalidTitleLengthError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+        }): ModifyTodoErrorResponse {
+            const message = new ModifyTodoErrorResponse({});
+            if (data.unauthorizedError != null) {
+                message.unauthorizedError = ErrorResponse.fromObject(data.unauthorizedError);
+            }
+            if (data.systemUnavailableError != null) {
+                message.systemUnavailableError = ErrorResponse.fromObject(data.systemUnavailableError);
+            }
+            if (data.todoDoesNotExistError != null) {
+                message.todoDoesNotExistError = ErrorResponse.fromObject(data.todoDoesNotExistError);
+            }
+            if (data.invalidTitleLengthError != null) {
+                message.invalidTitleLengthError = ErrorResponse.fromObject(data.invalidTitleLengthError);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                unauthorizedError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+                systemUnavailableError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+                todoDoesNotExistError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+                invalidTitleLengthError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            } = {};
+            if (this.unauthorizedError != null) {
+                data.unauthorizedError = this.unauthorizedError.toObject();
+            }
+            if (this.systemUnavailableError != null) {
+                data.systemUnavailableError = this.systemUnavailableError.toObject();
+            }
+            if (this.todoDoesNotExistError != null) {
+                data.todoDoesNotExistError = this.todoDoesNotExistError.toObject();
+            }
+            if (this.invalidTitleLengthError != null) {
+                data.invalidTitleLengthError = this.invalidTitleLengthError.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_unauthorizedError)
+                writer.writeMessage(1, this.unauthorizedError, () => this.unauthorizedError.serialize(writer));
+            if (this.has_systemUnavailableError)
+                writer.writeMessage(2, this.systemUnavailableError, () => this.systemUnavailableError.serialize(writer));
+            if (this.has_todoDoesNotExistError)
+                writer.writeMessage(3, this.todoDoesNotExistError, () => this.todoDoesNotExistError.serialize(writer));
+            if (this.has_invalidTitleLengthError)
+                writer.writeMessage(4, this.invalidTitleLengthError, () => this.invalidTitleLengthError.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ModifyTodoErrorResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ModifyTodoErrorResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.unauthorizedError, () => message.unauthorizedError = ErrorResponse.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.systemUnavailableError, () => message.systemUnavailableError = ErrorResponse.deserialize(reader));
+                        break;
+                    case 3:
+                        reader.readMessage(message.todoDoesNotExistError, () => message.todoDoesNotExistError = ErrorResponse.deserialize(reader));
+                        break;
+                    case 4:
+                        reader.readMessage(message.invalidTitleLengthError, () => message.invalidTitleLengthError = ErrorResponse.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ModifyTodoErrorResponse {
+            return ModifyTodoErrorResponse.deserialize(bytes);
+        }
+    }
+    export class ModifyTodoOKResponse extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {}) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") { }
         }
-        static fromObject(data: {}): RegisterResponse {
-            const message = new RegisterResponse({});
+        static fromObject(data: {}): ModifyTodoOKResponse {
+            const message = new ModifyTodoOKResponse({});
             return message;
         }
         toObject() {
@@ -466,8 +1558,8 @@ export namespace todo {
             if (!w)
                 return writer.getResultBuffer();
         }
-        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): RegisterResponse {
-            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new RegisterResponse();
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ModifyTodoOKResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ModifyTodoOKResponse();
             while (reader.nextField()) {
                 if (reader.isEndGroup())
                     break;
@@ -480,8 +1572,365 @@ export namespace todo {
         serializeBinary(): Uint8Array {
             return this.serialize();
         }
-        static deserializeBinary(bytes: Uint8Array): RegisterResponse {
-            return RegisterResponse.deserialize(bytes);
+        static deserializeBinary(bytes: Uint8Array): ModifyTodoOKResponse {
+            return ModifyTodoOKResponse.deserialize(bytes);
+        }
+    }
+    export class UncompleteTodoRequest extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            id?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+            }
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            id?: string;
+        }): UncompleteTodoRequest {
+            const message = new UncompleteTodoRequest({});
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                id?: string;
+            } = {};
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.id.length)
+                writer.writeString(1, this.id);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): UncompleteTodoRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new UncompleteTodoRequest();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.id = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): UncompleteTodoRequest {
+            return UncompleteTodoRequest.deserialize(bytes);
+        }
+    }
+    export class UncompleteTodoResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            ok?: UncompleteTodoOKResponse;
+            error?: never;
+        } | {
+            ok?: never;
+            error?: UncompleteTodoErrorResponse;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("ok" in data && data.ok != undefined) {
+                    this.ok = data.ok;
+                }
+                if ("error" in data && data.error != undefined) {
+                    this.error = data.error;
+                }
+            }
+        }
+        get ok() {
+            return pb_1.Message.getWrapperField(this, UncompleteTodoOKResponse, 1) as UncompleteTodoOKResponse;
+        }
+        set ok(value: UncompleteTodoOKResponse) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_ok() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get error() {
+            return pb_1.Message.getWrapperField(this, UncompleteTodoErrorResponse, 2) as UncompleteTodoErrorResponse;
+        }
+        set error(value: UncompleteTodoErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_error() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get result() {
+            const cases: {
+                [index: number]: "none" | "ok" | "error";
+            } = {
+                0: "none",
+                1: "ok",
+                2: "error"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
+        static fromObject(data: {
+            ok?: ReturnType<typeof UncompleteTodoOKResponse.prototype.toObject>;
+            error?: ReturnType<typeof UncompleteTodoErrorResponse.prototype.toObject>;
+        }): UncompleteTodoResponse {
+            const message = new UncompleteTodoResponse({});
+            if (data.ok != null) {
+                message.ok = UncompleteTodoOKResponse.fromObject(data.ok);
+            }
+            if (data.error != null) {
+                message.error = UncompleteTodoErrorResponse.fromObject(data.error);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                ok?: ReturnType<typeof UncompleteTodoOKResponse.prototype.toObject>;
+                error?: ReturnType<typeof UncompleteTodoErrorResponse.prototype.toObject>;
+            } = {};
+            if (this.ok != null) {
+                data.ok = this.ok.toObject();
+            }
+            if (this.error != null) {
+                data.error = this.error.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_ok)
+                writer.writeMessage(1, this.ok, () => this.ok.serialize(writer));
+            if (this.has_error)
+                writer.writeMessage(2, this.error, () => this.error.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): UncompleteTodoResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new UncompleteTodoResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.ok, () => message.ok = UncompleteTodoOKResponse.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.error, () => message.error = UncompleteTodoErrorResponse.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): UncompleteTodoResponse {
+            return UncompleteTodoResponse.deserialize(bytes);
+        }
+    }
+    export class UncompleteTodoErrorResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2, 3]];
+        constructor(data?: any[] | ({} & (({
+            unauthorizedError?: ErrorResponse;
+            systemUnavailableError?: never;
+            todoAlreadyExistsError?: never;
+        } | {
+            unauthorizedError?: never;
+            systemUnavailableError?: ErrorResponse;
+            todoAlreadyExistsError?: never;
+        } | {
+            unauthorizedError?: never;
+            systemUnavailableError?: never;
+            todoAlreadyExistsError?: ErrorResponse;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("unauthorizedError" in data && data.unauthorizedError != undefined) {
+                    this.unauthorizedError = data.unauthorizedError;
+                }
+                if ("systemUnavailableError" in data && data.systemUnavailableError != undefined) {
+                    this.systemUnavailableError = data.systemUnavailableError;
+                }
+                if ("todoAlreadyExistsError" in data && data.todoAlreadyExistsError != undefined) {
+                    this.todoAlreadyExistsError = data.todoAlreadyExistsError;
+                }
+            }
+        }
+        get unauthorizedError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 1) as ErrorResponse;
+        }
+        set unauthorizedError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_unauthorizedError() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get systemUnavailableError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 2) as ErrorResponse;
+        }
+        set systemUnavailableError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_systemUnavailableError() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get todoAlreadyExistsError() {
+            return pb_1.Message.getWrapperField(this, ErrorResponse, 3) as ErrorResponse;
+        }
+        set todoAlreadyExistsError(value: ErrorResponse) {
+            pb_1.Message.setOneofWrapperField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_todoAlreadyExistsError() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get error() {
+            const cases: {
+                [index: number]: "none" | "unauthorizedError" | "systemUnavailableError" | "todoAlreadyExistsError";
+            } = {
+                0: "none",
+                1: "unauthorizedError",
+                2: "systemUnavailableError",
+                3: "todoAlreadyExistsError"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2, 3])];
+        }
+        static fromObject(data: {
+            unauthorizedError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            systemUnavailableError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            todoAlreadyExistsError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+        }): UncompleteTodoErrorResponse {
+            const message = new UncompleteTodoErrorResponse({});
+            if (data.unauthorizedError != null) {
+                message.unauthorizedError = ErrorResponse.fromObject(data.unauthorizedError);
+            }
+            if (data.systemUnavailableError != null) {
+                message.systemUnavailableError = ErrorResponse.fromObject(data.systemUnavailableError);
+            }
+            if (data.todoAlreadyExistsError != null) {
+                message.todoAlreadyExistsError = ErrorResponse.fromObject(data.todoAlreadyExistsError);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                unauthorizedError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+                systemUnavailableError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+                todoAlreadyExistsError?: ReturnType<typeof ErrorResponse.prototype.toObject>;
+            } = {};
+            if (this.unauthorizedError != null) {
+                data.unauthorizedError = this.unauthorizedError.toObject();
+            }
+            if (this.systemUnavailableError != null) {
+                data.systemUnavailableError = this.systemUnavailableError.toObject();
+            }
+            if (this.todoAlreadyExistsError != null) {
+                data.todoAlreadyExistsError = this.todoAlreadyExistsError.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_unauthorizedError)
+                writer.writeMessage(1, this.unauthorizedError, () => this.unauthorizedError.serialize(writer));
+            if (this.has_systemUnavailableError)
+                writer.writeMessage(2, this.systemUnavailableError, () => this.systemUnavailableError.serialize(writer));
+            if (this.has_todoAlreadyExistsError)
+                writer.writeMessage(3, this.todoAlreadyExistsError, () => this.todoAlreadyExistsError.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): UncompleteTodoErrorResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new UncompleteTodoErrorResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.unauthorizedError, () => message.unauthorizedError = ErrorResponse.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.systemUnavailableError, () => message.systemUnavailableError = ErrorResponse.deserialize(reader));
+                        break;
+                    case 3:
+                        reader.readMessage(message.todoAlreadyExistsError, () => message.todoAlreadyExistsError = ErrorResponse.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): UncompleteTodoErrorResponse {
+            return UncompleteTodoErrorResponse.deserialize(bytes);
+        }
+    }
+    export class UncompleteTodoOKResponse extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {}) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") { }
+        }
+        static fromObject(data: {}): UncompleteTodoOKResponse {
+            const message = new UncompleteTodoOKResponse({});
+            return message;
+        }
+        toObject() {
+            const data: {} = {};
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): UncompleteTodoOKResponse {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new UncompleteTodoOKResponse();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): UncompleteTodoOKResponse {
+            return UncompleteTodoOKResponse.deserialize(bytes);
         }
     }
     export class Todo extends pb_1.Message {
@@ -597,113 +2046,6 @@ export namespace todo {
             return Todo.deserialize(bytes);
         }
     }
-    export class UpdateEmailRequest extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            email?: string;
-        }) {
-            super();
-            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
-            if (!Array.isArray(data) && typeof data == "object") {
-                if ("email" in data && data.email != undefined) {
-                    this.email = data.email;
-                }
-            }
-        }
-        get email() {
-            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
-        }
-        set email(value: string) {
-            pb_1.Message.setField(this, 1, value);
-        }
-        static fromObject(data: {
-            email?: string;
-        }): UpdateEmailRequest {
-            const message = new UpdateEmailRequest({});
-            if (data.email != null) {
-                message.email = data.email;
-            }
-            return message;
-        }
-        toObject() {
-            const data: {
-                email?: string;
-            } = {};
-            if (this.email != null) {
-                data.email = this.email;
-            }
-            return data;
-        }
-        serialize(): Uint8Array;
-        serialize(w: pb_1.BinaryWriter): void;
-        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
-            const writer = w || new pb_1.BinaryWriter();
-            if (this.email.length)
-                writer.writeString(1, this.email);
-            if (!w)
-                return writer.getResultBuffer();
-        }
-        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): UpdateEmailRequest {
-            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new UpdateEmailRequest();
-            while (reader.nextField()) {
-                if (reader.isEndGroup())
-                    break;
-                switch (reader.getFieldNumber()) {
-                    case 1:
-                        message.email = reader.readString();
-                        break;
-                    default: reader.skipField();
-                }
-            }
-            return message;
-        }
-        serializeBinary(): Uint8Array {
-            return this.serialize();
-        }
-        static deserializeBinary(bytes: Uint8Array): UpdateEmailRequest {
-            return UpdateEmailRequest.deserialize(bytes);
-        }
-    }
-    export class UpdateEmailResponse extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {}) {
-            super();
-            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
-            if (!Array.isArray(data) && typeof data == "object") { }
-        }
-        static fromObject(data: {}): UpdateEmailResponse {
-            const message = new UpdateEmailResponse({});
-            return message;
-        }
-        toObject() {
-            const data: {} = {};
-            return data;
-        }
-        serialize(): Uint8Array;
-        serialize(w: pb_1.BinaryWriter): void;
-        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
-            const writer = w || new pb_1.BinaryWriter();
-            if (!w)
-                return writer.getResultBuffer();
-        }
-        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): UpdateEmailResponse {
-            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new UpdateEmailResponse();
-            while (reader.nextField()) {
-                if (reader.isEndGroup())
-                    break;
-                switch (reader.getFieldNumber()) {
-                    default: reader.skipField();
-                }
-            }
-            return message;
-        }
-        serializeBinary(): Uint8Array {
-            return this.serialize();
-        }
-        static deserializeBinary(bytes: Uint8Array): UpdateEmailResponse {
-            return UpdateEmailResponse.deserialize(bytes);
-        }
-    }
     interface GrpcUnaryServiceInterface<P, R> {
         (message: P, metadata: grpc_1.Metadata, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
         (message: P, metadata: grpc_1.Metadata, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
@@ -728,42 +2070,6 @@ export namespace todo {
         (message: P, metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): Promise<R>;
         (message: P, options?: grpc_1.CallOptions): Promise<R>;
     }
-    export abstract class UnimplementedAuthenticationService {
-        static definition = {
-            Register: {
-                path: "/todo.Authentication/Register",
-                requestStream: false,
-                responseStream: false,
-                requestSerialize: (message: RegisterRequest) => Buffer.from(message.serialize()),
-                requestDeserialize: (bytes: Buffer) => RegisterRequest.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: RegisterResponse) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => RegisterResponse.deserialize(new Uint8Array(bytes))
-            },
-            UpdateEmail: {
-                path: "/todo.Authentication/UpdateEmail",
-                requestStream: false,
-                responseStream: false,
-                requestSerialize: (message: UpdateEmailRequest) => Buffer.from(message.serialize()),
-                requestDeserialize: (bytes: Buffer) => UpdateEmailRequest.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: UpdateEmailResponse) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => UpdateEmailResponse.deserialize(new Uint8Array(bytes))
-            }
-        };
-        [method: string]: grpc_1.UntypedHandleCall;
-        abstract Register(call: grpc_1.ServerUnaryCall<RegisterRequest, RegisterResponse>, callback: grpc_1.sendUnaryData<RegisterResponse>): void;
-        abstract UpdateEmail(call: grpc_1.ServerUnaryCall<UpdateEmailRequest, UpdateEmailResponse>, callback: grpc_1.sendUnaryData<UpdateEmailResponse>): void;
-    }
-    export class AuthenticationClient extends grpc_1.makeGenericClientConstructor(UnimplementedAuthenticationService.definition, "Authentication", {}) {
-        constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
-            super(address, credentials, options);
-        }
-        Register: GrpcUnaryServiceInterface<RegisterRequest, RegisterResponse> = (message: RegisterRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<RegisterResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<RegisterResponse>, callback?: grpc_1.requestCallback<RegisterResponse>): grpc_1.ClientUnaryCall => {
-            return super.Register(message, metadata, options, callback);
-        };
-        UpdateEmail: GrpcUnaryServiceInterface<UpdateEmailRequest, UpdateEmailResponse> = (message: UpdateEmailRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<UpdateEmailResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<UpdateEmailResponse>, callback?: grpc_1.requestCallback<UpdateEmailResponse>): grpc_1.ClientUnaryCall => {
-            return super.UpdateEmail(message, metadata, options, callback);
-        };
-    }
     export abstract class UnimplementedTodoAppService {
         static definition = {
             AddTodo: {
@@ -784,6 +2090,24 @@ export namespace todo {
                 responseSerialize: (message: CompleteTodoResponse) => Buffer.from(message.serialize()),
                 responseDeserialize: (bytes: Buffer) => CompleteTodoResponse.deserialize(new Uint8Array(bytes))
             },
+            UncompleteTodo: {
+                path: "/todo.TodoApp/UncompleteTodo",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: UncompleteTodoRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => UncompleteTodoRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: UncompleteTodoResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => UncompleteTodoResponse.deserialize(new Uint8Array(bytes))
+            },
+            ModifyTitle: {
+                path: "/todo.TodoApp/ModifyTitle",
+                requestStream: false,
+                responseStream: false,
+                requestSerialize: (message: ModifyTodoRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => ModifyTodoRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: ModifyTodoResponse) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => ModifyTodoResponse.deserialize(new Uint8Array(bytes))
+            },
             GetAllMyTodos: {
                 path: "/todo.TodoApp/GetAllMyTodos",
                 requestStream: false,
@@ -797,6 +2121,8 @@ export namespace todo {
         [method: string]: grpc_1.UntypedHandleCall;
         abstract AddTodo(call: grpc_1.ServerUnaryCall<AddTodoRequest, AddTodoResponse>, callback: grpc_1.sendUnaryData<AddTodoResponse>): void;
         abstract CompleteTodo(call: grpc_1.ServerUnaryCall<CompleteTodoRequest, CompleteTodoResponse>, callback: grpc_1.sendUnaryData<CompleteTodoResponse>): void;
+        abstract UncompleteTodo(call: grpc_1.ServerUnaryCall<UncompleteTodoRequest, UncompleteTodoResponse>, callback: grpc_1.sendUnaryData<UncompleteTodoResponse>): void;
+        abstract ModifyTitle(call: grpc_1.ServerUnaryCall<ModifyTodoRequest, ModifyTodoResponse>, callback: grpc_1.sendUnaryData<ModifyTodoResponse>): void;
         abstract GetAllMyTodos(call: grpc_1.ServerUnaryCall<GetAllMyTodosRequest, GetAllMyTodosResponse>, callback: grpc_1.sendUnaryData<GetAllMyTodosResponse>): void;
     }
     export class TodoAppClient extends grpc_1.makeGenericClientConstructor(UnimplementedTodoAppService.definition, "TodoApp", {}) {
@@ -808,6 +2134,12 @@ export namespace todo {
         };
         CompleteTodo: GrpcUnaryServiceInterface<CompleteTodoRequest, CompleteTodoResponse> = (message: CompleteTodoRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<CompleteTodoResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<CompleteTodoResponse>, callback?: grpc_1.requestCallback<CompleteTodoResponse>): grpc_1.ClientUnaryCall => {
             return super.CompleteTodo(message, metadata, options, callback);
+        };
+        UncompleteTodo: GrpcUnaryServiceInterface<UncompleteTodoRequest, UncompleteTodoResponse> = (message: UncompleteTodoRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<UncompleteTodoResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<UncompleteTodoResponse>, callback?: grpc_1.requestCallback<UncompleteTodoResponse>): grpc_1.ClientUnaryCall => {
+            return super.UncompleteTodo(message, metadata, options, callback);
+        };
+        ModifyTitle: GrpcUnaryServiceInterface<ModifyTodoRequest, ModifyTodoResponse> = (message: ModifyTodoRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<ModifyTodoResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<ModifyTodoResponse>, callback?: grpc_1.requestCallback<ModifyTodoResponse>): grpc_1.ClientUnaryCall => {
+            return super.ModifyTitle(message, metadata, options, callback);
         };
         GetAllMyTodos: GrpcUnaryServiceInterface<GetAllMyTodosRequest, GetAllMyTodosResponse> = (message: GetAllMyTodosRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<GetAllMyTodosResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<GetAllMyTodosResponse>, callback?: grpc_1.requestCallback<GetAllMyTodosResponse>): grpc_1.ClientUnaryCall => {
             return super.GetAllMyTodos(message, metadata, options, callback);

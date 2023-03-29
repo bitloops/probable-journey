@@ -19,7 +19,7 @@ import { CorrelationIdMiddleware, TracingModule } from '@src/bitloops/tracing';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.development.env',
+      envFilePath: '.development.env', // TODO make dynamic
       load: [configuration, authConfiguration],
     }),
     AuthModule.forRootAsync({

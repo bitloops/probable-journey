@@ -1,9 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { NatsConnection, JSONCodec, headers, MsgHdrs } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import {
   ASYNC_LOCAL_STORAGE,
-  METADATA_HEADERS,
   ProvidersConstants,
 } from '../jetstream.constants';
 import { AsyncLocalStorage } from 'node:async_hooks';
@@ -13,6 +12,7 @@ const jsonCodec = JSONCodec();
 
 @Injectable()
 export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
+  private readonly logger = new Logger(NatsPubSubQueryBus.name);
   private nc: NatsConnection;
   private static queryPrefix = 'Query_';
   constructor(
@@ -26,7 +26,7 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
 
   async request(query: any): Promise<any> {
     const topic = NatsPubSubQueryBus.getTopicFromQueryInstance(query);
-    console.log('Requesting query:', topic);
+    this.logger.log('Requesting query:' + topic);
 
     const headers = this.generateHeaders(query);
 
@@ -37,10 +37,10 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
       });
 
       const data = jsonCodec.decode(response.data);
-      console.log('Response in query request:', data);
+      this.logger.log('Response in query request:' + data);
       return data;
     } catch (err) {
-      console.log('Error in query request:', err);
+      this.logger.error('Error in query request for:' + topic, err);
     }
   }
 
@@ -49,7 +49,7 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
     handler: Application.IQueryHandler<any, any>,
   ) {
     try {
-      console.log('Subscribing query to:', subject);
+      this.logger.log('Subscribing query to: ' + subject);
       // this.logger.log(`
       //   Subscribing ${subject}!
       // `);
@@ -65,7 +65,7 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
             return handler.execute(query);
           });
           if (reply.isOk && reply.isOk() && m.reply) {
-            return this.nc.publish(
+            this.nc.publish(
               m.reply,
               jsonCodec.encode({
                 isOk: true,
@@ -73,7 +73,7 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
               }),
             );
           } else if (reply.isFail && reply.isFail() && m.reply) {
-            return this.nc.publish(
+            this.nc.publish(
               m.reply,
               jsonCodec.encode({
                 isOk: false,
@@ -82,16 +82,15 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
             );
           }
 
-          console.log(
+          this.logger.log(
             `[${sub.getProcessed()}]: ${JSON.stringify(
               jsonCodec.decode(m.data),
             )}`,
           );
         }
-        console.log('subscription closed');
       })();
     } catch (err) {
-      console.log('Error in query subscription:', err);
+      this.logger.error('Error in query subscription:', err);
     }
   }
 

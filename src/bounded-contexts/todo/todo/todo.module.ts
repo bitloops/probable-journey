@@ -4,7 +4,7 @@ import { TodoReadRepository } from './repository/todo-read.repository';
 import { TodoModule as LibTodoModule } from 'src/lib/bounded-contexts/todo/todo/todo.module';
 import { TodoWriteRepoPortToken } from '@src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 import { TodoReadRepoPortToken } from '@src/lib/bounded-contexts/todo/todo/ports/TodoReadRepoPort';
-import { MongoModule } from '@bitloops/mongo/mongo.module';
+import { MongoModule } from '@bitloops/bl-boilerplate-infra-mongo';
 import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers';
 import { PubSubQueryHandlers } from '@src/lib/bounded-contexts/todo/todo/application/query-handlers';
 import {

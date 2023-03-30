@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   NatsConnection,
   JSONCodec,
@@ -24,6 +24,7 @@ const jsonCodec = JSONCodec();
 export class NatsStreamingCommandBus
   implements Infra.CommandBus.IStreamCommandBus
 {
+  private readonly logger = new Logger(NatsStreamingCommandBus.name);
   private nc: NatsConnection;
   private js: JetStreamClient;
   constructor(
@@ -42,9 +43,8 @@ export class NatsStreamingCommandBus
     const subject = `${stream}.${command.constructor.name}`;
     const headers = this.generateHeaders(command);
     const options: Partial<JetStreamPublishOptions> = { msgID: '', headers };
-    // console.log('serializedDomainEvent', domainEvent);
     const message = jsonCodec.encode(command);
-    console.log('publishing command to:', subject);
+    this.logger.log('publishing command to:' + subject);
 
     await this.js.publish(subject, message, options);
   }
@@ -67,15 +67,13 @@ export class NatsStreamingCommandBus
     await this.jetStreamProvider.createStreamIfNotExists(stream, subject);
 
     try {
-      console.log('---Subscribing command to:', { subject, durableName });
+      this.logger.log('Subscribing to command: ' + subject);
       // this.logger.log(`
       //   Subscribing ${subject}!
       // `);
       const sub = await this.js.subscribe(subject, opts);
       (async () => {
-        // console.log('Starting domain event loop...');
         for await (const m of sub) {
-          console.log('Received command::');
           const command = jsonCodec.decode(m.data) as any;
 
           const contextData = ContextPropagation.createStoreFromMessageHeaders(
@@ -92,18 +90,18 @@ export class NatsStreamingCommandBus
             m.nak();
           } else m.ack();
 
-          console.log(
+          this.logger.log(
             `[Command ${sub.getProcessed()}]: ${JSON.stringify(
               jsonCodec.decode(m.data),
             )}`,
           );
         }
-        console.log('Exiting command loop...');
+        this.logger.log('Exiting command loop...');
       })();
-      console.log('Subscribed to:', subject);
+      this.logger.log('Subscribed to:' + subject);
     } catch (err) {
-      console.log({ subject, durableName });
-      console.log('Error subscribing to streaming command:', err);
+      this.logger.log(JSON.stringify({ subject, durableName }));
+      this.logger.error('Error subscribing to streaming command:', err);
     }
   }
 

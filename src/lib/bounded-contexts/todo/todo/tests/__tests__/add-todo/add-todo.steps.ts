@@ -4,7 +4,6 @@ import { AddTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/add
 import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
 import { TodoAddedDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain/events/todo-added.event';
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
-import { ContextBuilder } from '../../builders/context.builder';
 import { TodoPropsBuilder } from '../../builders/todo-props.builder';
 import { MockAddTodoWriteRepo } from './add-todo-write-repo.mock';
 import {
@@ -12,14 +11,25 @@ import {
   ADD_TODO_REPO_ERROR_CASE,
   ADD_TODO_SUCCESS_CASE,
 } from './add-todo.mock';
+import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
+
+const mockGet = jest.fn();
+jest.mock('@bitloops/tracing', () => ({
+  Traceable: () => jest.fn(),
+
+  asyncLocalStorage: {
+    getStore: jest.fn(() => ({
+      get: mockGet,
+    })),
+  },
+}));
 
 describe('Add todo feature test', () => {
   it('Todo created successfully', async () => {
     const { userId, title, completed } = ADD_TODO_SUCCESS_CASE;
-
+    mockAsyncLocalStorageGet(userId);
     // given
     const mockTodoWriteRepo = new MockAddTodoWriteRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
     const addTodoCommand = new AddTodoCommand({ title });
 
     // when
@@ -37,7 +47,6 @@ describe('Add todo feature test', () => {
 
     expect(mockTodoWriteRepo.mockSaveMethod).toHaveBeenCalledWith(
       expect.any(TodoEntity),
-      ctx,
     );
     const todoAggregate = mockTodoWriteRepo.mockSaveMethod.mock.calls[0][0];
     expect(todoAggregate.props).toEqual(todoProps);
@@ -47,9 +56,11 @@ describe('Add todo feature test', () => {
 
   it('Todo failed to be created, invalid title', async () => {
     const { userId, title } = ADD_TODO_INVALID_TITLE_CASE;
+    mockAsyncLocalStorageGet(userId);
+    // mockAsyncLocalStorage(userId);
+
     // given
     const mockTodoWriteRepo = new MockAddTodoWriteRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
     const addTodoCommand = new AddTodoCommand({ title });
 
     // when
@@ -65,10 +76,10 @@ describe('Add todo feature test', () => {
 
   it('Todo failed to be created, repo error', async () => {
     const { userId, title } = ADD_TODO_REPO_ERROR_CASE;
+    mockAsyncLocalStorageGet(userId);
 
     // given
     const mockTodoWriteRepo = new MockAddTodoWriteRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
     const addTodoCommand = new AddTodoCommand({ title });
 
     // when

@@ -13,6 +13,7 @@ import { TodoEntity } from 'src/lib/bounded-contexts/todo/todo/domain/TodoEntity
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import { StreamingDomainEventBusToken } from '@src/lib/bounded-contexts/todo/todo/constants';
+import { asyncLocalStorage } from '@src/bitloops/tracing';
 
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'todo';
 const MONGO_DB_TODO_COLLECTION =
@@ -41,9 +42,8 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async getById(
     id: Domain.UUIDv4,
-    ctx: Application.TContext,
   ): Promise<Either<TodoEntity | null, Application.Repo.Errors.Unexpected>> {
-    const { jwt } = ctx;
+    const { jwt } = asyncLocalStorage.getStore()?.get('context');
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
@@ -74,7 +74,6 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async update(
     todo: TodoEntity,
-    ctx?: any,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     const { id, ...todoInfo } = todo.toPrimitives();
     await this.collection.updateOne(
@@ -91,7 +90,6 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async delete(
     id: Domain.UUIDv4,
-    ctx?: any,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     throw new Error('Method not implemented.');
   }
@@ -99,9 +97,8 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async save(
     todo: TodoEntity,
-    ctx: Application.TContext,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
-    const { jwt } = ctx;
+    const { jwt } = asyncLocalStorage.getStore()?.get('context');
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);

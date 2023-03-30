@@ -22,7 +22,6 @@ type UpdateUserEmailCommandHandlerResponse = Either<
 export class UpdateUserEmailCommandHandler
   implements Application.ICommandHandler<UpdateUserEmailCommand, void>
 {
-  private ctx: Application.TContext;
   constructor(
     @Inject(UserEmailReadRepoPortToken)
     private userEmailRepo: UserEmailReadRepoPort,
@@ -46,7 +45,6 @@ export class UpdateUserEmailCommandHandler
   async execute(
     command: UpdateUserEmailCommand,
   ): Promise<UpdateUserEmailCommandHandlerResponse> {
-    this.ctx = command.ctx;
     console.log('UpdateUserEmailCommandHandler');
     const requestUserId = new Domain.UUIDv4(command.userId);
     const userIdEmail = new UserReadModel(
@@ -54,7 +52,7 @@ export class UpdateUserEmailCommandHandler
       command.email,
     );
 
-    const updateOrError = await this.userEmailRepo.save(userIdEmail, this.ctx);
+    const updateOrError = await this.userEmailRepo.save(userIdEmail);
     if (updateOrError.isFail()) {
       return fail(updateOrError.value);
     }

@@ -1,4 +1,3 @@
-import { ContextBuilder } from '../../builders/context.builder';
 import { TodoCompletionsIncrementedDomainEvent } from '@src/lib/bounded-contexts/marketing/marketing/domain/events/todo-completions-incremented.event';
 import { MockUserEmailReadRepo } from './user-email-read-repo.mock';
 import { TodoCompletionsIncrementedHandler } from '../../../application/event-handlers/domain/todo-completions-incremented.handler';
@@ -7,16 +6,28 @@ import { UserEntityBuilder } from '../../builders/user-entity.builder';
 import { Domain } from '@src/bitloops/bl-boilerplate-core';
 import { SUCCESS_CASE } from './todo-completions-incremented.mock';
 import { NotificationTemplateReadModel } from '../../../domain/read-models/notification-template.read-model';
+import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
+
+const mockGet = jest.fn();
+jest.mock('@bitloops/tracing', () => ({
+  Traceable: () => jest.fn(),
+
+  asyncLocalStorage: {
+    getStore: jest.fn(() => ({
+      get: mockGet,
+    })),
+  },
+}));
 
 describe('Todo completions incremented feature test', () => {
   it('Todo completions incremented successfully', async () => {
     const { userId, completedTodos } = SUCCESS_CASE;
+    mockAsyncLocalStorageGet(userId);
 
     // given
     const mockNotificationTemplateReadRepo =
       new MockNotificationTemplateReadRepo();
     const mockUserEmailReadRepo = new MockUserEmailReadRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
     const user = new UserEntityBuilder()
       .withId(userId)
       .withCompletedTodos(completedTodos)
@@ -37,11 +48,10 @@ describe('Todo completions incremented feature test', () => {
     //then
     expect(mockUserEmailReadRepo.mockGetUserEmailMethod).toHaveBeenCalledWith(
       new Domain.UUIDv4(userId),
-      ctx,
     );
     expect(
       mockNotificationTemplateReadRepo.mockGetByTypeMethod,
-    ).toHaveBeenCalledWith(NotificationTemplateReadModel.firstTodo, ctx);
+    ).toHaveBeenCalledWith(NotificationTemplateReadModel.firstTodo);
 
     // const todoAggregate =
     //   mockCompleteTodoWriteRepo.mockSaveMethod.mock.calls[0][0];

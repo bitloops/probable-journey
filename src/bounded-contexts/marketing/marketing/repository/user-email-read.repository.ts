@@ -6,6 +6,7 @@ import { UserEmailReadRepoPort } from '@src/lib/bounded-contexts/marketing/marke
 import { UserReadModel } from '@src/lib/bounded-contexts/marketing/marketing/domain/read-models/user-email.read-model';
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
+import { asyncLocalStorage } from '@src/bitloops/tracing';
 
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'marketing';
 const MONGO_DB_TODO_COLLECTION =
@@ -30,9 +31,8 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async getUserEmail(
     userid: Domain.UUIDv4,
-    ctx?: any,
   ): Promise<Either<UserReadModel | null, Application.Repo.Errors.Unexpected>> {
-    const { jwt } = ctx;
+    const { jwt } = asyncLocalStorage.getStore()?.get('context');
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
@@ -76,9 +76,8 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async save(
     userEmailReadModel: UserReadModel,
-    ctx?: any,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
-    const { jwt } = ctx;
+    const { jwt } = asyncLocalStorage.getStore()?.get('context');
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);

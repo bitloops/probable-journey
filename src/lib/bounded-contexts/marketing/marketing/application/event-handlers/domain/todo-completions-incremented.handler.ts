@@ -40,7 +40,7 @@ export class TodoCompletionsIncrementedHandler
   public async handle(
     event: TodoCompletionsIncrementedDomainEvent,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
-    const { data: user, metadata } = event;
+    const { data: user } = event;
 
     const marketingNotificationService = new MarketingNotificationService(
       this.notificationTemplateRepo,
@@ -61,11 +61,13 @@ export class TodoCompletionsIncrementedHandler
     const userid = user.id;
     const userEmail = await this.emailRepoPort.getUserEmail(userid);
     if (userEmail.isFail()) {
+      //return fail
       // return userEmail.value;
       return ok(); // TODO change this to fail
     }
 
     if (!userEmail.value) {
+      //ApplicationErrors.UserEmailNotFoundError(user.id.toString());
       // this.integrationEventBus().publish(new EmailNotFoundErrorMessage(new ApplicationErrors.EmailNotFoundError(userid.toString())));
       // TODO Error bus
       return ok(); // TODO change this to fail

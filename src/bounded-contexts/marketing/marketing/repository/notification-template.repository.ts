@@ -6,6 +6,7 @@ import { NotificationTemplateReadModel } from '@src/lib/bounded-contexts/marketi
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import { ConfigService } from '@nestjs/config';
 import { Application, Either, ok } from '@src/bitloops/bl-boilerplate-core';
+import { asyncLocalStorage } from '@src/bitloops/tracing';
 
 @Injectable()
 export class NotificationTemplateReadRepository
@@ -29,14 +30,13 @@ export class NotificationTemplateReadRepository
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async getByType(
     type: string,
-    ctx?: any,
   ): Promise<
     Either<
       NotificationTemplateReadModel | null,
       Application.Repo.Errors.Unexpected
     >
   > {
-    const { jwt } = ctx;
+    const { jwt } = asyncLocalStorage.getStore()?.get('context');
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
@@ -78,14 +78,13 @@ export class NotificationTemplateReadRepository
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async getById(
     id: string,
-    ctx?: any,
   ): Promise<
     Either<
       NotificationTemplateReadModel | null,
       Application.Repo.Errors.Unexpected
     >
   > {
-    const { jwt } = ctx;
+    const { jwt } = asyncLocalStorage.getStore()?.get('context');
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);

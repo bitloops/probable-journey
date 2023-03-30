@@ -22,7 +22,6 @@ type CreateUserCommandHandlerResponse = Either<
 export class CreateUserCommandHandler
   implements Application.ICommandHandler<CreateUserCommand, void>
 {
-  private ctx: Application.TContext;
   constructor(
     @Inject(UserEmailReadRepoPortToken)
     private userEmailRepo: UserEmailReadRepoPort,
@@ -46,7 +45,6 @@ export class CreateUserCommandHandler
   async execute(
     command: CreateUserCommand,
   ): Promise<CreateUserCommandHandlerResponse> {
-    this.ctx = command.ctx;
     console.log('CreateUserCommandHandler');
     const requestUserId = new Domain.UUIDv4(command.userId);
     const userIdEmail = new UserReadModel(
@@ -54,10 +52,7 @@ export class CreateUserCommandHandler
       command.email,
     );
 
-    const createOrError = await this.userEmailRepo.create(
-      userIdEmail,
-      this.ctx,
-    );
+    const createOrError = await this.userEmailRepo.create(userIdEmail);
     if (createOrError.isFail()) {
       return fail(createOrError.value);
     }

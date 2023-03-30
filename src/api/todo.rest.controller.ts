@@ -69,9 +69,7 @@ export class TodoController {
   @Get()
   async findAll(@Request() req): Promise<TodoReadModel[]> {
     // const jwt = jwtwebtoken.sign({ userId: 'vasilis' }, this.JWT_SECRET);
-    const results = await this.queryBus.request(
-      new GetTodosQuery({ jwt: this.getJWTToken(req) }),
-    );
+    const results = await this.queryBus.request(new GetTodosQuery());
     if (results.isOk) return results.data;
     else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }

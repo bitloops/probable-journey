@@ -6,6 +6,7 @@ import { UserEntity } from '@src/lib/bounded-contexts/marketing/marketing/domain
 import { UserWriteRepoPort } from '@src/lib/bounded-contexts/marketing/marketing/ports/user-write.repo-port';
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
+import { asyncLocalStorage } from '@src/bitloops/tracing';
 
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'marketing';
 const MONGO_DB_TODO_COLLECTION =
@@ -45,9 +46,8 @@ export class UserWriteRepository implements UserWriteRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async getById(
     id: Domain.UUIDv4,
-    ctx?: any,
   ): Promise<Either<UserEntity | null, Application.Repo.Errors.Unexpected>> {
-    const { jwt } = ctx;
+    const { jwt } = asyncLocalStorage.getStore()?.get('context');
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
@@ -78,9 +78,8 @@ export class UserWriteRepository implements UserWriteRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async save(
     user: UserEntity,
-    ctx?: any,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
-    const { jwt } = ctx;
+    const { jwt } = asyncLocalStorage.getStore()?.get('context');
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);

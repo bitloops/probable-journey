@@ -10,7 +10,6 @@ type SendEmailCommandHandlerResponse = Either<void, never>;
 export class SendEmailCommandHandler
   implements Application.ICommandHandler<SendEmailCommand, void>
 {
-  private ctx?: Application.TContext;
   constructor(
     @Inject(EmailServicePortToken)
     private readonly emailService: EmailServicePort,
@@ -34,16 +33,12 @@ export class SendEmailCommandHandler
   async execute(
     command: SendEmailCommand,
   ): Promise<SendEmailCommandHandlerResponse> {
-    this.ctx = command.ctx;
     console.log('SendEmailHandler');
-    await this.emailService.send(
-      {
-        origin: command.origin,
-        destination: command.destination,
-        content: command.content,
-      },
-      this.ctx,
-    );
+    await this.emailService.send({
+      origin: command.origin,
+      destination: command.destination,
+      content: command.content,
+    });
     return ok();
   }
 }

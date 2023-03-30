@@ -1,4 +1,3 @@
-import { ContextBuilder } from '../../builders/context.builder';
 import {
   CREATE_USER_REPO_ERROR_CASE,
   CREATE_USER_SUCCESS_CASE,
@@ -8,13 +7,25 @@ import { MockCreateUserReadRepo } from './create-user-read-repo.mock';
 import { CreateUserCommandHandler } from '@src/lib/bounded-contexts/marketing/marketing/application/command-handlers/create-user.command-handler';
 import { UserEmailReadModelBuilder } from '../../builders/user-read-model.builder';
 import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
+
+const mockGet = jest.fn();
+jest.mock('@bitloops/tracing', () => ({
+  Traceable: () => jest.fn(),
+
+  asyncLocalStorage: {
+    getStore: jest.fn(() => ({
+      get: mockGet,
+    })),
+  },
+}));
 
 describe('Create user feature test', () => {
   it('Created user successfully,', async () => {
     const { email, userId } = CREATE_USER_SUCCESS_CASE;
+    mockAsyncLocalStorageGet(userId);
     // given
     const mockCreateUserReadRepo = new MockCreateUserReadRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
     const createUserCommand = new CreateUserCommand({ email, userId });
 
     // when
@@ -29,10 +40,10 @@ describe('Create user feature test', () => {
       .withEmail(email)
       .build();
 
-    expect(mockCreateUserReadRepo.mockCreateMethod).toHaveBeenCalledWith(
-      { userId, email },
-      ctx,
-    );
+    expect(mockCreateUserReadRepo.mockCreateMethod).toHaveBeenCalledWith({
+      userId,
+      email,
+    });
     const userAggregate =
       mockCreateUserReadRepo.mockCreateMethod.mock.calls[0][0];
     expect(userAggregate).toEqual(userIdEmail);
@@ -40,9 +51,9 @@ describe('Create user feature test', () => {
   });
   it('Created user failed, repo error', async () => {
     const { email, userId } = CREATE_USER_REPO_ERROR_CASE;
+    mockAsyncLocalStorageGet(userId);
     // given
     const mockCreateUserReadRepo = new MockCreateUserReadRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
     const createUserCommand = new CreateUserCommand({ email, userId });
 
     // when
@@ -59,7 +70,6 @@ describe('Create user feature test', () => {
 
     expect(mockCreateUserReadRepo.mockCreateMethod).toHaveBeenCalledWith(
       userIdEmail,
-      ctx,
     );
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });

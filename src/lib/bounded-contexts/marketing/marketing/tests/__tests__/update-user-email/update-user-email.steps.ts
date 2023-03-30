@@ -1,4 +1,3 @@
-import { ContextBuilder } from '../../builders/context.builder';
 import {
   UPDATE_USER_REPO_ERROR_CASE,
   UPDATE_USER_SUCCESS_CASE,
@@ -8,17 +7,29 @@ import { Application } from '@src/bitloops/bl-boilerplate-core';
 import { MockUpdateUserReadRepo } from './update-user-email-read-repo.mock.ts';
 import { UpdateUserEmailCommand } from '@src/lib/bounded-contexts/marketing/marketing/commands/update-user-email.command';
 import { UpdateUserEmailCommandHandler } from '@src/lib/bounded-contexts/marketing/marketing/application/command-handlers/update-user-email.command-handler';
+import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
+
+const mockGet = jest.fn();
+jest.mock('@bitloops/tracing', () => ({
+  Traceable: () => jest.fn(),
+
+  asyncLocalStorage: {
+    getStore: jest.fn(() => ({
+      get: mockGet,
+    })),
+  },
+}));
 
 describe('Create user feature test', () => {
   it('Created user successfully,', async () => {
     const { email, userId } = UPDATE_USER_SUCCESS_CASE;
+    mockAsyncLocalStorageGet(userId);
     // given
     const mockUpdateUserReadRepo = new MockUpdateUserReadRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
-    const updateUserEmailCommand = new UpdateUserEmailCommand(
-      { email, userId },
-      ctx,
-    );
+    const updateUserEmailCommand = new UpdateUserEmailCommand({
+      email,
+      userId,
+    });
 
     // when
     const updateUserEmailHandler = new UpdateUserEmailCommandHandler(
@@ -32,10 +43,10 @@ describe('Create user feature test', () => {
       .withEmail(email)
       .build();
 
-    expect(mockUpdateUserReadRepo.mockSaveMethod).toHaveBeenCalledWith(
-      { userId, email },
-      ctx,
-    );
+    expect(mockUpdateUserReadRepo.mockSaveMethod).toHaveBeenCalledWith({
+      userId,
+      email,
+    });
     const userAggregate =
       mockUpdateUserReadRepo.mockSaveMethod.mock.calls[0][0];
     expect(userAggregate).toEqual(userIdEmail);
@@ -45,11 +56,11 @@ describe('Create user feature test', () => {
     const { email, userId } = UPDATE_USER_REPO_ERROR_CASE;
     // given
     const mockUpdateUserReadRepo = new MockUpdateUserReadRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
-    const updateUserEmailCommand = new UpdateUserEmailCommand(
-      { email, userId },
-      ctx,
-    );
+    mockAsyncLocalStorageGet(userId);
+    const updateUserEmailCommand = new UpdateUserEmailCommand({
+      email,
+      userId,
+    });
 
     // when
     const updateUserEmailHandler = new UpdateUserEmailCommandHandler(
@@ -65,7 +76,6 @@ describe('Create user feature test', () => {
 
     expect(mockUpdateUserReadRepo.mockSaveMethod).toHaveBeenCalledWith(
       userIdEmail,
-      ctx,
     );
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });

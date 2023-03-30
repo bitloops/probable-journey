@@ -16,7 +16,7 @@ import {
   UNCOMPLETE_TODO_SUCCESS_CASE,
 } from './uncomplete-todo.mock';
 
-export class MockCompleteTodoWriteRepo {
+export class MockUncompleteTodoWriteRepo {
   public readonly mockSaveMethod: jest.Mock;
   public readonly mockGetByIdMethod: jest.Mock;
   private mockTodoWriteRepo: TodoWriteRepoPort;

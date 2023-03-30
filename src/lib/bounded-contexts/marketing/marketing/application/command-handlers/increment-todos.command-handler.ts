@@ -28,7 +28,6 @@ export class IncrementTodosCommandHandler
       Promise<IncrementDepositsCommandHandlerResponse>
     >
 {
-  private ctx?: Application.TContext;
   constructor(
     @Inject(UserWriteRepoPortToken) private userRepo: UserWriteRepoPort,
   ) {}
@@ -51,11 +50,10 @@ export class IncrementTodosCommandHandler
   async execute(
     command: IncrementTodosCommand,
   ): Promise<IncrementDepositsCommandHandlerResponse> {
-    this.ctx = command.ctx;
     console.log('IncrementTodosCommandHandler');
 
     const requestUserId = new Domain.UUIDv4(command.id);
-    const user = await this.userRepo.getById(requestUserId, this.ctx);
+    const user = await this.userRepo.getById(requestUserId);
     if (user.isFail()) {
       return fail(user.value);
     }
@@ -76,7 +74,7 @@ export class IncrementTodosCommandHandler
       }
       const newUser = newUserOrError.value;
       newUser.incrementCompletedTodos();
-      const saveResult = await this.userRepo.save(newUser, this.ctx);
+      const saveResult = await this.userRepo.save(newUser);
       if (saveResult.isFail()) {
         return fail(saveResult.value);
       }
@@ -86,7 +84,7 @@ export class IncrementTodosCommandHandler
       if (incrementedOrError.isFail()) {
         return fail(incrementedOrError.value);
       }
-      const saveResult = await this.userRepo.save(user.value, this.ctx);
+      const saveResult = await this.userRepo.save(user.value);
       if (saveResult.isFail()) {
         return fail(saveResult.value);
       }

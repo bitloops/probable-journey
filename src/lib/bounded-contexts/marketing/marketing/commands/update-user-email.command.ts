@@ -16,10 +16,7 @@ export class UpdateUserEmailCommand extends Application.Command {
   public email: string;
   public userId: string;
 
-  constructor(
-    props: TUpdateUserEmailCommand,
-    public readonly ctx: Application.TContext,
-  ) {
+  constructor(props: TUpdateUserEmailCommand) {
     super();
     this.email = props.email;
     this.userId = props.userId;

@@ -14,6 +14,7 @@ import { EmailVO } from '@src/lib/bounded-contexts/iam/authentication/domain/Ema
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import { StreamingDomainEventBusToken } from '@src/lib/bounded-contexts/iam/authentication/constants';
+import { asyncLocalStorage } from '@src/bitloops/tracing';
 
 @Injectable()
 export class UserWritePostgresRepository implements UserWriteRepoPort {
@@ -55,9 +56,8 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async getById(
     id: Domain.UUIDv4,
-    ctx: Application.TContext,
   ): Promise<Either<UserEntity | null, Application.Repo.Errors.Unexpected>> {
-    const { jwt } = ctx;
+    const { jwt } = asyncLocalStorage.getStore()?.get('context');
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);

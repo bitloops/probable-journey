@@ -43,6 +43,8 @@ export function Traceable(input: TraceableDecoratorInput) {
         asyncLocalStorageServiceKey
       ] as AsyncLocalStorageService;
 
+      console.log('asyncLocalStorage', asyncLocalStorage);
+
       const correlationId = asyncLocalStorage.getCorrelationId();
       console.table({
         correlationId,

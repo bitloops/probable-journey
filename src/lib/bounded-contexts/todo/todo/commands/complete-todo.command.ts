@@ -15,10 +15,7 @@ export class CompleteTodoCommand extends Application.Command {
   };
   public id: string;
 
-  constructor(
-    props: TCompleteTodoCommand,
-    public readonly ctx: Application.TContext,
-  ) {
+  constructor(props: TCompleteTodoCommand) {
     super();
     this.id = props.todoId;
   }

@@ -12,7 +12,7 @@ export class LogInCommand extends Application.Command {
     context: asyncLocalStorage.getStore()?.get('context'),
     correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
   };
-  constructor(loginCommand: LogInCommand) {
+  constructor(loginCommand: TLogInCommand) {
     super();
     this.userId = loginCommand.userId;
   }

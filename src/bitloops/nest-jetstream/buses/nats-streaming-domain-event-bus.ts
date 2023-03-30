@@ -56,7 +56,12 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
       const message = jsonCodec.encode(domainEvent);
       this.logger.log('publishing domain event to:' + subject);
 
-      await this.js.publish(subject, message, options);
+      try {
+        await this.js.publish(subject, message, options);
+      } catch (err) {
+        // NatsError: 503
+        this.logger.error('Error publishing domain event to:' + subject, err);
+      }
 
       // the jetstream returns an acknowledgement with the
       // stream that captured the message, it's assigned sequence

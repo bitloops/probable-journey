@@ -46,8 +46,9 @@ export class NatsPubSubCommandBus
         timeout: 10000,
       });
       return jsonCodec.decode(response.data);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error in command request for:' + topic, error);
+      return { isOk: false, data: error.message };
     }
   }
 

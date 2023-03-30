@@ -51,12 +51,12 @@ describe('Increment completed todos feature test', () => {
     expect(mockIncrementTodosWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
       new Domain.UUIDv4(id),
     );
-    expect(mockIncrementTodosWriteRepo.mockSaveMethod).toHaveBeenCalledWith(
+    expect(mockIncrementTodosWriteRepo.mockUpdateMethod).toHaveBeenCalledWith(
       expect.any(UserEntity),
     );
 
     const todoAggregate =
-      mockIncrementTodosWriteRepo.mockSaveMethod.mock.calls[0][0];
+      mockIncrementTodosWriteRepo.mockUpdateMethod.mock.calls[0][0];
     expect(todoAggregate.props).toEqual(userProps);
     expect(todoAggregate.domainEvents[0]).toBeInstanceOf(
       TodoCompletionsIncrementedDomainEvent,
@@ -160,7 +160,7 @@ describe('Increment completed todos feature test', () => {
     expect(mockIncrementTodosWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
       new Domain.UUIDv4(id),
     );
-    expect(mockIncrementTodosWriteRepo.mockSaveMethod).toHaveBeenCalledWith(
+    expect(mockIncrementTodosWriteRepo.mockUpdateMethod).toHaveBeenCalledWith(
       expect.any(UserEntity),
     );
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);

@@ -17,17 +17,17 @@ import {
 } from './uncomplete-todo.mock';
 
 export class MockUncompleteTodoWriteRepo {
-  public readonly mockSaveMethod: jest.Mock;
+  public readonly mockUpdateMethod: jest.Mock;
   public readonly mockGetByIdMethod: jest.Mock;
   private mockTodoWriteRepo: TodoWriteRepoPort;
 
   constructor() {
-    this.mockSaveMethod = this.getMockSaveMethod();
+    this.mockUpdateMethod = this.getMockUpdateMethod();
     this.mockGetByIdMethod = this.getMockGetByIdMethod();
     this.mockTodoWriteRepo = {
-      save: this.mockSaveMethod,
+      save: jest.fn(),
       getById: this.mockGetByIdMethod,
-      update: jest.fn(),
+      update: this.mockUpdateMethod,
       delete: jest.fn(),
     };
   }
@@ -36,7 +36,7 @@ export class MockUncompleteTodoWriteRepo {
     return this.mockTodoWriteRepo;
   }
 
-  private getMockSaveMethod(): jest.Mock {
+  private getMockUpdateMethod(): jest.Mock {
     return jest.fn(
       (
         todo: TodoEntity,

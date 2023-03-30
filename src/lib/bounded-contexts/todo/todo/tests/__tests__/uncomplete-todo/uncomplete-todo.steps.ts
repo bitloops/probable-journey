@@ -55,12 +55,12 @@ describe('Uncomplete todo feature test', () => {
     expect(mockUncompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith({
       value: id,
     });
-    expect(mockUncompleteTodoWriteRepo.mockSaveMethod).toHaveBeenCalledWith(
+    expect(mockUncompleteTodoWriteRepo.mockUpdateMethod).toHaveBeenCalledWith(
       expect.any(TodoEntity),
     );
 
     const todoAggregate =
-      mockUncompleteTodoWriteRepo.mockSaveMethod.mock.calls[0][0];
+      mockUncompleteTodoWriteRepo.mockUpdateMethod.mock.calls[0][0];
     expect(todoAggregate.props).toEqual(todoProps);
     expect(todoAggregate.domainEvents[0]).toBeInstanceOf(
       TodoUncompletedDomainEvent,
@@ -153,7 +153,7 @@ describe('Uncomplete todo feature test', () => {
     expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith({
       value: id,
     });
-    expect(mockCompleteTodoWriteRepo.mockSaveMethod).toHaveBeenCalledWith(
+    expect(mockCompleteTodoWriteRepo.mockUpdateMethod).toHaveBeenCalledWith(
       expect.any(TodoEntity),
     );
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);

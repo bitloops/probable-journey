@@ -17,17 +17,19 @@ import {
 import { DomainErrors } from '@src/lib/bounded-contexts/marketing/marketing/domain/errors';
 
 export class MockIncrementCompletedTodosWriteRepo {
-  public readonly mockSaveMethod: jest.Mock;
+  public readonly mockUpdateMethod: jest.Mock;
   public readonly mockGetByIdMethod: jest.Mock;
+  public readonly mockSaveMethod: jest.Mock;
   private mockUserWriteRepo: UserWriteRepoPort;
 
   constructor() {
+    this.mockUpdateMethod = this.getMockUpdateMethod();
     this.mockSaveMethod = this.getMockSaveMethod();
     this.mockGetByIdMethod = this.getMockGetByIdMethod();
     this.mockUserWriteRepo = {
       save: this.mockSaveMethod,
       getById: this.mockGetByIdMethod,
-      update: jest.fn(),
+      update: this.mockUpdateMethod,
       delete: jest.fn(),
     };
   }
@@ -36,7 +38,7 @@ export class MockIncrementCompletedTodosWriteRepo {
     return this.mockUserWriteRepo;
   }
 
-  private getMockSaveMethod(): jest.Mock {
+  private getMockUpdateMethod(): jest.Mock {
     return jest.fn(
       (
         user: UserEntity,
@@ -50,6 +52,16 @@ export class MockIncrementCompletedTodosWriteRepo {
             fail(new Application.Repo.Errors.Unexpected('Unexpected error')),
           );
         }
+        return Promise.resolve(ok());
+      },
+    );
+  }
+
+  private getMockSaveMethod(): jest.Mock {
+    return jest.fn(
+      (
+        user: UserEntity,
+      ): Promise<Either<void, Application.Repo.Errors.Unexpected>> => {
         return Promise.resolve(ok());
       },
     );

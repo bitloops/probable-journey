@@ -48,10 +48,10 @@ export class TodoGrpcController {
 
   @GrpcMethod('TodoApp', 'AddTodo')
   async addTodo(
-    @Payload() data: todo.AddTodoRequest,
+    data: todo.AddTodoRequest,
     metadata: Metadata, // @TODO figure out how to get the metadata https://github.com/nestjs/nest/issues/4851
     call: ServerUnaryCall<todo.AddTodoRequest, todo.AddTodoResponse>, // @TODO figure out how to get the call
-    @GetAuthData() authData: any,
+    authData: any,
   ): Promise<todo.AddTodoResponse> {
     // console.log('metadata', metadata);
     // console.log('call', call);

@@ -6,10 +6,17 @@ import {
   JetStreamPublishOptions,
   consumerOpts,
   createInbox,
+  headers,
+  MsgHdrs,
 } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from '../nestjs-jetstream.class';
-import { ProvidersConstants } from '../jetstream.constants';
+import {
+  ASYNC_LOCAL_STORAGE,
+  METADATA_HEADERS,
+  ProvidersConstants,
+} from '../jetstream.constants';
+import { ContextPropagation } from './utils/context-propagation';
 
 const jsonCodec = JSONCodec();
 
@@ -22,6 +29,8 @@ export class NatsStreamingCommandBus
   constructor(
     @Inject(ProvidersConstants.JETSTREAM_PROVIDER)
     private readonly jetStreamProvider: NestjsJetstream,
+    @Inject(ASYNC_LOCAL_STORAGE)
+    private readonly asyncLocalStorage: any,
   ) {
     this.nc = this.jetStreamProvider.getConnection();
     this.js = this.nc.jetstream();
@@ -31,7 +40,8 @@ export class NatsStreamingCommandBus
     const boundedContext = command.metadata.boundedContextId;
     const stream = NatsStreamingCommandBus.getStreamName(boundedContext);
     const subject = `${stream}.${command.constructor.name}`;
-    const options: Partial<JetStreamPublishOptions> = { msgID: '' };
+    const headers = this.generateHeaders(command);
+    const options: Partial<JetStreamPublishOptions> = { msgID: '', headers };
     // console.log('serializedDomainEvent', domainEvent);
     const message = jsonCodec.encode(command);
     console.log('publishing command to:', subject);
@@ -68,7 +78,16 @@ export class NatsStreamingCommandBus
           console.log('Received command::');
           const command = jsonCodec.decode(m.data) as any;
 
-          const reply = await handler.execute(command);
+          const contextData = ContextPropagation.createStoreFromMessageHeaders(
+            m.headers,
+          );
+
+          const reply = await this.asyncLocalStorage.run(
+            contextData,
+            async () => {
+              return handler.execute(command);
+            },
+          );
           if (reply.isFail && reply.isFail() && reply.value.nakable) {
             m.nak();
           } else m.ack();
@@ -93,6 +112,21 @@ export class NatsStreamingCommandBus
     commandHandler: Application.ICommandHandler<any, any>,
   ): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  private generateHeaders(command: Application.Command): MsgHdrs {
+    const h = headers();
+    for (const [key, value] of Object.entries(command.metadata)) {
+      if (key === 'context' && value) {
+        h.append(key, JSON.stringify(value));
+        continue;
+      }
+      const header = value?.toString();
+      if (header) {
+        h.append(key, header);
+      }
+    }
+    return h;
   }
 
   static getSubjectFromHandler(

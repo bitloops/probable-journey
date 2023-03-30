@@ -21,7 +21,8 @@ import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import { JwtAuthGuard } from '@src/bitloops/nest-auth-passport';
 import { Traceable } from '@src/bitloops/tracing';
-import { Infra } from '@src/bitloops/bl-boilerplate-core';
+import { Infra, asyncLocalStorage } from '@src/bitloops/bl-boilerplate-core';
+import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
 @Injectable()
@@ -52,17 +53,20 @@ export class TodoController {
   async addTodo(@Request() req, @Body() dto: AddTodoDto) {
     // const jwt = jwtwebtoken.sign({ userId: dto.userId }, this.JWT_SECRET);
     const command = new AddTodoCommand({ title: dto.title });
+    // const context = asyncLocalStorage.getStore()?.get('context');
     const results = await this.commandBus.request(command);
     if (results.isOk) return results.data;
     else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('/complete')
   async completeTodo(@Body() dto: CompleteTodoDto) {
     // userId get from context
-    // return this.commandBus.execute(
-    //   new CompleteTodoCommand({ todoId: dto.todoId }),
-    // );
+    const command = new CompleteTodoCommand({ todoId: dto.todoId });
+    const result = await this.commandBus.request(command);
+    if (result.isOk) return result.data;
+    else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -72,14 +76,5 @@ export class TodoController {
     const results = await this.queryBus.request(new GetTodosQuery());
     if (results.isOk) return results.data;
     else throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-  }
-
-  private getJWTToken(req: any): string {
-    const authHeader = req.headers.authorization;
-    if (authHeader) {
-      const token = authHeader.split('Bearer ')[1];
-      return token;
-    }
-    return '';
   }
 }

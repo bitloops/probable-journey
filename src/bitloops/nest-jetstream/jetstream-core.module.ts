@@ -1,5 +1,6 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
 import { ConnectionOptions } from 'nats';
+import { Application, asyncLocalStorage } from '@bitloops/bl-boilerplate-core';
 import { NestjsJetstream } from './nestjs-jetstream.class';
 import { NatsPubSubCommandBus } from './buses/nats-pubsub-command-bus';
 import { NatsPubSubQueryBus } from './buses/nats-pubsub-query-bus';
@@ -10,14 +11,12 @@ import {
   NatsStreamingIntegrationEventBus,
   NatsStreamingCommandBus,
 } from './buses';
-import { Application } from '../bl-boilerplate-core';
 import { SubscriptionsService } from './jetstream.subscriptions.service';
 import {
   ASYNC_LOCAL_STORAGE,
   HANDLERS_TOKENS,
   ProvidersConstants,
 } from './jetstream.constants';
-import { asyncLocalStorage } from '@bitloops/tracing';
 
 const pubSubCommandBus = {
   provide: BUSES_TOKENS.PUBSUB_COMMAND_BUS,
@@ -59,7 +58,6 @@ export class JetstreamCoreModule {
       },
     };
 
-    // This would probably be injected in plugin config, alongside connectionOptions
     const asyncLocalStorageProvider = {
       provide: ASYNC_LOCAL_STORAGE,
       useValue: asyncLocalStorage,

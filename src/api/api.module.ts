@@ -19,7 +19,7 @@ import { CorrelationIdMiddleware, TracingModule } from '@src/bitloops/tracing';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.development.env',
+      envFilePath: '.development.env', // TODO make dynamic
       load: [configuration, authConfiguration],
     }),
     AuthModule.forRootAsync({
@@ -47,15 +47,23 @@ import { CorrelationIdMiddleware, TracingModule } from '@src/bitloops/tracing';
       },
       integrationEventBus: NatsStreamingIntegrationEventBus,
     }),
-    JetstreamModule.forRoot({}),
+    JetstreamModule.forRoot({
+      servers: [
+        `nats://${process.env.NATS_HOST ?? 'localhost'}:${
+          process.env.NATS_PORT ?? 4222
+        }`,
+      ],
+    }),
+
     TracingModule.register({
       messageBus: NatsStreamingMessageBus,
     }),
   ],
   controllers: [AuthController, TodoController, TodoGrpcController],
 })
-export class ApiModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
-  }
+// implements NestModule
+export class ApiModule {
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+  // }
 }

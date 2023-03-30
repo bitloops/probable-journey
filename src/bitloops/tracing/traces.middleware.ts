@@ -2,6 +2,7 @@ import { Inject, Injectable, NestMiddleware } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { randomUUID } from 'crypto';
 import { AsyncLocalStorageService } from './async-local-storage.service';
+import { asyncLocalStorage } from '../bl-boilerplate-core';
 
 @Injectable()
 export class CorrelationIdMiddleware implements NestMiddleware {
@@ -10,18 +11,25 @@ export class CorrelationIdMiddleware implements NestMiddleware {
   ) {}
 
   use(req: FastifyRequest['raw'], res: FastifyReply['raw'], next: () => void) {
-    const asyncLocalStorage = this.asyncLocalStorageService.asyncLocalStorage;
-
-    // req.headers['x-correlation-id'] ||
     const correlationId: string = randomUUID().replace(/-/g, '');
-    console.log(`Request... ${correlationId}`);
-    asyncLocalStorage.run(
-      this.asyncLocalStorageService.returnEmptyStore(),
-      () => {
-        this.asyncLocalStorageService.setCorrelationId(correlationId);
-        next();
-      },
-    );
+    console.log(`Request (middleware)... ${correlationId}`);
+    const initialStore = new Map();
+    initialStore.set('correlationId', correlationId);
+    return asyncLocalStorage.run(initialStore, () => {
+      next();
+    });
+    // const asyncLocalStorage = this.asyncLocalStorageService.asyncLocalStorage;
+
+    // // req.headers['x-correlation-id'] ||
+    // const correlationId: string = randomUUID().replace(/-/g, '');
+    // console.log(`Request... ${correlationId}`);
+    // asyncLocalStorage.run(
+    //   this.asyncLocalStorageService.returnEmptyStore(),
+    //   () => {
+    //     this.asyncLocalStorageService.setCorrelationId(correlationId);
+    //     next();
+    //   },
+    // );
   }
 }
 

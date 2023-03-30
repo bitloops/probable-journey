@@ -1,21 +1,42 @@
-// import { Infra, Application } from '@src/bitloops/bl-boilerplate-core';
-// import { UpdateUserEmailCommand } from '../../../commands/update-user-email.command';
+import {
+  Infra,
+  Application,
+  Either,
+  ok,
+} from '@src/bitloops/bl-boilerplate-core';
+import { UserEmailChangedIntegrationEvent } from '@src/lib/bounded-contexts/iam/authentication/contracts/integration-events/user-email-changed.integration-event';
+import { ChangeUserEmailCommand } from '../../../commands/change-user-email.command';
 
-// export class UserEmailChangedIntegrationEventHandler
-//   implements Application.IHandle
-// {
-//   constructor(private commandBus: Infra.CommandBus.IPubSubCommandBus) {}
+export class UserEmailChangedIntegrationEventHandler
+  implements Application.IHandleIntegrationEvent
+{
+  constructor(private commandBus: Infra.CommandBus.IStreamCommandBus) {}
 
-//   public async handle(event: UserEmailChangedIntegrationEvent): Promise<void> {
-//     const { data } = event;
-//     const command = new UpdateUserEmailCommand({
-//       userId: data.userId,
-//       email: data.email,
-//     });
-//     await this.commandBus.send(command);
+  get event() {
+    return UserEmailChangedIntegrationEvent;
+  }
 
-//     console.log(
-//       `[UserEmailChangedIntegrationEvent]: Successfully sent UpdateUserEmail`,
-//     );
-//   }
-// }
+  get boundedContext() {
+    return UserEmailChangedIntegrationEvent.boundedContextId;
+  }
+
+  get version() {
+    return UserEmailChangedIntegrationEvent.versions[0]; // here output will be 'v1'
+  }
+
+  public async handle(
+    event: UserEmailChangedIntegrationEvent,
+  ): Promise<Either<void, never>> {
+    const { data } = event;
+    const command = new ChangeUserEmailCommand({
+      userId: data.userId,
+      email: data.email,
+    });
+    await this.commandBus.publish(command);
+
+    console.log(
+      `[UserEmailChangedIntegrationEvent]: Successfully sent UpdateUserEmail`,
+    );
+    return ok();
+  }
+}

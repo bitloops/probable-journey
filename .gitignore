@@ -35,5 +35,5 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 data/mongo-1
-.env
+*.env
 data/*

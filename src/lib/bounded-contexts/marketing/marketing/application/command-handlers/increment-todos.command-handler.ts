@@ -84,7 +84,7 @@ export class IncrementTodosCommandHandler
       if (incrementedOrError.isFail()) {
         return fail(incrementedOrError.value);
       }
-      const saveResult = await this.userRepo.save(user.value);
+      const saveResult = await this.userRepo.update(user.value);
       if (saveResult.isFail()) {
         return fail(saveResult.value);
       }

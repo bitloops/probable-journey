@@ -1,7 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { AsyncLocalStorageService } from './async-local-storage.service';
 import { MESSAGE_BUS_TOKEN } from './constants';
-import { Infra } from '../bl-boilerplate-core';
+import { Infra, asyncLocalStorage } from '../bl-boilerplate-core';
 import { isAsyncFunction } from './utils';
 import { TelemetryEvent, TraceableDecoratorInput } from './definitons';
 
@@ -39,13 +39,12 @@ export function Traceable(input: TraceableDecoratorInput) {
       );
       const startTime = Date.now();
 
-      const asyncLocalStorage = this[
+      const asyncLocalStorageService = this[
         asyncLocalStorageServiceKey
       ] as AsyncLocalStorageService;
 
-      console.log('asyncLocalStorage', asyncLocalStorage);
-
-      const correlationId = asyncLocalStorage.getCorrelationId();
+      const store = asyncLocalStorage.getStore();
+      const correlationId = asyncLocalStorageService.getCorrelationId();
       console.table({
         correlationId,
       });

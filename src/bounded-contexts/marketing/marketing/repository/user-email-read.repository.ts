@@ -1,4 +1,10 @@
-import { Application, Domain, Either, ok } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Domain,
+  Either,
+  asyncLocalStorage,
+  ok,
+} from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import { Collection, MongoClient } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';
@@ -6,7 +12,6 @@ import { UserEmailReadRepoPort } from '@src/lib/bounded-contexts/marketing/marke
 import { UserReadModel } from '@src/lib/bounded-contexts/marketing/marketing/domain/read-models/user-email.read-model';
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
-import { asyncLocalStorage } from '@src/bitloops/tracing';
 
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'marketing';
 const MONGO_DB_TODO_COLLECTION =
@@ -32,7 +37,8 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
   async getUserEmail(
     userid: Domain.UUIDv4,
   ): Promise<Either<UserReadModel | null, Application.Repo.Errors.Unexpected>> {
-    const { jwt } = asyncLocalStorage.getStore()?.get('context');
+    const ctx = asyncLocalStorage.getStore()?.get('context');
+    const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
@@ -47,7 +53,7 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
       return ok(null);
     }
 
-    if (result.userId !== jwtPayload.userId) {
+    if (result.userId !== jwtPayload.sub) {
       throw new Error('Invalid userId');
     }
 
@@ -77,7 +83,9 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
   async save(
     userEmailReadModel: UserReadModel,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
-    const { jwt } = asyncLocalStorage.getStore()?.get('context');
+    const ctx = asyncLocalStorage.getStore()?.get('context');
+    const { jwt } = ctx;
+
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
@@ -85,7 +93,7 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
       throw new Error('Invalid JWT!');
     }
     const userEmail = userEmailReadModel.toPrimitives();
-    if (userEmail.userId !== jwtPayload.userId) {
+    if (userEmail.userId !== jwtPayload.sub) {
       throw new Error('Invalid userId');
     }
     await this.collection.insertOne({

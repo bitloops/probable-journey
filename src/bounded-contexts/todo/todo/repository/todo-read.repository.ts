@@ -11,8 +11,12 @@ import {
 } from 'src/lib/bounded-contexts/todo/todo/domain/TodoReadModel';
 import { ConfigService } from '@nestjs/config';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
-import { Application, Either, ok } from '@src/bitloops/bl-boilerplate-core';
-import { asyncLocalStorage } from '@src/bitloops/tracing';
+import {
+  Application,
+  asyncLocalStorage,
+  Either,
+  ok,
+} from '@src/bitloops/bl-boilerplate-core';
 
 const MONGO_DB_DATABASE = process.env.MONGO_DB_DATABASE || 'todo';
 const MONGO_DB_TODO_COLLECTION =
@@ -46,7 +50,8 @@ export class TodoReadRepository implements TodoReadRepoPort {
   async getAll(): Promise<
     Either<TTodoReadModelSnapshot[], Application.Repo.Errors.Unexpected>
   > {
-    const { jwt } = asyncLocalStorage.getStore()?.get('context');
+    const ctx = asyncLocalStorage.getStore()?.get('context');
+    const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);

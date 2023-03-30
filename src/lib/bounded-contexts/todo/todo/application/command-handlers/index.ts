@@ -11,7 +11,7 @@ import { ModifyTodoTitleHandler } from './modify-title-todo.handler';
 
 export const PubSubCommandHandlers = [
   AddTodoCommandHandler,
-  // CompleteTodoHandler,
+  CompleteTodoHandler,
   // UncompleteTodoHandler,
   // ModifyTodoTitleHandler,
 ];

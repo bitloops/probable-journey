@@ -5,9 +5,10 @@ import {
 import { UserEmailReadModelBuilder } from '../../builders/user-read-model.builder';
 import { Application } from '@src/bitloops/bl-boilerplate-core';
 import { MockUpdateUserReadRepo } from './update-user-email-read-repo.mock.ts';
-import { UpdateUserEmailCommand } from '@src/lib/bounded-contexts/marketing/marketing/commands/update-user-email.command';
-import { UpdateUserEmailCommandHandler } from '@src/lib/bounded-contexts/marketing/marketing/application/command-handlers/update-user-email.command-handler';
+
 import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
+import { ChangeUserEmailCommand } from '@src/lib/bounded-contexts/marketing/marketing/commands/change-user-email.command';
+import { ChangeUserEmailCommandHandler } from '@src/lib/bounded-contexts/marketing/marketing/application/command-handlers/change-user-email.command-handler';
 
 const mockGet = jest.fn();
 jest.mock('@bitloops/tracing', () => ({
@@ -26,13 +27,13 @@ describe('Create user feature test', () => {
     mockAsyncLocalStorageGet(userId);
     // given
     const mockUpdateUserReadRepo = new MockUpdateUserReadRepo();
-    const updateUserEmailCommand = new UpdateUserEmailCommand({
+    const updateUserEmailCommand = new ChangeUserEmailCommand({
       email,
       userId,
     });
 
     // when
-    const updateUserEmailHandler = new UpdateUserEmailCommandHandler(
+    const updateUserEmailHandler = new ChangeUserEmailCommandHandler(
       mockUpdateUserReadRepo.getMockMarketingReadRepo(),
     );
     const result = await updateUserEmailHandler.execute(updateUserEmailCommand);
@@ -57,13 +58,13 @@ describe('Create user feature test', () => {
     // given
     const mockUpdateUserReadRepo = new MockUpdateUserReadRepo();
     mockAsyncLocalStorageGet(userId);
-    const updateUserEmailCommand = new UpdateUserEmailCommand({
+    const updateUserEmailCommand = new ChangeUserEmailCommand({
       email,
       userId,
     });
 
     // when
-    const updateUserEmailHandler = new UpdateUserEmailCommandHandler(
+    const updateUserEmailHandler = new ChangeUserEmailCommandHandler(
       mockUpdateUserReadRepo.getMockMarketingReadRepo(),
     );
     const result = await updateUserEmailHandler.execute(updateUserEmailCommand);

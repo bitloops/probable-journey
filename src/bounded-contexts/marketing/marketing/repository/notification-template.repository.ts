@@ -5,8 +5,12 @@ import { NotificationTemplateReadRepoPort } from '@src/lib/bounded-contexts/mark
 import { NotificationTemplateReadModel } from '@src/lib/bounded-contexts/marketing/marketing/domain/read-models/notification-template.read-model';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import { ConfigService } from '@nestjs/config';
-import { Application, Either, ok } from '@src/bitloops/bl-boilerplate-core';
-import { asyncLocalStorage } from '@src/bitloops/tracing';
+import {
+  Application,
+  Either,
+  asyncLocalStorage,
+  ok,
+} from '@src/bitloops/bl-boilerplate-core';
 
 @Injectable()
 export class NotificationTemplateReadRepository
@@ -36,7 +40,8 @@ export class NotificationTemplateReadRepository
       Application.Repo.Errors.Unexpected
     >
   > {
-    const { jwt } = asyncLocalStorage.getStore()?.get('context');
+    const ctx = asyncLocalStorage.getStore()?.get('context');
+    const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
@@ -84,7 +89,8 @@ export class NotificationTemplateReadRepository
       Application.Repo.Errors.Unexpected
     >
   > {
-    const { jwt } = asyncLocalStorage.getStore()?.get('context');
+    const ctx = asyncLocalStorage.getStore()?.get('context');
+    const { jwt } = ctx;
     let jwtPayload: null | any = null;
     try {
       jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
@@ -99,7 +105,7 @@ export class NotificationTemplateReadRepository
       return ok(null);
     }
 
-    if (result.userId !== jwtPayload.userId) {
+    if (result.userId !== jwtPayload.sub) {
       throw new Error('Invalid userId');
     }
 

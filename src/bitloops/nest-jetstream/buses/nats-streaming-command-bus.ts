@@ -43,7 +43,6 @@ export class NatsStreamingCommandBus
     const subject = `${stream}.${command.constructor.name}`;
     const headers = this.generateHeaders(command);
     const options: Partial<JetStreamPublishOptions> = { msgID: '', headers };
-    // console.log('serializedDomainEvent', domainEvent);
     const message = jsonCodec.encode(command);
     this.logger.log('publishing command to:' + subject);
 
@@ -74,7 +73,6 @@ export class NatsStreamingCommandBus
       // `);
       const sub = await this.js.subscribe(subject, opts);
       (async () => {
-        // console.log('Starting domain event loop...');
         for await (const m of sub) {
           const command = jsonCodec.decode(m.data) as any;
 

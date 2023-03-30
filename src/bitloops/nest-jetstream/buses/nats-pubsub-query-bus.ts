@@ -40,7 +40,7 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
       this.logger.log('Response in query request:' + data);
       return data;
     } catch (err) {
-      this.logger.error('Error in query request:', err);
+      this.logger.error('Error in query request for:' + topic, err);
     }
   }
 

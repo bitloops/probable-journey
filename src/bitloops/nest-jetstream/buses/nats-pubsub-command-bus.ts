@@ -47,7 +47,7 @@ export class NatsPubSubCommandBus
       });
       return jsonCodec.decode(response.data);
     } catch (error) {
-      this.logger.error('Error in command request', error);
+      this.logger.error('Error in command request for:' + topic, error);
     }
   }
 
@@ -110,7 +110,7 @@ export class NatsPubSubCommandBus
     handler: Application.ICommandHandler<any, any>,
     command: any,
     m: Msg,
-  ) {
+  ): Promise<void> {
     const reply = await handler.execute(command);
     if (reply.isOk && reply.isOk() && m.reply) {
       return this.nc.publish(

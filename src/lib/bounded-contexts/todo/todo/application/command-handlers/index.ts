@@ -12,11 +12,11 @@ import { ModifyTodoTitleHandler } from './modify-title-todo.handler';
 export const PubSubCommandHandlers = [
   AddTodoCommandHandler,
   CompleteTodoHandler,
-  // UncompleteTodoHandler,
+  UncompleteTodoHandler,
   // ModifyTodoTitleHandler,
 ];
 
 export const StreamingCommandHandlers = [
-  AddTodoCommandHandler,
-  CompleteTodoHandler,
+  // AddTodoCommandHandler,
+  // CompleteTodoHandler,
 ];

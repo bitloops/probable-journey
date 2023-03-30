@@ -25,6 +25,7 @@ import { CorrelationIdInterceptor } from '@src/bitloops/tracing';
 import { TodoReadModel } from '@src/lib/bounded-contexts/todo/todo/domain/TodoReadModel';
 import { GetTodosQuery } from '@src/lib/bounded-contexts/todo/todo/queries/get-todos.query';
 import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
+import { UncompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/uncomplete-todo.command';
 
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
@@ -95,7 +96,7 @@ export class TodoGrpcController {
       });
     } else {
       const error = results.error;
-      console.error('Error while creating todo:', error?.message);
+      console.error('Error while fetching todos:', error?.message);
       return new todo.GetAllTodosResponse({
         error: new todo.GetAllTodosErrorResponse({
           systemUnavailableError: new todo.ErrorResponse({
@@ -119,9 +120,33 @@ export class TodoGrpcController {
       });
     } else {
       const error = results.error;
-      console.error('Error while creating todo:', error?.message);
+      console.error('Error while completing todo:', error?.message);
       return new todo.CompleteTodoResponse({
         error: new todo.CompleteTodoErrorResponse({
+          systemUnavailableError: new todo.ErrorResponse({
+            code: error?.code || 'SYSTEM_UNAVAILABLE_ERROR',
+            message: error?.message || 'The system is unavailable.',
+          }),
+        }),
+      });
+    }
+  }
+
+  @GrpcMethod('TodoApp', 'Uncomplete')
+  async uncompleteTodo(
+    data: todo.CompleteTodoRequest,
+  ): Promise<todo.UncompleteTodoResponse> {
+    const command = new UncompleteTodoCommand({ id: data.id });
+    const results = await this.commandBus.request(command);
+    if (results.isOk) {
+      return new todo.UncompleteTodoResponse({
+        ok: new todo.UncompleteTodoOKResponse(),
+      });
+    } else {
+      const error = results.error;
+      console.error('Error while uncompleting todo:', error?.message);
+      return new todo.UncompleteTodoResponse({
+        error: new todo.UncompleteTodoErrorResponse({
           systemUnavailableError: new todo.ErrorResponse({
             code: error?.code || 'SYSTEM_UNAVAILABLE_ERROR',
             message: error?.message || 'The system is unavailable.',

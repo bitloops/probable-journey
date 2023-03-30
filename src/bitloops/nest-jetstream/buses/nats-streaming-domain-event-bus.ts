@@ -53,7 +53,6 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
       };
       // const pubAck =
       domainEvent.data = domainEvent.data.toPrimitives();
-      // console.log('serializedDomainEvent', domainEvent);
       const message = jsonCodec.encode(domainEvent);
       this.logger.log('publishing domain event to:' + subject);
 
@@ -89,7 +88,6 @@ export class NatsStreamingDomainEventBus implements Infra.EventBus.IEventBus {
       // `);
       const sub = await this.js.subscribe(subject, opts);
       (async () => {
-        // console.log('Starting domain event loop...');
         for await (const m of sub) {
           const domainEvent = jsonCodec.decode(m.data) as any;
           // domainEvent.data = Domain.EventData.fromPrimitives(domainEvent.data);

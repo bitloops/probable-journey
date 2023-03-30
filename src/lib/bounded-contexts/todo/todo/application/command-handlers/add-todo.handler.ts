@@ -95,7 +95,6 @@ export class AddTodoCommandHandler
 //   async execute(
 //     command: AddTodoCommandLegacy,
 //   ): Promise<AddTodoUseCaseResponse> {
-//     console.log('AddTodoCommand...');
 
 //     const title = TitleVO.create({ title: command.title });
 //     if (title.isFail()) {

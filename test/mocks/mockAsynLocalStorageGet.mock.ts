@@ -1,4 +1,4 @@
-import { asyncLocalStorage } from '@bitloops/tracing';
+import { asyncLocalStorage } from '@bitloops/bl-boilerplate-core';
 import { ContextBuilder } from './context.builder';
 export function mockAsyncLocalStorageGet(userId: string, jwt = 'jwt') {
   jest

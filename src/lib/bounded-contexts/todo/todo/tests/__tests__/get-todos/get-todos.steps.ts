@@ -10,17 +10,6 @@ import {
 } from './get-todos.mock';
 import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 
-const mockGet = jest.fn();
-jest.mock('@bitloops/tracing', () => ({
-  Traceable: () => jest.fn(),
-
-  asyncLocalStorage: {
-    getStore: jest.fn(() => ({
-      get: mockGet,
-    })),
-  },
-}));
-
 describe('Get todos feature test', () => {
   it('Get all todos successfully', async () => {
     const { userId, title, titleId, completed } = GET_TODOS_SUCCESS_CASE;

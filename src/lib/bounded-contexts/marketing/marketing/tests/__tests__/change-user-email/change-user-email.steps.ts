@@ -10,17 +10,6 @@ import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/moc
 import { ChangeUserEmailCommand } from '@src/lib/bounded-contexts/marketing/marketing/commands/change-user-email.command';
 import { ChangeUserEmailCommandHandler } from '@src/lib/bounded-contexts/marketing/marketing/application/command-handlers/change-user-email.command-handler';
 
-const mockGet = jest.fn();
-jest.mock('@bitloops/tracing', () => ({
-  Traceable: () => jest.fn(),
-
-  asyncLocalStorage: {
-    getStore: jest.fn(() => ({
-      get: mockGet,
-    })),
-  },
-}));
-
 describe('Change user email feature test', () => {
   it('Changed user email successfully,', async () => {
     const { email, userId } = UPDATE_USER_SUCCESS_CASE;

@@ -9,17 +9,6 @@ import { UserEmailReadModelBuilder } from '../../builders/user-read-model.builde
 import { Application } from '@src/bitloops/bl-boilerplate-core';
 import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 
-const mockGet = jest.fn();
-jest.mock('@bitloops/tracing', () => ({
-  Traceable: () => jest.fn(),
-
-  asyncLocalStorage: {
-    getStore: jest.fn(() => ({
-      get: mockGet,
-    })),
-  },
-}));
-
 describe('Create user feature test', () => {
   it('Created user successfully,', async () => {
     const { email, userId } = CREATE_USER_SUCCESS_CASE;

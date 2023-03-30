@@ -16,17 +16,6 @@ import { DomainErrors } from '../../../domain/errors';
 import { ApplicationErrors } from '../../../application/errors';
 import { UserUpdatedEmailDomainEvent } from '../../../domain/events/user-updated-email.event';
 
-const mockGet = jest.fn();
-jest.mock('@bitloops/tracing', () => ({
-  Traceable: () => jest.fn(),
-
-  asyncLocalStorage: {
-    getStore: jest.fn(() => ({
-      get: mockGet,
-    })),
-  },
-}));
-
 describe('Change user email feature test', () => {
   it('Changed user email successfully', async () => {
     const { id, email, password } = CHANGE_EMAIL_SUCCESS_CASE;

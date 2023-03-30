@@ -16,17 +16,6 @@ import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/moc
 import { MockStreamCommandBus } from './stream-command-bus.mock';
 import { ApplicationErrors } from '../../../application/errors';
 
-const mockGet = jest.fn();
-jest.mock('@bitloops/tracing', () => ({
-  Traceable: () => jest.fn(),
-
-  asyncLocalStorage: {
-    getStore: jest.fn(() => ({
-      get: mockGet,
-    })),
-  },
-}));
-
 describe('Todo completions incremented feature test', () => {
   it('Todo completions incremented successfully, email sent', async () => {
     const { userId, completedTodos } = SUCCESS_CASE;

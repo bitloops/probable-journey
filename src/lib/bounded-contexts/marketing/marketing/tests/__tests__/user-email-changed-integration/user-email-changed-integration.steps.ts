@@ -4,17 +4,6 @@ import { UserEmailChangedIntegrationEventHandler } from '../../../application/ev
 import { MockStreamCommandBus } from './stream-command-bus.mock';
 import { SUCCESS_CASE } from './user-email-changed.mock';
 
-const mockGet = jest.fn();
-jest.mock('@bitloops/tracing', () => ({
-  Traceable: () => jest.fn(),
-
-  asyncLocalStorage: {
-    getStore: jest.fn(() => ({
-      get: mockGet,
-    })),
-  },
-}));
-
 describe('UserEmailChangedIntegrationEvent feature test', () => {
   it('Sent UserEmailChangedCommand successfully', async () => {
     const { userId, email } = SUCCESS_CASE;

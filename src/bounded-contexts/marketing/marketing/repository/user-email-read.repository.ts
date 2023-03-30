@@ -80,7 +80,7 @@ export class UserEmailReadRepository implements UserEmailReadRepoPort {
   }
 
   @Application.Repo.Decorators.ReturnUnexpectedError()
-  async save(
+  async update(
     userEmailReadModel: UserReadModel,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     const ctx = asyncLocalStorage.getStore()?.get('context');

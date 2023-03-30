@@ -13,17 +13,6 @@ import {
 } from './add-todo.mock';
 import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 
-const mockGet = jest.fn();
-jest.mock('@bitloops/tracing', () => ({
-  Traceable: () => jest.fn(),
-
-  asyncLocalStorage: {
-    getStore: jest.fn(() => ({
-      get: mockGet,
-    })),
-  },
-}));
-
 describe('Add todo feature test', () => {
   it('Todo created successfully', async () => {
     const { userId, title, completed } = ADD_TODO_SUCCESS_CASE;

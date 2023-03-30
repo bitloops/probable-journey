@@ -6,3 +6,17 @@ Object.defineProperty(global, 'crypto', {
     randomUUID: () => crypto.randomUUID(),
   },
 });
+
+jest.mock('@bitloops/tracing', () => ({
+  Traceable: () => jest.fn(),
+}));
+
+const mockGet = jest.fn();
+jest.mock('@bitloops/bl-boilerplate-core', () => ({
+  ...jest.requireActual('@bitloops/bl-boilerplate-core'),
+  asyncLocalStorage: {
+    getStore: jest.fn(() => ({
+      get: mockGet,
+    })),
+  },
+}));

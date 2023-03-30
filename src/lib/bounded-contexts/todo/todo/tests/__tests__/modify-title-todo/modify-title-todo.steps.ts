@@ -16,17 +16,6 @@ import {
 import { ModifyTitleWriteRepo } from './modify-title-write-repo.mock';
 import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 
-const mockGet = jest.fn();
-jest.mock('@bitloops/tracing', () => ({
-  Traceable: () => jest.fn(),
-
-  asyncLocalStorage: {
-    getStore: jest.fn(() => ({
-      get: mockGet,
-    })),
-  },
-}));
-
 describe('Modify title todo feature test', () => {
   it('Todo title modified successfully', async () => {
     const { userId, titleId, titleAfterUpdate, completed } =

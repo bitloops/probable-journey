@@ -4,17 +4,6 @@ import { TodoCompletedIntegrationEventHandler } from '../../../application/event
 import { MockStreamCommandBus } from './stream-command-bus.mock';
 import { SUCCESS_CASE } from './todo-completed-integration.mock';
 
-const mockGet = jest.fn();
-jest.mock('@bitloops/tracing', () => ({
-  Traceable: () => jest.fn(),
-
-  asyncLocalStorage: {
-    getStore: jest.fn(() => ({
-      get: mockGet,
-    })),
-  },
-}));
-
 describe('TodoCompletedIntegrationEvent feature test', () => {
   it('Sent IncrementTodosCommand successfully', async () => {
     const { userId, todoId } = SUCCESS_CASE;

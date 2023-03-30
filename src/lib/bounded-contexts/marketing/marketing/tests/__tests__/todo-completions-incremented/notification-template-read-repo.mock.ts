@@ -3,6 +3,7 @@ import {
   Either,
   ok,
   fail,
+  asyncLocalStorage,
 } from '@src/bitloops/bl-boilerplate-core';
 import { NotificationTemplateReadModel } from '../../../domain/read-models/notification-template.read-model';
 import { NotificationTemplateReadRepoPort } from '../../../ports/notification-template-read.repo-port.';
@@ -10,7 +11,6 @@ import {
   SUCCESS_CASE,
   UNSUCCESS_REPO_ERROR_CASE,
 } from './todo-completions-incremented.mock';
-import { asyncLocalStorage } from '@bitloops/tracing';
 
 export class MockNotificationTemplateReadRepo {
   public readonly mockGetByTypeMethod: jest.Mock;

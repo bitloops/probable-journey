@@ -3,8 +3,8 @@ import {
   Either,
   ok,
   fail,
+  asyncLocalStorage,
 } from '@src/bitloops/bl-boilerplate-core';
-import { asyncLocalStorage } from '@src/bitloops/tracing';
 import { TodoReadModel } from '../../../domain/TodoReadModel';
 import { TodoReadRepoPort } from '../../../ports/TodoReadRepoPort';
 import {

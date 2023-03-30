@@ -20,7 +20,7 @@ export class MockUserEmailReadRepo {
     this.mockGetUserEmailMethod = this.getMockGetUserEmailMethod();
     this.mockUserEmailReadRepo = {
       getUserEmail: this.mockGetUserEmailMethod,
-      save: jest.fn(),
+      update: jest.fn(),
       create: jest.fn(),
       getAll: jest.fn(),
       getById: jest.fn(),

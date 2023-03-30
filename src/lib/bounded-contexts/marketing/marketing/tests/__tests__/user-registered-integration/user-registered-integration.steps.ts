@@ -4,17 +4,6 @@ import { UserRegisteredIntegrationEventHandler } from '../../../application/even
 import { MockStreamCommandBus } from './stream-command-bus.mock';
 import { SUCCESS_CASE } from './user-registered-integration.mock';
 
-const mockGet = jest.fn();
-jest.mock('@bitloops/tracing', () => ({
-  Traceable: () => jest.fn(),
-
-  asyncLocalStorage: {
-    getStore: jest.fn(() => ({
-      get: mockGet,
-    })),
-  },
-}));
-
 describe('UserRegisteredIntegrationEvent feature test', () => {
   it('Sent CreateUserCommand successfully', async () => {
     const { userId, email } = SUCCESS_CASE;

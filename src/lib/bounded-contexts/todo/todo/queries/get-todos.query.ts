@@ -1,5 +1,8 @@
-import { Application, Domain } from '@bitloops/bl-boilerplate-core';
-import { asyncLocalStorage } from '@src/bitloops/tracing';
+import {
+  Application,
+  Domain,
+  asyncLocalStorage,
+} from '@bitloops/bl-boilerplate-core';
 
 export class GetTodosQuery implements Application.IQuery {
   public metadata: Application.TQueryMetadata;

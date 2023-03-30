@@ -15,17 +15,6 @@ import { TodoCompletionsIncrementedDomainEvent } from '@src/lib/bounded-contexts
 import { DomainErrors } from '@src/lib/bounded-contexts/marketing/marketing/domain/errors';
 import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 
-const mockGet = jest.fn();
-jest.mock('@bitloops/tracing', () => ({
-  Traceable: () => jest.fn(),
-
-  asyncLocalStorage: {
-    getStore: jest.fn(() => ({
-      get: mockGet,
-    })),
-  },
-}));
-
 describe('Increment completed todos feature test', () => {
   it('Incremented completed todos successfully, user exists', async () => {
     const { id, completedTodos } = INCREMENT_TODOS_SUCCESS_USER_EXISTS_CASE;

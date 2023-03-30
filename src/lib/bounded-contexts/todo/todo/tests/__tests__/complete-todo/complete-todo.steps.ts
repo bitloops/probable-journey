@@ -17,17 +17,6 @@ import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors'
 
 import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 
-const mockGet = jest.fn();
-jest.mock('@bitloops/tracing', () => ({
-  Traceable: () => jest.fn(),
-
-  asyncLocalStorage: {
-    getStore: jest.fn(() => ({
-      get: mockGet,
-    })),
-  },
-}));
-
 describe('Complete todo feature test', () => {
   it('Todo completed successfully', async () => {
     const todoTitle = COMPLETE_TODO_SUCCESS_CASE.title;

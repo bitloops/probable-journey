@@ -43,7 +43,7 @@ export class NatsStreamingMessageBus
       await this.js.publish(topic, messageEncoded, options);
     } catch (err) {
       // NatsError: 503
-      this.logger.error('Error publishing integration event to:', err);
+      this.logger.error('Error publishing message to topic: ' + topic, err);
     }
   }
 

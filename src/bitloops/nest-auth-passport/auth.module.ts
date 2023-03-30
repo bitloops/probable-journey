@@ -9,7 +9,7 @@ import { UserPostgresRepository } from './users/user-repo';
 import {
   PostgresModule,
   PostgresModuleAsyncOptions,
-} from '../postgres/postgres.module';
+} from '@bitloops/bl-boilerplate-infra-postgres';
 import { JwtModuleAsyncOptions } from '@nestjs/jwt';
 import { JWTSecret, IntegrationEventBusToken } from './constants';
 import { Infra } from '../bl-boilerplate-core';

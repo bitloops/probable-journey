@@ -12,7 +12,7 @@ import {
   StreamingCommandBusToken,
 } from '@src/lib/bounded-contexts/marketing/marketing/constants';
 import { MockEmailService } from './service';
-import { MongoModule } from '@bitloops/mongo/mongo.module';
+import { MongoModule } from '@bitloops/bl-boilerplate-infra-mongo';
 import { JetstreamModule } from '@src/bitloops/nest-jetstream/jetstream.module';
 import { StreamingIntegrationEventHandlers } from '@src/lib/bounded-contexts/marketing/marketing/application/event-handlers';
 import { StreamingCommandHandlers } from '@src/lib/bounded-contexts/marketing/marketing/application/command-handlers';

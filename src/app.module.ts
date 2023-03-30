@@ -6,11 +6,11 @@ import {
   JetstreamModule,
   NatsStreamingMessageBus,
 } from '@src/bitloops/nest-jetstream';
-import { PostgresModule } from './bitloops/postgres/postgres.module';
+import { PostgresModule } from '@bitloops/bl-boilerplate-infra-postgres';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import authConfiguration from './config/auth.configuration';
-import { MongoModule } from '@bitloops/mongo';
+import { MongoModule } from '@bitloops/bl-boilerplate-infra-mongo';
 import { TracingModule } from '@bitloops/tracing';
 
 @Module({

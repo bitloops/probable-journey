@@ -9,7 +9,7 @@ import { UserReadModel } from '@src/lib/bounded-contexts/marketing/marketing/dom
 import {
   UPDATE_USER_REPO_ERROR_CASE,
   UPDATE_USER_SUCCESS_CASE,
-} from './update-user-email.mock';
+} from './change-user-email.mock';
 
 export class MockUpdateUserReadRepo {
   public readonly mockSaveMethod: jest.Mock;

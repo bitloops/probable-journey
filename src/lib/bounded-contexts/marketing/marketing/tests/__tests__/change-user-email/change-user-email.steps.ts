@@ -1,10 +1,10 @@
 import {
   UPDATE_USER_REPO_ERROR_CASE,
   UPDATE_USER_SUCCESS_CASE,
-} from './update-user-email.mock';
+} from './change-user-email.mock';
 import { UserEmailReadModelBuilder } from '../../builders/user-read-model.builder';
 import { Application } from '@src/bitloops/bl-boilerplate-core';
-import { MockUpdateUserReadRepo } from './update-user-email-read-repo.mock.ts';
+import { MockUpdateUserReadRepo } from './change-user-email-read-repo.mock.ts';
 
 import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 import { ChangeUserEmailCommand } from '@src/lib/bounded-contexts/marketing/marketing/commands/change-user-email.command';
@@ -21,8 +21,8 @@ jest.mock('@bitloops/tracing', () => ({
   },
 }));
 
-describe('Create user feature test', () => {
-  it('Created user successfully,', async () => {
+describe('Change user email feature test', () => {
+  it('Changed user email successfully,', async () => {
     const { email, userId } = UPDATE_USER_SUCCESS_CASE;
     mockAsyncLocalStorageGet(userId);
     // given
@@ -53,7 +53,7 @@ describe('Create user feature test', () => {
     expect(userAggregate).toEqual(userIdEmail);
     expect(typeof result.value).toBe('undefined');
   });
-  it('Created user failed, repo error', async () => {
+  it('Changed user email failed, repo error', async () => {
     const { email, userId } = UPDATE_USER_REPO_ERROR_CASE;
     // given
     const mockUpdateUserReadRepo = new MockUpdateUserReadRepo();

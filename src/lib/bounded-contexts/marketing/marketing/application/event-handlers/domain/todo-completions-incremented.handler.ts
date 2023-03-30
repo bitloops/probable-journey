@@ -17,12 +17,15 @@ import {
   NotificationTemplateReadRepoPortToken,
 } from '../../../ports/notification-template-read.repo-port.';
 import { MarketingNotificationService } from '../../../domain/services/marketing-notification.service';
+import { StreamingCommandBusToken } from '../../../constants';
+import { ApplicationErrors } from '../../errors';
 
 export class TodoCompletionsIncrementedHandler
   implements Application.IHandleDomainEvent
 {
-  private commandBus: Infra.CommandBus.IPubSubCommandBus;
   constructor(
+    @Inject(StreamingCommandBusToken)
+    private commandBus: Infra.CommandBus.IStreamCommandBus,
     @Inject(UserEmailReadRepoPortToken)
     private readonly emailRepoPort: UserEmailReadRepoPort,
     @Inject(NotificationTemplateReadRepoPortToken)
@@ -61,16 +64,15 @@ export class TodoCompletionsIncrementedHandler
     const userid = user.id;
     const userEmail = await this.emailRepoPort.getUserEmail(userid);
     if (userEmail.isFail()) {
-      //return fail
-      // return userEmail.value;
-      return ok(); // TODO change this to fail
+      //TODO: nakable error for Unexpected Error
+      return fail(userEmail.value);
     }
 
     if (!userEmail.value) {
-      //ApplicationErrors.UserEmailNotFoundError(user.id.toString());
-      // this.integrationEventBus().publish(new EmailNotFoundErrorMessage(new ApplicationErrors.EmailNotFoundError(userid.toString())));
       // TODO Error bus
-      return ok(); // TODO change this to fail
+      return fail(
+        new ApplicationErrors.UserEmailNotFoundError(user.id.toString()),
+      );
     }
 
     const command = new SendEmailCommand({

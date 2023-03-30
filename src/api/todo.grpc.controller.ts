@@ -20,8 +20,8 @@ import {
   GetAuthData,
   JwtGrpcAuthGuard,
 } from '@src/bitloops/nest-auth-passport';
-import { Infra } from '@src/bitloops/bl-boilerplate-core';
-import { CorrelationIdInterceptor } from '@src/bitloops/tracing/correlationId.interceptor';
+import { Infra, asyncLocalStorage } from '@src/bitloops/bl-boilerplate-core';
+import { CorrelationIdInterceptor } from '@src/bitloops/tracing';
 
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
@@ -53,6 +53,7 @@ export class TodoGrpcController {
   ): Promise<todo.AddTodoResponse> {
     // console.log('metadata', metadata);
     // console.log('call', call);
+    const context = asyncLocalStorage.getStore()?.get('context');
     const command = new AddTodoCommand({ title: data.title });
     const results = await this.commandBus.request(command);
     if (results.isOk) {

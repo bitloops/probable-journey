@@ -35,6 +35,9 @@ async function bootstrap() {
     }),
     { abortOnError: false },
   );
+  api.enableCors({
+    origin: 'http://localhost:3000',
+  });
   const appConfig = config();
   api.useGlobalInterceptors(
     new CorrelationIdInterceptor(),

@@ -46,7 +46,7 @@ export class TodoGrpcController {
     }
   }
 
-  @GrpcMethod('TodoApp', 'AddTodo')
+  @GrpcMethod('TodoApp', 'Add')
   async addTodo(
     data: todo.AddTodoRequest,
     metadata: Metadata, // @TODO figure out how to get the metadata https://github.com/nestjs/nest/issues/4851
@@ -81,20 +81,20 @@ export class TodoGrpcController {
   }
 
   @GrpcMethod('TodoApp', 'GetAllMyTodos')
-  async getAllMyTodos(): Promise<todo.GetAllMyTodosResponse> {
+  async getAllMyTodos(): Promise<todo.GetAllTodosResponse> {
     const results = await this.queryBus.request(new GetTodosQuery());
 
     if (results.isOk) {
-      return new todo.GetAllMyTodosResponse({
-        ok: new todo.GetAllMyTodosOKResponse({
+      return new todo.GetAllTodosResponse({
+        ok: new todo.GetAllTodosOKResponse({
           todos: results.data.map((i) => new todo.Todo(i)),
         }),
       });
     } else {
       const error = results.error;
       console.error('Error while creating todo:', error?.message);
-      return new todo.GetAllMyTodosResponse({
-        error: new todo.GetAllMyTodosErrorResponse({
+      return new todo.GetAllTodosResponse({
+        error: new todo.GetAllTodosErrorResponse({
           systemUnavailableError: new todo.ErrorResponse({
             code: error?.code || 'SYSTEM_UNAVAILABLE_ERROR',
             message: error?.message || 'The system is unavailable.',

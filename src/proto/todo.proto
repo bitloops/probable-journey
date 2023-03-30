@@ -3,11 +3,15 @@ syntax = "proto3";
 package todo;
 
 service TodoApp {
-	rpc AddTodo(AddTodoRequest) returns (AddTodoResponse);
-  rpc CompleteTodo (CompleteTodoRequest) returns (CompleteTodoResponse);
-  rpc UncompleteTodo (UncompleteTodoRequest) returns (UncompleteTodoResponse);
-  rpc ModifyTitle (ModifyTodoRequest) returns (ModifyTodoResponse);
-	rpc GetAllMyTodos(GetAllMyTodosRequest) returns (GetAllMyTodosResponse);
+	rpc Add(AddTodoRequest) returns (AddTodoResponse);
+  rpc Complete (CompleteTodoRequest) returns (CompleteTodoResponse);
+  rpc Uncomplete (UncompleteTodoRequest) returns (UncompleteTodoResponse);
+  rpc ModifyTitle (ModifyTitleTodoRequest) returns (ModifyTitleTodoResponse);
+	rpc GetAll(GetAllTodosRequest) returns (GetAllTodosResponse);
+  rpc OnAdded (OnAddedRequest) returns (stream Todo);
+  rpc OnCompleted (OnCompletedRequest) returns (stream Todo);
+  rpc OnUncompleted (OnUncompletedRequest) returns (stream Todo);
+  rpc OnModifiedTitle (OnModifiedTitleRequest) returns (stream Todo);
 }
 
 message ErrorResponse {
@@ -59,39 +63,39 @@ message CompleteTodoErrorResponse {
 
 message CompleteTodoOKResponse {}
 
-message GetAllMyTodosRequest {}
+message GetAllTodosRequest {}
 
-message GetAllMyTodosResponse {
+message GetAllTodosResponse {
   oneof result {
-    GetAllMyTodosOKResponse ok = 1;
-    GetAllMyTodosErrorResponse error = 2;
+    GetAllTodosOKResponse ok = 1;
+    GetAllTodosErrorResponse error = 2;
   }
 }
 
-message GetAllMyTodosErrorResponse {
+message GetAllTodosErrorResponse {
   oneof error {
     ErrorResponse unauthorizedError = 1;
     ErrorResponse systemUnavailableError = 2;
   }
 }
 
-message GetAllMyTodosOKResponse {
+message GetAllTodosOKResponse {
   repeated Todo todos = 1;
 }
 
-message ModifyTodoRequest {
+message ModifyTitleTodoRequest {
   string id = 1;
   string title = 2;
 }
 
-message ModifyTodoResponse {
+message ModifyTitleTodoResponse {
   oneof result {
-    ModifyTodoOKResponse ok = 1;
-    ModifyTodoErrorResponse error = 2;
+    ModifyTitleTodoOKResponse ok = 1;
+    ModifyTitleTodoErrorResponse error = 2;
   }
 }
 
-message ModifyTodoErrorResponse {
+message ModifyTitleTodoErrorResponse {
   oneof error {
     ErrorResponse unauthorizedError = 1;
     ErrorResponse systemUnavailableError = 2;
@@ -100,7 +104,7 @@ message ModifyTodoErrorResponse {
   }
 }
 
-message ModifyTodoOKResponse {}
+message ModifyTitleTodoOKResponse {}
 
 message UncompleteTodoRequest {
   string id = 1;
@@ -128,3 +132,8 @@ message Todo {
   string text = 2;
   bool completed = 3;
 }
+
+message OnAddedRequest {}
+message OnCompletedRequest {}
+message OnUncompletedRequest {}
+message OnModifiedTitleRequest {}

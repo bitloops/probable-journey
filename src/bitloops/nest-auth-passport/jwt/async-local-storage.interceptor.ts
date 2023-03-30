@@ -30,6 +30,23 @@ export class AsyncLocalStorageInterceptor implements NestInterceptor {
       return next.handle();
     } else if (context.getType() === 'rpc') {
       // do something that is only important in the context of Microservice requests
+      const data = context.switchToRpc().getData();
+      const requestContext: any = context.switchToRpc().getContext();
+      const { decodedToken, jwt } = requestContext;
+
+      const store = asyncLocalStorage.getStore();
+      if (!store)
+        throw new Error(
+          'No store found, did you forget to attach correlation middleware?',
+        );
+      if (!decodedToken) {
+        return next.handle();
+      }
+
+      const email = decodedToken.email;
+
+      const userId = decodedToken.sub;
+      store.set('context', { userId, email, jwt });
       return next.handle();
     }
     // TODO Handle graphQL

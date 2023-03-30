@@ -1,4 +1,10 @@
-import { Controller, Inject, Injectable, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Inject,
+  Injectable,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { RpcException, GrpcMethod, Payload } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
@@ -10,16 +16,19 @@ import { AddTodoCommand } from '../lib/bounded-contexts/todo/todo/commands/add-t
 import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import {
+  AsyncLocalStorageInterceptor,
   GetAuthData,
   JwtGrpcAuthGuard,
 } from '@src/bitloops/nest-auth-passport';
 import { Infra } from '@src/bitloops/bl-boilerplate-core';
+import { CorrelationIdInterceptor } from '@src/bitloops/tracing/correlationId.interceptor';
 
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
 @Injectable()
 @Controller()
 @UseGuards(JwtGrpcAuthGuard)
+@UseInterceptors(CorrelationIdInterceptor, AsyncLocalStorageInterceptor)
 export class TodoGrpcController {
   private readonly JWT_SECRET: string;
   constructor(

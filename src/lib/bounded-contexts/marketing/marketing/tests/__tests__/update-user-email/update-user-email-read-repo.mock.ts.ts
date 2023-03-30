@@ -1,9 +1,4 @@
-import {
-  Application,
-  Either,
-  ok,
-  fail,
-} from '@src/bitloops/bl-boilerplate-core';
+import { Application, Either, ok, fail } from '@bitloops/bl-boilerplate-core';
 import { UserEmailReadRepoPort } from '@src/lib/bounded-contexts/marketing/marketing/ports/user-email-read.repo-port';
 import { UserReadModel } from '@src/lib/bounded-contexts/marketing/marketing/domain/read-models/user-email.read-model';
 import {

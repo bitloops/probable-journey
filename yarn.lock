@@ -1083,6 +1083,24 @@
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@bitloops/bl-boilerplate-core@0.3.0", "@bitloops/bl-boilerplate-core@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-core/-/bl-boilerplate-core-0.3.0.tgz#3357bf7e32219a4be0dfbdfd715dc6174c527a65"
+  integrity sha512-pYeNuvlw5v0WNlOL47Iqjjwpw2WI0Mq4TZvcPqepVYqOKwZ94AEqPoqVDawvRL1qlUqFuV9frELUUzzFSsz4eQ==
+  dependencies:
+    class-transformer "^0.5.1"
+    nats "^2.10.2"
+    reflect-metadata "^0.1.13"
+
+"@bitloops/bl-boilerplate-core@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-core/-/bl-boilerplate-core-0.3.1.tgz#4e6a7f3bae7940b412b3fdd7a1716050931f7307"
+  integrity sha512-f+I8RbEZx3atrLsfHSW9SLMCeqgoVYI72U0wwXI7xTf2/jWNhM4n855uax+IPZy2xcRKboFR6p9Vdid5e6wAJw==
+  dependencies:
+    class-transformer "^0.5.1"
+    nats "^2.10.2"
+    reflect-metadata "^0.1.13"
+
 "@bitloops/bl-boilerplate-infra-mongo@^0.1.2":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-mongo/-/bl-boilerplate-infra-mongo-0.1.2.tgz#0b40e2f21a5422f796aed2349b44088b5e79d66a"
@@ -1091,6 +1109,33 @@
     "@nestjs/common" "^9.0.0"
     mongodb "^4.10.0"
 
+"@bitloops/bl-boilerplate-infra-nest-auth-passport@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-nest-auth-passport/-/bl-boilerplate-infra-nest-auth-passport-0.1.1.tgz#394286f49712ecaa801653f026746725dd627a68"
+  integrity sha512-9M6eOMJDdeyDVVvL6xJTyvpIAUfsBTcFbjkN4EzSOhEZKz0XH85i5g06Dqgv8yZIpVl95d3D8mNrFz2OFKJ2xQ==
+  dependencies:
+    "@bitloops/bl-boilerplate-core" "^0.3.0"
+    "@bitloops/bl-boilerplate-infra-postgres" "^0.1.1"
+    "@nestjs/common" "^9.0.0"
+    "@nestjs/jwt" "^10.0.2"
+    "@nestjs/microservices" "^9.3.10"
+    "@nestjs/passport" "^9.0.3"
+    bcrypt "^5.1.0"
+    class-validator "^0.14.0"
+    passport-jwt "^4.0.1"
+    passport-local "^1.0.0"
+    rxjs "^7.8.0"
+
+"@bitloops/bl-boilerplate-infra-nest-jetsream@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-nest-jetsream/-/bl-boilerplate-infra-nest-jetsream-0.1.2.tgz#0250d20032acbb91ae347a0241d26df2c984d5f7"
+  integrity sha512-qgx3UJsWJpQdDGj7WEfYHCcS9tyJwAJyeFZe1ppv78wz35i3v9K1YNDrXrd7xbfiDrH8OUMQbguqwhkACFzf/Q==
+  dependencies:
+    "@bitloops/bl-boilerplate-core" "^0.3.1"
+    "@nestjs/common" "^9.3.12"
+    async-mutex "^0.4.0"
+    nats "^2.13.1"
+
 "@bitloops/bl-boilerplate-infra-postgres@^0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-postgres/-/bl-boilerplate-infra-postgres-0.1.1.tgz#195bc43cc366c05f502164a4c95c2248ceb4b8ed"
@@ -1098,6 +1143,15 @@
   dependencies:
     "@nestjs/common" "^9.0.0"
     pg "^8.10.0"
+
+"@bitloops/bl-boilerplate-infra-telemetry@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-telemetry/-/bl-boilerplate-infra-telemetry-0.1.0.tgz#1aff46cfe4076afad00392287c399f53afc6960a"
+  integrity sha512-TPBgbbRGpaKJym6l54ZZX6sncRwtH8kWjCWbfIknwVSyyP9WPNMS6+rtalPvW8SODeHI3WsVrtDnZ06qOW/n8Q==
+  dependencies:
+    "@bitloops/bl-boilerplate-core" "0.3.0"
+    "@nestjs/common" "^9.0.0"
+    fastify "^4.15.0"
 
 "@colors/colors@1.5.0":
   version "1.5.0"
@@ -1143,7 +1197,7 @@
   resolved "https://registry.npmjs.org/@eslint/js/-/js-8.36.0.tgz"
   integrity sha512-lxJ9R5ygVm8ZWgYdUweoq5ownDlJ4upvoWmO4eLxBYHdMo+vZ/Rx0EN6MbKWDJOSUGrqJy2Gt+Dyv/VKml0fjg==
 
-"@fastify/ajv-compiler@^3.3.1":
+"@fastify/ajv-compiler@^3.3.1", "@fastify/ajv-compiler@^3.5.0":
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/@fastify/ajv-compiler/-/ajv-compiler-3.5.0.tgz#459bff00fefbf86c96ec30e62e933d2379e46670"
   integrity sha512-ebbEtlI7dxXF5ziNdr05mOY8NnDiPB1XvAlLHctRt/Rc+C3LCOVW5imUVX+mhvUhnNzmPBHewUkOFgGlCxgdAA==
@@ -1170,7 +1224,7 @@
   resolved "https://registry.yarnpkg.com/@fastify/error/-/error-3.2.0.tgz#9010e0acfe07965f5fc7d2b367f58f042d0f4106"
   integrity sha512-KAfcLa+CnknwVi5fWogrLXgidLic+GXnLjijXdpl8pvkvbXU5BGa37iZO9FGvsh9ZL4y+oFi5cbHBm5UOG+dmQ==
 
-"@fastify/fast-json-stringify-compiler@^4.1.0":
+"@fastify/fast-json-stringify-compiler@^4.1.0", "@fastify/fast-json-stringify-compiler@^4.2.0":
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/@fastify/fast-json-stringify-compiler/-/fast-json-stringify-compiler-4.2.0.tgz#52d047fac76b0d75bd660f04a5dd606659f57c5a"
   integrity sha512-ypZynRvXA3dibfPykQN3RB5wBdEUgSGgny8Qc6k163wYPLD4mEGEDkACp+00YmqkGvIm8D/xYoHajwyEdWD/eg==
@@ -1648,6 +1702,15 @@
   version "9.3.9"
   resolved "https://registry.npmjs.org/@nestjs/common/-/common-9.3.9.tgz"
   integrity sha512-GshTD9Xz+wD2em6NyzU4NXw5IXMUmapgDgD+iuj6XL0258hvDwODmNk37mBBnZvTZlqER+krvIUKnS34etqF/A==
+  dependencies:
+    uid "2.0.1"
+    iterare "1.2.1"
+    tslib "2.5.0"
+
+"@nestjs/common@^9.3.12":
+  version "9.3.12"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-9.3.12.tgz#9b3a9e162fe73c830ffa588fd3d921fd8a9f174a"
+  integrity sha512-NtrUG2VgCbhmZEO1yRt/Utq16uFRV+xeHAOtdYIsfHGG0ssAV2lVLlvFFAQYh0SQ+KuYY1Gsxd3GK2JFoJCNqQ==
   dependencies:
     uid "2.0.1"
     iterare "1.2.1"
@@ -4654,6 +4717,27 @@ fastify@4.13.0:
     semver "^7.3.7"
     tiny-lru "^10.0.0"
 
+fastify@^4.15.0:
+  version "4.15.0"
+  resolved "https://registry.yarnpkg.com/fastify/-/fastify-4.15.0.tgz#4ebadaea706217467a332341f9cfa632072d51f2"
+  integrity sha512-m/CaRN8nf5uyYdrDe2qqq+0z3oGyE+A++qlKQoLJTI4WI0nWK9D6R3FxXQ3MVwt/md977GMR4F43pE9oqrS2zw==
+  dependencies:
+    "@fastify/ajv-compiler" "^3.5.0"
+    "@fastify/error" "^3.0.0"
+    "@fastify/fast-json-stringify-compiler" "^4.2.0"
+    abstract-logging "^2.0.1"
+    avvio "^8.2.0"
+    fast-content-type-parse "^1.0.0"
+    find-my-way "^7.6.0"
+    light-my-request "^5.6.1"
+    pino "^8.5.0"
+    process-warning "^2.0.0"
+    proxy-addr "^2.0.7"
+    rfdc "^1.3.0"
+    secure-json-parse "^2.5.0"
+    semver "^7.3.7"
+    tiny-lru "^10.0.0"
+
 fastq@^1.6.0, fastq@^1.6.1:
   version "1.15.0"
   resolved "https://registry.npmjs.org/fastq/-/fastq-1.15.0.tgz"
@@ -4702,7 +4786,7 @@ finalhandler@1.2.0:
     statuses "2.0.1"
     unpipe "~1.0.0"
 
-find-my-way@^7.3.0:
+find-my-way@^7.3.0, find-my-way@^7.6.0:
   version "7.6.0"
   resolved "https://registry.yarnpkg.com/find-my-way/-/find-my-way-7.6.0.tgz#f1e271fd1aafe87e87860662f9940124274f73c7"
   integrity sha512-H7berWdHJ+5CNVr4ilLWPai4ml7Y2qAsxjw3pfeBxPigZmaDTzF0wjJLj90xRCmGcWYcyt050yN+34OZDJm1eQ==
@@ -6145,7 +6229,7 @@ mysql@2.18.1:
     safe-buffer "5.1.2"
     sqlstring "2.3.1"
 
-nats@^2.13.1, nats@^2.6.1:
+nats@^2.10.2, nats@^2.13.1, nats@^2.6.1:
   version "2.13.1"
   resolved "https://registry.yarnpkg.com/nats/-/nats-2.13.1.tgz#05e3e8d617890f97f4dfd2931a8edca3b9cc5e63"
   integrity sha512-lHV/DQREZVHXtavlAI5fFA7XDyN2/LNBtnNX76mPQV9BIKpTehzYrD1Hw7t/1mV4AGdrJj6U60JkQ8AMrVc6Mg==
@@ -6958,7 +7042,7 @@ rxjs@6.6.7, rxjs@^6.6.0:
   dependencies:
     tslib "^1.9.0"
 
-rxjs@^7.2.0, rxjs@^7.4.0, rxjs@^7.5.5:
+rxjs@^7.2.0, rxjs@^7.4.0, rxjs@^7.5.5, rxjs@^7.8.0:
   version "7.8.0"
   resolved "https://registry.npmjs.org/rxjs/-/rxjs-7.8.0.tgz"
   integrity sha512-F2+gxDshqmIub1KdvZkaEfGDwLNpPvk9Fs6LD/MyQxNgMds/WH9OdDDXOmxUZpME+iSK3rQCctkL0DYyytUqMg==

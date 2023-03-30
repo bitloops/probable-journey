@@ -1,5 +1,5 @@
 import { Application, Domain } from '@bitloops/bl-boilerplate-core';
-import { asyncLocalStorage } from '@src/bitloops/tracing';
+import { asyncLocalStorage } from '@bitloops/bl-boilerplate-infra-telemetry';
 export type TLogInCommand = {
   userId: string;
 };

@@ -1,5 +1,5 @@
 import { Domain } from '@bitloops/bl-boilerplate-core';
-import { asyncLocalStorage } from '@src/bitloops/tracing';
+import { asyncLocalStorage } from '@bitloops/bl-boilerplate-infra-telemetry';
 import { UserEntity } from '../user.entity';
 
 export class TodoCompletionsIncrementedDomainEvent

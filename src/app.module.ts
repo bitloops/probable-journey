@@ -5,13 +5,13 @@ import { IamModule } from './bounded-contexts/iam/iam/iam.module';
 import {
   JetstreamModule,
   NatsStreamingMessageBus,
-} from '@src/bitloops/nest-jetstream';
+} from '@bitloops/bl-boilerplate-infra-nest-jetsream';
 import { PostgresModule } from '@bitloops/bl-boilerplate-infra-postgres';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import authConfiguration from './config/auth.configuration';
 import { MongoModule } from '@bitloops/bl-boilerplate-infra-mongo';
-import { TracingModule } from '@bitloops/tracing';
+import { TracingModule } from '@bitloops/bl-boilerplate-infra-telemetry';
 
 @Module({
   imports: [

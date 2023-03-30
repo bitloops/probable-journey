@@ -9,8 +9,8 @@ import { GrpcOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 import { ApiModule } from './api/api.module';
 import config from './config/configuration';
-import { AsyncLocalStorageInterceptor } from './bitloops/nest-auth-passport/jwt/async-local-storage.interceptor';
-import { CorrelationIdInterceptor } from './bitloops/tracing/correlationId.interceptor';
+import { AsyncLocalStorageInterceptor } from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
+import { CorrelationIdInterceptor } from '@bitloops/bl-boilerplate-infra-telemetry';
 
 // gRPC microservice configuration
 const grpcMicroserviceOptions: () => GrpcOptions = () => {

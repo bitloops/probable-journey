@@ -1,5 +1,5 @@
 import { Domain } from '@bitloops/bl-boilerplate-core';
-import { asyncLocalStorage } from '@src/bitloops/tracing';
+import { asyncLocalStorage } from '@bitloops/bl-boilerplate-core';
 import { TodoEntity } from '../TodoEntity';
 
 export class TodoUncompletedDomainEvent

@@ -7,7 +7,7 @@ import { CreateUserCommand } from '@src/lib/bounded-contexts/marketing/marketing
 import { MockCreateUserReadRepo } from './create-user-read-repo.mock';
 import { CreateUserCommandHandler } from '@src/lib/bounded-contexts/marketing/marketing/application/command-handlers/create-user.command-handler';
 import { UserEmailReadModelBuilder } from '../../builders/user-read-model.builder';
-import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { Application } from '@bitloops/bl-boilerplate-core';
 
 describe('Create user feature test', () => {
   it('Created user successfully,', async () => {

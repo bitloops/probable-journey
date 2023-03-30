@@ -13,7 +13,7 @@ import {
   COMPLETE_TODO_REPO_ERROR_SAVE_CASE,
   COMPLETE_TODO_SUCCESS_CASE,
 } from './complete-todo.mock';
-import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { Application } from '@bitloops/bl-boilerplate-core';
 import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
 
 describe('Complete todo feature test', () => {

@@ -1,9 +1,4 @@
-import {
-  Application,
-  Either,
-  ok,
-  fail,
-} from '@src/bitloops/bl-boilerplate-core';
+import { Application, Either, ok, fail } from '@bitloops/bl-boilerplate-core';
 import {
   EmailServicePort,
   SendEmailRequest,

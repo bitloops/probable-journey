@@ -15,11 +15,11 @@ import {
   StreamingDomainEventBusToken,
   StreamingIntegrationEventBusToken,
 } from '@src/lib/bounded-contexts/todo/todo/constants';
-import { NatsStreamingIntegrationEventBus } from '@src/bitloops/nest-jetstream/buses/nats-streaming-integration-event-bus';
 import {
   JetstreamModule,
   NatsStreamingDomainEventBus,
-} from '@src/bitloops/nest-jetstream';
+  NatsStreamingIntegrationEventBus,
+} from '@bitloops/bl-boilerplate-infra-nest-jetsream';
 
 const providers = [
   {

@@ -1,5 +1,5 @@
 import { Domain, Infra } from '@bitloops/bl-boilerplate-core';
-import { asyncLocalStorage } from '@src/bitloops/tracing';
+import { asyncLocalStorage } from '@bitloops/bl-boilerplate-infra-telemetry';
 import { TodoCompletedDomainEvent } from '../../domain/events/todo-completed.event';
 
 export type IntegrationSchemaV1 = {

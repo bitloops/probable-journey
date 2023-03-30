@@ -12,14 +12,17 @@ import {
 import { UpdateEmailCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/update-email.command';
 import { UpdateEmailDTO } from './dto/update-email.dto';
 import { RegisterDTO } from './dto/register.dto';
-import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
-import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
+import { BUSES_TOKENS } from '@bitloops/bl-boilerplate-infra-nest-jetsream';
+import { Application, Infra } from '@bitloops/bl-boilerplate-core';
 import {
   AuthService,
   JwtAuthGuard,
   LocalAuthGuard,
-} from '@src/bitloops/nest-auth-passport';
-import { Traceable, asyncLocalStorage } from '@bitloops/tracing';
+} from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
+import {
+  Traceable,
+  asyncLocalStorage,
+} from '@bitloops/bl-boilerplate-infra-telemetry';
 
 @Controller('auth')
 export class AuthController {

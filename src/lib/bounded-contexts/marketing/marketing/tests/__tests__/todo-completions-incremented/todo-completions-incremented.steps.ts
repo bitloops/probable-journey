@@ -4,7 +4,7 @@ import { MockUserEmailReadRepo } from './user-email-read-repo.mock';
 import { TodoCompletionsIncrementedHandler } from '../../../application/event-handlers/domain/todo-completions-incremented.handler';
 import { MockNotificationTemplateReadRepo } from './notification-template-read-repo.mock';
 import { UserEntityBuilder } from '../../builders/user-entity.builder';
-import { Domain } from '@src/bitloops/bl-boilerplate-core';
+import { Domain } from '@bitloops/bl-boilerplate-core';
 import { SUCCESS_CASE } from './todo-completions-incremented.mock';
 import { NotificationTemplateReadModel } from '../../../domain/read-models/notification-template.read-model';
 

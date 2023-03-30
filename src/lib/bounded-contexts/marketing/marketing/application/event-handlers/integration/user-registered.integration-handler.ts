@@ -25,8 +25,7 @@ export class UserRegisteredIntegrationEventHandler
   }
 
   public async handle(
-    // TODO FIx this
-    event: /*UserRegisteredIntegrationEvent as*/ any,
+    event: UserRegisteredIntegrationEvent,
   ): Promise<Either<void, never>> {
     const { data } = event;
     const command = new CreateUserCommand({

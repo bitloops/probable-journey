@@ -1083,7 +1083,16 @@
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@bitloops/bl-boilerplate-core@0.3.0", "@bitloops/bl-boilerplate-core@^0.3.0":
+"@bitloops/bl-boilerplate-core@0.3.1", "@bitloops/bl-boilerplate-core@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-core/-/bl-boilerplate-core-0.3.1.tgz#4e6a7f3bae7940b412b3fdd7a1716050931f7307"
+  integrity sha512-f+I8RbEZx3atrLsfHSW9SLMCeqgoVYI72U0wwXI7xTf2/jWNhM4n855uax+IPZy2xcRKboFR6p9Vdid5e6wAJw==
+  dependencies:
+    class-transformer "^0.5.1"
+    nats "^2.10.2"
+    reflect-metadata "^0.1.13"
+
+"@bitloops/bl-boilerplate-core@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-core/-/bl-boilerplate-core-0.3.0.tgz#3357bf7e32219a4be0dfbdfd715dc6174c527a65"
   integrity sha512-pYeNuvlw5v0WNlOL47Iqjjwpw2WI0Mq4TZvcPqepVYqOKwZ94AEqPoqVDawvRL1qlUqFuV9frELUUzzFSsz4eQ==
@@ -1092,10 +1101,10 @@
     nats "^2.10.2"
     reflect-metadata "^0.1.13"
 
-"@bitloops/bl-boilerplate-core@^0.3.1":
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-core/-/bl-boilerplate-core-0.3.1.tgz#4e6a7f3bae7940b412b3fdd7a1716050931f7307"
-  integrity sha512-f+I8RbEZx3atrLsfHSW9SLMCeqgoVYI72U0wwXI7xTf2/jWNhM4n855uax+IPZy2xcRKboFR6p9Vdid5e6wAJw==
+"@bitloops/bl-boilerplate-core@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-core/-/bl-boilerplate-core-0.3.2.tgz#90c9abda71bf0144b99770dfd7d18c76530c73ae"
+  integrity sha512-k81jra50PzgI2zjfwfE1+OpQlmHE4e0+HGYxrFtlPQwV9RbGZkDxVrkSxsUNo8oNjRrXOuvfGaN4ssfo8kxhww==
   dependencies:
     class-transformer "^0.5.1"
     nats "^2.10.2"
@@ -1109,12 +1118,12 @@
     "@nestjs/common" "^9.0.0"
     mongodb "^4.10.0"
 
-"@bitloops/bl-boilerplate-infra-nest-auth-passport@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-nest-auth-passport/-/bl-boilerplate-infra-nest-auth-passport-0.1.1.tgz#394286f49712ecaa801653f026746725dd627a68"
-  integrity sha512-9M6eOMJDdeyDVVvL6xJTyvpIAUfsBTcFbjkN4EzSOhEZKz0XH85i5g06Dqgv8yZIpVl95d3D8mNrFz2OFKJ2xQ==
+"@bitloops/bl-boilerplate-infra-nest-auth-passport@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-nest-auth-passport/-/bl-boilerplate-infra-nest-auth-passport-0.1.2.tgz#4cef0f812d6113a34c61a47b61d36c8829da95fb"
+  integrity sha512-iKE5Ilp0s2J1OoyltfNlYpeqziCYFc9SPF9C0c0SxHnz7mOuhnWLoKKzKKckAtj+ixAMPA0eiUrxMGqvLzhSTA==
   dependencies:
-    "@bitloops/bl-boilerplate-core" "^0.3.0"
+    "@bitloops/bl-boilerplate-core" "^0.3.2"
     "@bitloops/bl-boilerplate-infra-postgres" "^0.1.1"
     "@nestjs/common" "^9.0.0"
     "@nestjs/jwt" "^10.0.2"
@@ -1144,14 +1153,15 @@
     "@nestjs/common" "^9.0.0"
     pg "^8.10.0"
 
-"@bitloops/bl-boilerplate-infra-telemetry@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-telemetry/-/bl-boilerplate-infra-telemetry-0.1.0.tgz#1aff46cfe4076afad00392287c399f53afc6960a"
-  integrity sha512-TPBgbbRGpaKJym6l54ZZX6sncRwtH8kWjCWbfIknwVSyyP9WPNMS6+rtalPvW8SODeHI3WsVrtDnZ06qOW/n8Q==
+"@bitloops/bl-boilerplate-infra-telemetry@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-telemetry/-/bl-boilerplate-infra-telemetry-0.1.1.tgz#c3ea3fedf173e08f6cbeb80344283b8472d8c208"
+  integrity sha512-QvRCb6wZnzprQkFjbKlhhaDdQXrzadOL4rUcVsZn/4PBGK03SFvXf1jconOwTv++lUNFPI3RdrrzRkuYMiGC1w==
   dependencies:
-    "@bitloops/bl-boilerplate-core" "0.3.0"
+    "@bitloops/bl-boilerplate-core" "0.3.1"
     "@nestjs/common" "^9.0.0"
     fastify "^4.15.0"
+    rxjs "^7.8.0"
 
 "@colors/colors@1.5.0":
   version "1.5.0"

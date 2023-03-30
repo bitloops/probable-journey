@@ -48,7 +48,8 @@ import {
         }),
         inject: [ConfigService],
       },
-      integrationEventBus: NatsStreamingIntegrationEventBus,
+      // TODO fix this
+      integrationEventBus: NatsStreamingIntegrationEventBus as any,
     }),
     JetstreamModule.forRoot({
       servers: [

@@ -6,7 +6,7 @@ import {
   fail,
 } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
-import { UpdateUserEmailCommand } from '../../commands/update-user-email.command';
+import { ChangeUserEmailCommand } from '../../commands/change-user-email.command';
 import { UserReadModel } from '../../domain/read-models/user-email.read-model';
 import {
   UserEmailReadRepoPort,
@@ -19,8 +19,8 @@ type UpdateUserEmailCommandHandlerResponse = Either<
   Application.Repo.Errors.Unexpected
 >;
 
-export class UpdateUserEmailCommandHandler
-  implements Application.ICommandHandler<UpdateUserEmailCommand, void>
+export class ChangeUserEmailCommandHandler
+  implements Application.ICommandHandler<ChangeUserEmailCommand, void>
 {
   constructor(
     @Inject(UserEmailReadRepoPortToken)
@@ -28,7 +28,7 @@ export class UpdateUserEmailCommandHandler
   ) {}
 
   get command() {
-    return UpdateUserEmailCommand;
+    return ChangeUserEmailCommand;
   }
 
   get boundedContext(): string {
@@ -36,16 +36,16 @@ export class UpdateUserEmailCommandHandler
   }
 
   @Traceable({
-    operation: 'UpdateUserEmailCommandHandler',
+    operation: 'ChangeUserEmailCommandHandler',
     metrics: {
-      name: 'UpdateUserEmailCommandHandler',
+      name: 'ChangeUserEmailCommandHandler',
       category: 'commandHandler',
     },
   })
   async execute(
-    command: UpdateUserEmailCommand,
+    command: ChangeUserEmailCommand,
   ): Promise<UpdateUserEmailCommandHandlerResponse> {
-    console.log('UpdateUserEmailCommandHandler');
+    console.log('ChangeUserEmailCommandHandler');
     const requestUserId = new Domain.UUIDv4(command.userId);
     const userIdEmail = new UserReadModel(
       requestUserId.toString(),

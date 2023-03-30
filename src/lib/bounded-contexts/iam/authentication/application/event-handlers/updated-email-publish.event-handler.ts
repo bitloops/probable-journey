@@ -1,7 +1,7 @@
 import { Infra, Application, Either, ok } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
 import { StreamingIntegrationEventBusToken } from '../../constants';
-import { UserUpdatedEmailIntegrationEvent } from '../../contracts/integration-events/user-updated-email.integration-event';
+import { UserEmailChangedIntegrationEvent } from '../../contracts/integration-events/user-email-changed.integration-event';
 import { UserUpdatedEmailDomainEvent } from '../../domain/events/user-updated-email.event';
 
 export class UserUpdatedEmailPublishIntegrationEventHandler
@@ -23,7 +23,7 @@ export class UserUpdatedEmailPublishIntegrationEventHandler
   public async handle(
     event: UserUpdatedEmailDomainEvent,
   ): Promise<Either<void, never>> {
-    const events = UserUpdatedEmailIntegrationEvent.create(event);
+    const events = UserEmailChangedIntegrationEvent.create(event);
     await this.eventBus.publish(events);
 
     console.log(

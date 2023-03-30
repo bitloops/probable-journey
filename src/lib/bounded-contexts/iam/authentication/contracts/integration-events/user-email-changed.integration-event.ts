@@ -15,21 +15,21 @@ type ToIntegrationDataMapper = (
   data: UserUpdatedEmailDomainEvent,
 ) => IntegrationSchemas;
 
-export class UserUpdatedEmailIntegrationEvent
+export class UserEmailChangedIntegrationEvent
   implements Infra.EventBus.IntegrationEvent<IntegrationSchemas>
 {
   static versions = ['v1'];
-  public static readonly fromContextId = 'IAM';
+  public static readonly boundedContextId = 'IAM';
   // UserUpdatedEmailDomainEvent.fromContextId; // get from it's own context in case we have some props as input
   static versionMappers: Record<string, ToIntegrationDataMapper> = {
-    v1: UserUpdatedEmailIntegrationEvent.toIntegrationDataV1,
+    v1: UserEmailChangedIntegrationEvent.toIntegrationDataV1,
   };
   public metadata: Infra.EventBus.TIntegrationEventMetadata;
 
   constructor(public data: IntegrationSchemas, version: string) {
     this.metadata = {
       messageId: new Domain.UUIDv4().toString(),
-      boundedContextId: UserUpdatedEmailIntegrationEvent.fromContextId,
+      boundedContextId: UserEmailChangedIntegrationEvent.boundedContextId,
       version,
       createdAtTimestamp: Date.now(),
       correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
@@ -39,11 +39,11 @@ export class UserUpdatedEmailIntegrationEvent
 
   static create(
     event: UserUpdatedEmailDomainEvent,
-  ): UserUpdatedEmailIntegrationEvent[] {
-    return UserUpdatedEmailIntegrationEvent.versions.map((version) => {
-      const mapper = UserUpdatedEmailIntegrationEvent.versionMappers[version];
+  ): UserEmailChangedIntegrationEvent[] {
+    return UserEmailChangedIntegrationEvent.versions.map((version) => {
+      const mapper = UserEmailChangedIntegrationEvent.versionMappers[version];
       const data = mapper(event);
-      return new UserUpdatedEmailIntegrationEvent(data, version);
+      return new UserEmailChangedIntegrationEvent(data, version);
     });
   }
 

@@ -5,11 +5,11 @@ import { MongoModule } from '@bitloops/bl-boilerplate-infra-mongo';
 import { PostgresModule } from '@bitloops/bl-boilerplate-infra-postgres';
 import { UserWriteRepoPortToken } from '@src/lib/bounded-contexts/iam/authentication/ports/UserWriteRepoPort';
 import { PubSubCommandHandlers } from '@src/lib/bounded-contexts/iam/authentication/application/command-handlers';
-import { NatsStreamingIntegrationEventBus } from '@src/bitloops/nest-jetstream/buses/nats-streaming-integration-event-bus';
 import {
   JetstreamModule,
   NatsStreamingDomainEventBus,
-} from '@src/bitloops/nest-jetstream';
+  NatsStreamingIntegrationEventBus,
+} from '@bitloops/bl-boilerplate-infra-nest-jetsream';
 import { StreamingDomainEventHandlers } from '@src/lib/bounded-contexts/iam/authentication/application/event-handlers';
 import {
   StreamingDomainEventBusToken,

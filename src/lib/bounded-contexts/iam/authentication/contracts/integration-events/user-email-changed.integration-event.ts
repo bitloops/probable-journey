@@ -31,7 +31,7 @@ export class UserEmailChangedIntegrationEvent
       messageId: new Domain.UUIDv4().toString(),
       boundedContextId: UserEmailChangedIntegrationEvent.boundedContextId,
       version,
-      createdAtTimestamp: Date.now(),
+      createdTimestamp: Date.now(),
       correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
       context: asyncLocalStorage.getStore()?.get('context'),
     };

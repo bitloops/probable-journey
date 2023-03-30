@@ -1,4 +1,4 @@
-import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { Application } from '@bitloops/bl-boilerplate-core';
 import { GetTodosHandler } from '../../../application/query-handlers/get-todos.handler';
 import { GetTodosQuery } from '../../../queries/get-todos.query';
 import { ContextBuilder } from '../../builders/context.builder';

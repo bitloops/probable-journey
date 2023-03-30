@@ -1,4 +1,4 @@
-import { Application, Either, ok } from '@src/bitloops/bl-boilerplate-core';
+import { Application, Either, ok } from '@bitloops/bl-boilerplate-core';
 import { NotificationTemplateReadModel } from '../../../domain/read-models/notification-template.read-model';
 import { NotificationTemplateReadRepoPort } from '../../../ports/notification-template-read.repo-port.';
 

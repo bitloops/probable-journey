@@ -1,11 +1,6 @@
 import { Inject } from '@nestjs/common';
-import {
-  Infra,
-  Application,
-  Either,
-  ok,
-} from '@src/bitloops/bl-boilerplate-core';
-import { UserRegisteredIntegrationEvent } from '@src/bitloops/nest-auth-passport';
+import { Infra, Application, Either, ok } from '@bitloops/bl-boilerplate-core';
+import { UserRegisteredIntegrationEvent } from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
 import { CreateUserCommand } from '../../../commands/create-user.command';
 import { StreamingCommandBusToken } from '../../../constants';
 

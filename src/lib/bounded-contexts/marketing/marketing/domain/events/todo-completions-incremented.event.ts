@@ -1,5 +1,5 @@
 import { Domain } from '@bitloops/bl-boilerplate-core';
-import { asyncLocalStorage } from '@src/bitloops/tracing';
+import { asyncLocalStorage } from '@bitloops/bl-boilerplate-infra-telemetry';
 import { UserEntity } from '../user.entity';
 
 export class TodoCompletionsIncrementedDomainEvent
@@ -12,7 +12,7 @@ export class TodoCompletionsIncrementedDomainEvent
     const uuid = new Domain.UUIDv4();
     this.metadata = {
       boundedContextId: 'Marketing',
-      createdAtTimestamp: Date.now(),
+      createdTimestamp: Date.now(),
       context: asyncLocalStorage.getStore()?.get('context'),
       messageId: uuid.toString(),
       correlationId: asyncLocalStorage.getStore()?.get('correlationId'),

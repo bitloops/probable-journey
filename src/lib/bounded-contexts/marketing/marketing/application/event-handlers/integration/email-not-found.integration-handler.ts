@@ -1,9 +1,4 @@
-import {
-  Infra,
-  Application,
-  Either,
-  ok,
-} from '@src/bitloops/bl-boilerplate-core';
+import { Infra, Application, Either, ok } from '@bitloops/bl-boilerplate-core';
 import { EmailNotFoundIntegrationErrorEvent } from '@src/lib/bounded-contexts/iam/authentication/application/error-events/email-not-found.integration-event';
 
 export class EmailNotFoundIntegrationErrorEventHandler

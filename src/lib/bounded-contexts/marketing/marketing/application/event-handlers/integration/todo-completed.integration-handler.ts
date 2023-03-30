@@ -1,9 +1,4 @@
-import {
-  Infra,
-  Application,
-  ok,
-  Either,
-} from '@src/bitloops/bl-boilerplate-core';
+import { Infra, Application, ok, Either } from '@bitloops/bl-boilerplate-core';
 import { TodoCompletedIntegrationEvent } from '@src/lib/bounded-contexts/todo/todo/contracts/integration-events/todo-completed.integration-event';
 import { IncrementTodosCommand } from '../../../commands/Increment-todos.command';
 import { StreamingCommandBusToken } from '../../../constants';

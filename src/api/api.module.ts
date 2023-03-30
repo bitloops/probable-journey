@@ -7,13 +7,16 @@ import {
   JetstreamModule,
   NatsStreamingIntegrationEventBus,
   NatsStreamingMessageBus,
-} from '@src/bitloops/nest-jetstream';
+} from '@bitloops/bl-boilerplate-infra-nest-jetsream';
 import configuration from '@src/config/configuration';
 import authConfiguration, {
   AuthEnvironmentVariables,
 } from '@src/config/auth.configuration';
-import { AuthModule } from '@src/bitloops/nest-auth-passport';
-import { CorrelationIdMiddleware, TracingModule } from '@src/bitloops/tracing';
+import { AuthModule } from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
+import {
+  CorrelationIdMiddleware,
+  TracingModule,
+} from '@bitloops/bl-boilerplate-infra-telemetry';
 
 @Module({
   imports: [
@@ -45,7 +48,8 @@ import { CorrelationIdMiddleware, TracingModule } from '@src/bitloops/tracing';
         }),
         inject: [ConfigService],
       },
-      integrationEventBus: NatsStreamingIntegrationEventBus,
+      // TODO fix this
+      integrationEventBus: NatsStreamingIntegrationEventBus as any,
     }),
     JetstreamModule.forRoot({
       servers: [

@@ -13,15 +13,14 @@ import { todo } from '../proto/generated/todo';
 
 import { AddTodoCommand } from '../lib/bounded-contexts/todo/todo/commands/add-todo.command';
 
-import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
+import { BUSES_TOKENS } from '@bitloops/bl-boilerplate-infra-nest-jetsream';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import {
   AsyncLocalStorageInterceptor,
-  GetAuthData,
   JwtGrpcAuthGuard,
-} from '@src/bitloops/nest-auth-passport';
-import { Infra, asyncLocalStorage } from '@src/bitloops/bl-boilerplate-core';
-import { CorrelationIdInterceptor } from '@src/bitloops/tracing';
+} from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
+import { Infra, asyncLocalStorage } from '@bitloops/bl-boilerplate-core';
+import { CorrelationIdInterceptor } from '@bitloops/bl-boilerplate-infra-telemetry';
 import { TodoReadModel } from '@src/lib/bounded-contexts/todo/todo/domain/TodoReadModel';
 import { GetTodosQuery } from '@src/lib/bounded-contexts/todo/todo/queries/get-todos.query';
 import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
@@ -172,7 +171,7 @@ export class TodoGrpcController {
       });
     } else {
       const error = result.error;
-      console.error('Error while uncompleting todo:', error?.message);
+      console.error('Error while  todo:', error?.message);
       return new todo.ModifyTitleTodoResponse({
         error: new todo.ModifyTitleTodoErrorResponse({
           systemUnavailableError: new todo.ErrorResponse({

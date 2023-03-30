@@ -32,11 +32,11 @@ export interface AppConfig {
 }
 export default (): AppConfig => ({
   http: {
-    port: process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT, 10) : 3000,
+    port: process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT, 10) : 8082,
     ip: process.env.HTTP_IP ?? '0.0.0.0',
   },
   grpc: {
-    port: process.env.GRPC_PORT ? parseInt(process.env.GRPC_PORT, 10) : 3001,
+    port: process.env.GRPC_PORT ? parseInt(process.env.GRPC_PORT, 10) : 8081,
     ip: process.env.GRPC_IP ?? '0.0.0.0',
     packageName: process.env.GRPC_PACKAGE_NAME ?? 'todo',
     protoPath: process.env.GRPC_PROTO_PATH ?? 'src/proto/todo.proto',

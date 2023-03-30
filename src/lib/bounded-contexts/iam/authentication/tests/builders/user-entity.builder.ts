@@ -1,4 +1,4 @@
-import { Domain } from '@src/bitloops/bl-boilerplate-core';
+import { Domain } from '@bitloops/bl-boilerplate-core';
 import {
   UserEntity,
   UserProps,

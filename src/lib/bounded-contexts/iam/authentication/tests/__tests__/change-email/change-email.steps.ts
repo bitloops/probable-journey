@@ -1,5 +1,5 @@
 import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
-import { Application, Domain } from '@src/bitloops/bl-boilerplate-core';
+import { Application, Domain } from '@bitloops/bl-boilerplate-core';
 import {
   CHANGE_EMAIL_SUCCESS_CASE,
   INVALID_EMAIL_CASE,

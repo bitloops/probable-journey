@@ -1,4 +1,4 @@
-import { Infra, ok } from '@src/bitloops/bl-boilerplate-core';
+import { Infra, ok } from '@bitloops/bl-boilerplate-core';
 import { IncrementTodosCommand } from '../../../commands/Increment-todos.command';
 
 export class MockStreamCommandBus {

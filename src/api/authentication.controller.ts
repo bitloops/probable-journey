@@ -13,16 +13,17 @@ import { ChangeEmailCommand } from '@src/lib/bounded-contexts/iam/authentication
 import { UpdateEmailDTO } from './dto/update-email.dto';
 import { RegisterDTO } from './dto/register.dto';
 import { BUSES_TOKENS } from '@bitloops/bl-boilerplate-infra-nest-jetsream';
-import { Application, Infra } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Infra,
+  asyncLocalStorage,
+} from '@bitloops/bl-boilerplate-core';
 import {
   AuthService,
   JwtAuthGuard,
   LocalAuthGuard,
 } from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
-import {
-  Traceable,
-  asyncLocalStorage,
-} from '@bitloops/bl-boilerplate-infra-telemetry';
+import { Traceable } from '@bitloops/bl-boilerplate-infra-telemetry';
 
 @Controller('auth')
 export class AuthController {

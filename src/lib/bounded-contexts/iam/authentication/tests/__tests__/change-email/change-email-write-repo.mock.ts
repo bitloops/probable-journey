@@ -4,7 +4,7 @@ import {
   ok,
   fail,
   Domain,
-} from '@src/bitloops/bl-boilerplate-core';
+} from '@bitloops/bl-boilerplate-core';
 import { UserEntity } from '../../../domain/UserEntity';
 import { UserWriteRepoPort } from '../../../ports/UserWriteRepoPort';
 import {

@@ -1,4 +1,4 @@
-import { Infra, ok } from '@src/bitloops/bl-boilerplate-core';
+import { Infra, ok } from '@bitloops/bl-boilerplate-core';
 import { CreateUserCommand } from '../../../commands/create-user.command';
 export class MockStreamCommandBus {
   public readonly mockPublish: jest.Mock;

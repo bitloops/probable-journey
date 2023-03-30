@@ -1,4 +1,4 @@
-import { Infra, ok } from '@src/bitloops/bl-boilerplate-core';
+import { Infra, ok } from '@bitloops/bl-boilerplate-core';
 import { SendEmailCommand } from '../../../commands/send-email.command';
 
 export class MockStreamCommandBus {

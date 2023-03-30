@@ -80,8 +80,8 @@ export class TodoGrpcController {
     }
   }
 
-  @GrpcMethod('TodoApp', 'GetAllMyTodos')
-  async getAllMyTodos(): Promise<todo.GetAllTodosResponse> {
+  @GrpcMethod('TodoApp', 'GetAll')
+  async getAll(): Promise<todo.GetAllTodosResponse> {
     const results = await this.queryBus.request(new GetTodosQuery());
 
     if (results.isOk) {

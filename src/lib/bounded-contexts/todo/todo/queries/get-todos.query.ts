@@ -1,11 +1,12 @@
 import { Application, Domain } from '@bitloops/bl-boilerplate-core';
 import { asyncLocalStorage } from '@bitloops/bl-boilerplate-infra-telemetry';
 
-export class GetTodosQuery implements Application.IQuery {
+export class GetTodosQuery extends Application.Query {
   public metadata: Application.TQueryMetadata;
   public readonly boundedContext = 'Todo';
 
   constructor() {
+    super();
     this.metadata = {
       boundedContextId: 'Todo',
       createdTimestamp: Date.now(),

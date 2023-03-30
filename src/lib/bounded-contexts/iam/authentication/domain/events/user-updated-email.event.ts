@@ -11,7 +11,7 @@ export class UserUpdatedEmailDomainEvent
     this.metadata = {
       boundedContextId: 'IAM',
       messageId: new Domain.UUIDv4().toString(),
-      createdAtTimestamp: Date.now(),
+      createdTimestamp: Date.now(),
       correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
       context: asyncLocalStorage.getStore()?.get('context'),
     };

@@ -33,7 +33,7 @@ export class TodoAddedIntegrationEvent
       context: asyncLocalStorage.getStore()?.get('context'),
       messageId: new Domain.UUIDv4().toString(),
       correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
-      createdAtTimestamp: Date.now(),
+      createdTimestamp: Date.now(),
     };
   }
 

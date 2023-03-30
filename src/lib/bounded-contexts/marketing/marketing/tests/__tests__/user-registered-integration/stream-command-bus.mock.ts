@@ -1,24 +1,23 @@
 import { Infra, ok } from '@src/bitloops/bl-boilerplate-core';
-import { SendEmailCommand } from '../../../commands/send-email.command';
-
-export class MockStreamingCommandBus {
+import { CreateUserCommand } from '../../../commands/create-user.command';
+export class MockStreamCommandBus {
   public readonly mockPublish: jest.Mock;
-  private mockStreamingCommandBus: Infra.CommandBus.IStreamCommandBus;
+  private mockStreamCommandBus: Infra.CommandBus.IStreamCommandBus;
 
   constructor() {
     this.mockPublish = this.getMockPublishMethod();
-    this.mockStreamingCommandBus = {
+    this.mockStreamCommandBus = {
       publish: this.mockPublish,
       subscribe: jest.fn(),
     };
   }
 
-  getMockStreamingCommandBus(): Infra.CommandBus.IStreamCommandBus {
-    return this.mockStreamingCommandBus;
+  getMockStreamCommandBus(): Infra.CommandBus.IStreamCommandBus {
+    return this.mockStreamCommandBus;
   }
 
   private getMockPublishMethod(): jest.Mock {
-    return jest.fn((command: SendEmailCommand) => {
+    return jest.fn((command: CreateUserCommand) => {
       console.log('Publishing...', command);
       return Promise.resolve(ok());
     });

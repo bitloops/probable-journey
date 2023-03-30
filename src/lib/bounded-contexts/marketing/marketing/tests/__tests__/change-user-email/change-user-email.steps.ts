@@ -44,12 +44,12 @@ describe('Change user email feature test', () => {
       .withEmail(email)
       .build();
 
-    expect(mockUpdateUserReadRepo.mockSaveMethod).toHaveBeenCalledWith({
+    expect(mockUpdateUserReadRepo.mockUpdateMethod).toHaveBeenCalledWith({
       userId,
       email,
     });
     const userAggregate =
-      mockUpdateUserReadRepo.mockSaveMethod.mock.calls[0][0];
+      mockUpdateUserReadRepo.mockUpdateMethod.mock.calls[0][0];
     expect(userAggregate).toEqual(userIdEmail);
     expect(typeof result.value).toBe('undefined');
   });
@@ -75,7 +75,7 @@ describe('Change user email feature test', () => {
       .withEmail(email)
       .build();
 
-    expect(mockUpdateUserReadRepo.mockSaveMethod).toHaveBeenCalledWith(
+    expect(mockUpdateUserReadRepo.mockUpdateMethod).toHaveBeenCalledWith(
       userIdEmail,
     );
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);

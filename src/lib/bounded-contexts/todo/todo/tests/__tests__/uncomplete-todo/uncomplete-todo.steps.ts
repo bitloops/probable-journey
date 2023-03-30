@@ -74,17 +74,17 @@ describe('Uncomplete todo feature test', () => {
     mockAsyncLocalStorageGet(userId);
 
     // given
-    const mockCompleteTodoWriteRepo = new MockUncompleteTodoWriteRepo();
-    const completeTodoCommand = new UncompleteTodoCommand({ id });
+    const mockUncompleteTodoWriteRepo = new MockUncompleteTodoWriteRepo();
+    const uncompleteTodoCommand = new UncompleteTodoCommand({ id });
 
     // when
-    const completeTodoHandler = new UncompleteTodoHandler(
-      mockCompleteTodoWriteRepo.getMockTodoWriteRepo(),
+    const uncompleteTodoHandler = new UncompleteTodoHandler(
+      mockUncompleteTodoWriteRepo.getMockTodoWriteRepo(),
     );
-    const result = await completeTodoHandler.execute(completeTodoCommand);
+    const result = await uncompleteTodoHandler.execute(uncompleteTodoCommand);
 
     //then
-    expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith({
+    expect(mockUncompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith({
       value: id,
     });
     expect(result.value).toBeInstanceOf(ApplicationErrors.TodoNotFoundError);
@@ -95,17 +95,17 @@ describe('Uncomplete todo feature test', () => {
     mockAsyncLocalStorageGet(userId);
 
     // given
-    const mockCompleteTodoWriteRepo = new MockUncompleteTodoWriteRepo();
-    const completeTodoCommand = new UncompleteTodoCommand({ id });
+    const mockUncompleteTodoWriteRepo = new MockUncompleteTodoWriteRepo();
+    const uncompleteTodoCommand = new UncompleteTodoCommand({ id });
 
     // when
-    const completeTodoHandler = new UncompleteTodoHandler(
-      mockCompleteTodoWriteRepo.getMockTodoWriteRepo(),
+    const uncompleteTodoHandler = new UncompleteTodoHandler(
+      mockUncompleteTodoWriteRepo.getMockTodoWriteRepo(),
     );
-    const result = await completeTodoHandler.execute(completeTodoCommand);
+    const result = await uncompleteTodoHandler.execute(uncompleteTodoCommand);
 
     //then
-    expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith({
+    expect(mockUncompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith({
       value: id,
     });
     expect(result.value).toBeInstanceOf(
@@ -120,13 +120,13 @@ describe('Uncomplete todo feature test', () => {
 
     // given
     const mockCompleteTodoWriteRepo = new MockUncompleteTodoWriteRepo();
-    const completeTodoCommand = new UncompleteTodoCommand({ id });
+    const uncompleteTodoCommand = new UncompleteTodoCommand({ id });
 
     // when
-    const completeTodoHandler = new UncompleteTodoHandler(
+    const uncompleteTodoHandler = new UncompleteTodoHandler(
       mockCompleteTodoWriteRepo.getMockTodoWriteRepo(),
     );
-    const result = await completeTodoHandler.execute(completeTodoCommand);
+    const result = await uncompleteTodoHandler.execute(uncompleteTodoCommand);
 
     //then
     expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith({
@@ -135,26 +135,39 @@ describe('Uncomplete todo feature test', () => {
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });
   it('Todo failed to be uncompleted, save repo error', async () => {
+    const todoTitle = UNCOMPLETE_TODO_SUCCESS_CASE.title;
     const userId = UNCOMPLETE_TODO_REPO_ERROR_SAVE_CASE.userId;
     const id = UNCOMPLETE_TODO_REPO_ERROR_SAVE_CASE.id;
     mockAsyncLocalStorageGet(userId);
 
     // given
-    const mockCompleteTodoWriteRepo = new MockUncompleteTodoWriteRepo();
-    const completeTodoCommand = new UncompleteTodoCommand({ id });
+    const mockUncompleteTodoWriteRepo = new MockUncompleteTodoWriteRepo();
+    const uncompleteTodoCommand = new UncompleteTodoCommand({ id });
 
     // when
-    const completeTodoHandler = new UncompleteTodoHandler(
-      mockCompleteTodoWriteRepo.getMockTodoWriteRepo(),
+    const uncompleteTodoHandler = new UncompleteTodoHandler(
+      mockUncompleteTodoWriteRepo.getMockTodoWriteRepo(),
     );
-    const result = await completeTodoHandler.execute(completeTodoCommand);
+    const result = await uncompleteTodoHandler.execute(uncompleteTodoCommand);
 
     //then
-    expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith({
+    const todoProps = new TodoPropsBuilder()
+      .withTitle(todoTitle)
+      .withCompleted(false)
+      .withUserId(userId)
+      .withId(id)
+      .build();
+    expect(mockUncompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith({
       value: id,
     });
-    expect(mockCompleteTodoWriteRepo.mockUpdateMethod).toHaveBeenCalledWith(
+    expect(mockUncompleteTodoWriteRepo.mockUpdateMethod).toHaveBeenCalledWith(
       expect.any(TodoEntity),
+    );
+    const todoAggregate =
+      mockUncompleteTodoWriteRepo.mockUpdateMethod.mock.calls[0][0];
+    expect(todoAggregate.props).toEqual(todoProps);
+    expect(todoAggregate.domainEvents[0]).toBeInstanceOf(
+      TodoUncompletedDomainEvent,
     );
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });

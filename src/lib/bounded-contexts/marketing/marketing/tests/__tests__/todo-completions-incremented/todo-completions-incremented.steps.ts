@@ -13,7 +13,7 @@ import {
 } from './todo-completions-incremented.mock';
 import { NotificationTemplateReadModel } from '../../../domain/read-models/notification-template.read-model';
 import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
-import { MockStreamingCommandBus } from './streaming-command-bus.mock';
+import { MockStreamCommandBus } from './stream-command-bus.mock';
 import { ApplicationErrors } from '../../../application/errors';
 
 const mockGet = jest.fn();
@@ -38,7 +38,7 @@ describe('Todo completions incremented feature test', () => {
     const mockNotificationTemplateReadRepo =
       new MockNotificationTemplateReadRepo();
     const mockUserEmailReadRepo = new MockUserEmailReadRepo();
-    const mockStreamingCommandBus = new MockStreamingCommandBus();
+    const mockStreamCommandBus = new MockStreamCommandBus();
     const user = new UserEntityBuilder()
       .withId(userId)
       .withCompletedTodos(completedTodos)
@@ -49,7 +49,7 @@ describe('Todo completions incremented feature test', () => {
     // when
     const todoCompletionsIncrementedEventHandler =
       new TodoCompletionsIncrementedHandler(
-        mockStreamingCommandBus.getMockStreamingCommandBus(),
+        mockStreamCommandBus.getMockStreamingCommandBus(),
         mockUserEmailReadRepo.getMockUserEmailReadRepo(),
         mockNotificationTemplateReadRepo.getMockNotificationTemplateReadRepo(),
       );
@@ -66,9 +66,8 @@ describe('Todo completions incremented feature test', () => {
       new Domain.UUIDv4(userId),
     );
 
-    expect(mockStreamingCommandBus.mockPublish).toHaveBeenCalled();
-    const publishedCommand =
-      mockStreamingCommandBus.mockPublish.mock.calls[0][0];
+    expect(mockStreamCommandBus.mockPublish).toHaveBeenCalled();
+    const publishedCommand = mockStreamCommandBus.mockPublish.mock.calls[0][0];
     expect(publishedCommand.destination).toEqual(userEmail);
     expect(publishedCommand.content).toEqual(template);
     expect(publishedCommand.origin).toEqual('marketing@bitloops.com');
@@ -82,7 +81,7 @@ describe('Todo completions incremented feature test', () => {
     const mockNotificationTemplateReadRepo =
       new MockNotificationTemplateReadRepo();
     const mockUserEmailReadRepo = new MockUserEmailReadRepo();
-    const mockStreamingCommandBus = new MockStreamingCommandBus();
+    const mockStreamCommandBus = new MockStreamCommandBus();
     const user = new UserEntityBuilder()
       .withId(userId)
       .withCompletedTodos(completedTodos)
@@ -93,7 +92,7 @@ describe('Todo completions incremented feature test', () => {
     // when
     const todoCompletionsIncrementedEventHandler =
       new TodoCompletionsIncrementedHandler(
-        mockStreamingCommandBus.getMockStreamingCommandBus(),
+        mockStreamCommandBus.getMockStreamingCommandBus(),
         mockUserEmailReadRepo.getMockUserEmailReadRepo(),
         mockNotificationTemplateReadRepo.getMockNotificationTemplateReadRepo(),
       );
@@ -115,7 +114,7 @@ describe('Todo completions incremented feature test', () => {
     const mockNotificationTemplateReadRepo =
       new MockNotificationTemplateReadRepo();
     const mockUserEmailReadRepo = new MockUserEmailReadRepo();
-    const mockStreamingCommandBus = new MockStreamingCommandBus();
+    const mockStreamCommandBus = new MockStreamCommandBus();
     const user = new UserEntityBuilder()
       .withId(userId)
       .withCompletedTodos(completedTodos)
@@ -126,7 +125,7 @@ describe('Todo completions incremented feature test', () => {
     // when
     const todoCompletionsIncrementedEventHandler =
       new TodoCompletionsIncrementedHandler(
-        mockStreamingCommandBus.getMockStreamingCommandBus(),
+        mockStreamCommandBus.getMockStreamingCommandBus(),
         mockUserEmailReadRepo.getMockUserEmailReadRepo(),
         mockNotificationTemplateReadRepo.getMockNotificationTemplateReadRepo(),
       );
@@ -146,7 +145,7 @@ describe('Todo completions incremented feature test', () => {
     const mockNotificationTemplateReadRepo =
       new MockNotificationTemplateReadRepo();
     const mockUserEmailReadRepo = new MockUserEmailReadRepo();
-    const mockStreamingCommandBus = new MockStreamingCommandBus();
+    const mockStreamCommandBus = new MockStreamCommandBus();
     const user = new UserEntityBuilder()
       .withId(userId)
       .withCompletedTodos(completedTodos)
@@ -157,7 +156,7 @@ describe('Todo completions incremented feature test', () => {
     // when
     const todoCompletionsIncrementedEventHandler =
       new TodoCompletionsIncrementedHandler(
-        mockStreamingCommandBus.getMockStreamingCommandBus(),
+        mockStreamCommandBus.getMockStreamingCommandBus(),
         mockUserEmailReadRepo.getMockUserEmailReadRepo(),
         mockNotificationTemplateReadRepo.getMockNotificationTemplateReadRepo(),
       );
@@ -184,7 +183,7 @@ describe('Todo completions incremented feature test', () => {
     const mockNotificationTemplateReadRepo =
       new MockNotificationTemplateReadRepo();
     const mockUserEmailReadRepo = new MockUserEmailReadRepo();
-    const mockStreamingCommandBus = new MockStreamingCommandBus();
+    const mockStreamCommandBus = new MockStreamCommandBus();
     const user = new UserEntityBuilder()
       .withId(userId)
       .withCompletedTodos(completedTodos)
@@ -195,7 +194,7 @@ describe('Todo completions incremented feature test', () => {
     // when
     const todoCompletionsIncrementedEventHandler =
       new TodoCompletionsIncrementedHandler(
-        mockStreamingCommandBus.getMockStreamingCommandBus(),
+        mockStreamCommandBus.getMockStreamingCommandBus(),
         mockUserEmailReadRepo.getMockUserEmailReadRepo(),
         mockNotificationTemplateReadRepo.getMockNotificationTemplateReadRepo(),
       );

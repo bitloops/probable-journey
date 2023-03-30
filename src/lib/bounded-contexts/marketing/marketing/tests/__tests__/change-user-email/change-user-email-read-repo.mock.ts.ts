@@ -12,17 +12,17 @@ import {
 } from './change-user-email.mock';
 
 export class MockUpdateUserReadRepo {
-  public readonly mockSaveMethod: jest.Mock;
+  public readonly mockUpdateMethod: jest.Mock;
   private mockUserReadRepo: UserEmailReadRepoPort;
 
   constructor() {
-    this.mockSaveMethod = this.getMockSaveMethod();
+    this.mockUpdateMethod = this.getMockUpdateMethod();
     this.mockUserReadRepo = {
       getAll: jest.fn(),
       getById: jest.fn(),
       getUserEmail: jest.fn(),
       create: jest.fn(),
-      save: this.mockSaveMethod,
+      update: this.mockUpdateMethod,
     };
   }
 
@@ -30,7 +30,7 @@ export class MockUpdateUserReadRepo {
     return this.mockUserReadRepo;
   }
 
-  private getMockSaveMethod(): jest.Mock {
+  private getMockUpdateMethod(): jest.Mock {
     return jest.fn(
       (
         userIdEmail: UserReadModel,

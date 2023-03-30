@@ -60,6 +60,7 @@ export class ChangeEmailHandler
     if (saveResult.isFail()) {
       return fail(saveResult.value);
     }
+    //TODO publish email changed event?
     return ok();
   }
 }

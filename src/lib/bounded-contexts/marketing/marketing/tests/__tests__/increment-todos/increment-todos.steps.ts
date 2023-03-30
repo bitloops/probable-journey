@@ -142,7 +142,7 @@ describe('Increment completed todos feature test', () => {
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });
   it('Incremented completed todos failed, save repo error', async () => {
-    const { id } = INCREMENT_TODOS_REPO_ERROR_SAVE_CASE;
+    const { id, completedTodos } = INCREMENT_TODOS_REPO_ERROR_SAVE_CASE;
     mockAsyncLocalStorageGet(id);
 
     // given
@@ -157,11 +157,22 @@ describe('Increment completed todos feature test', () => {
     const result = await incrementTodosHandler.execute(incrementTodosCommand);
 
     //then
+    const userProps = new UserPropsBuilder()
+      .withId(id)
+      .withCompletedTodos(completedTodos + 1)
+      .build();
+
     expect(mockIncrementTodosWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
       new Domain.UUIDv4(id),
     );
     expect(mockIncrementTodosWriteRepo.mockUpdateMethod).toHaveBeenCalledWith(
       expect.any(UserEntity),
+    );
+    const todoAggregate =
+      mockIncrementTodosWriteRepo.mockUpdateMethod.mock.calls[0][0];
+    expect(todoAggregate.props).toEqual(userProps);
+    expect(todoAggregate.domainEvents[0]).toBeInstanceOf(
+      TodoCompletionsIncrementedDomainEvent,
     );
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });

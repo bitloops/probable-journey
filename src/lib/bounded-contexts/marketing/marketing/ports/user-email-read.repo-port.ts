@@ -6,7 +6,7 @@ export interface UserEmailReadRepoPort
   getUserEmail(
     userid: Domain.UUIDv4,
   ): Promise<Either<UserReadModel | null, Application.Repo.Errors.Unexpected>>;
-  save(
+  update(
     userReadModel: UserReadModel,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>>;
   create(

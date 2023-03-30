@@ -14,6 +14,7 @@ import { UserEntityBuilder } from '../../builders/user-entity.builder';
 import { UserEntity } from '../../../domain/UserEntity';
 import { DomainErrors } from '../../../domain/errors';
 import { ApplicationErrors } from '../../../application/errors';
+import { UserUpdatedEmailDomainEvent } from '../../../domain/events/user-updated-email.event';
 
 const mockGet = jest.fn();
 jest.mock('@bitloops/tracing', () => ({
@@ -58,6 +59,9 @@ describe('Change user email feature test', () => {
       expect.any(UserEntity),
     );
     const userAggregate = mockUserWriteRepo.mockUpdateMethod.mock.calls[0][0];
+    expect(userAggregate.domainEvents[0]).toBeInstanceOf(
+      UserUpdatedEmailDomainEvent,
+    );
     expect(userAggregate.id).toEqual(userEntity.id);
     expect(userAggregate.email).toEqual(userEntity.email);
     expect(userAggregate.password).toEqual(userEntity.password);
@@ -165,6 +169,9 @@ describe('Change user email feature test', () => {
       expect.any(UserEntity),
     );
     const userAggregate = mockUserWriteRepo.mockUpdateMethod.mock.calls[0][0];
+    expect(userAggregate.domainEvents[0]).toBeInstanceOf(
+      UserUpdatedEmailDomainEvent,
+    );
     expect(userAggregate.id).toEqual(userEntity.id);
     expect(userAggregate.email).toEqual(userEntity.email);
     expect(userAggregate.password).toEqual(userEntity.password);

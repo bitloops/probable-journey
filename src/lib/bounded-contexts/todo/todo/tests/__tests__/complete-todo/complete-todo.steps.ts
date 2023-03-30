@@ -134,6 +134,7 @@ describe('Complete todo feature test', () => {
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });
   it('Todo failed to be completed, save repo error', async () => {
+    const todoTitle = COMPLETE_TODO_REPO_ERROR_SAVE_CASE.title;
     const userId = COMPLETE_TODO_REPO_ERROR_SAVE_CASE.userId;
     const todoId = COMPLETE_TODO_REPO_ERROR_SAVE_CASE.id;
     mockAsyncLocalStorageGet(userId);
@@ -149,11 +150,24 @@ describe('Complete todo feature test', () => {
     const result = await completeTodoHandler.execute(completeTodoCommand);
 
     //then
+    const todoProps = new TodoPropsBuilder()
+      .withTitle(todoTitle)
+      .withCompleted(true)
+      .withUserId(userId)
+      .withId(todoId)
+      .build();
+
     expect(mockCompleteTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith({
       value: todoId,
     });
     expect(mockCompleteTodoWriteRepo.mockUpdateMethod).toHaveBeenCalledWith(
       expect.any(TodoEntity),
+    );
+    const todoAggregate =
+      mockCompleteTodoWriteRepo.mockUpdateMethod.mock.calls[0][0];
+    expect(todoAggregate.props).toEqual(todoProps);
+    expect(todoAggregate.domainEvents[0]).toBeInstanceOf(
+      TodoCompletedDomainEvent,
     );
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });

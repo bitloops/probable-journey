@@ -37,7 +37,7 @@ export class TodoCompletedIntegrationEventHandler
     await this.commandBus.publish(command);
 
     console.log(
-      `[TodoCompletedIntegrationEvent]: Successfully sent IncrementDepositsCommand`,
+      `[TodoCompletedIntegrationEvent]: Successfully sent IncrementTodosCommand`,
     );
 
     return ok();

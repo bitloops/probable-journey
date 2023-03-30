@@ -61,8 +61,9 @@ import { CorrelationIdMiddleware, TracingModule } from '@src/bitloops/tracing';
   ],
   controllers: [AuthController, TodoController, TodoGrpcController],
 })
-export class ApiModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
-  }
+// implements NestModule
+export class ApiModule {
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+  // }
 }

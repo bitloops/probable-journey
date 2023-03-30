@@ -1,8 +1,5 @@
-import {
-  Application,
-  Domain,
-  asyncLocalStorage,
-} from '@bitloops/bl-boilerplate-core';
+import { Application, Domain } from '@bitloops/bl-boilerplate-core';
+import { asyncLocalStorage } from '@bitloops/bl-boilerplate-infra-telemetry';
 export type TModifyTodoTitleCommand = {
   id: string;
   title: string;

@@ -4,7 +4,7 @@ import {
   Either,
   ok,
   fail,
-} from '@src/bitloops/bl-boilerplate-core';
+} from '@bitloops/bl-boilerplate-core';
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 import { TodoWriteRepoPort } from '@src/lib/bounded-contexts/todo/todo/ports/TodoWriteRepoPort';
 import {

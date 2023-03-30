@@ -1,4 +1,4 @@
-import { Domain } from '@src/bitloops/bl-boilerplate-core';
+import { Domain } from '@bitloops/bl-boilerplate-core';
 import { UserProps } from '@src/lib/bounded-contexts/marketing/marketing/domain/user.entity';
 import { CompletedTodosVO } from '@src/lib/bounded-contexts/marketing/marketing/domain/completed-todos.vo';
 

@@ -3,12 +3,11 @@ import {
   UPDATE_USER_SUCCESS_CASE,
 } from './change-user-email.mock';
 import { UserEmailReadModelBuilder } from '../../builders/user-read-model.builder';
-import { Application } from '@src/bitloops/bl-boilerplate-core';
-import { MockUpdateUserReadRepo } from './change-user-email-read-repo.mock.ts';
-
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
+import { Application } from '@bitloops/bl-boilerplate-core';
 import { ChangeUserEmailCommand } from '@src/lib/bounded-contexts/marketing/marketing/commands/change-user-email.command';
 import { ChangeUserEmailCommandHandler } from '@src/lib/bounded-contexts/marketing/marketing/application/command-handlers/change-user-email.command-handler';
+import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
+import { MockUpdateUserReadRepo } from './change-user-email-read-repo.mock';
 
 describe('Change user email feature test', () => {
   it('Changed user email successfully,', async () => {

@@ -1,4 +1,4 @@
-import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { Application } from '@bitloops/bl-boilerplate-core';
 
 export class ContextBuilder {
   private userId: string;

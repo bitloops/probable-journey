@@ -10,7 +10,7 @@ import {
   Either,
   asyncLocalStorage,
   ok,
-} from '@src/bitloops/bl-boilerplate-core';
+} from '@bitloops/bl-boilerplate-core';
 
 @Injectable()
 export class NotificationTemplateReadRepository

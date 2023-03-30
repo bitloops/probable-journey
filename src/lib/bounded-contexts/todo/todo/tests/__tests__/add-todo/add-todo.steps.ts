@@ -1,4 +1,4 @@
-import { Application } from '@src/bitloops/bl-boilerplate-core';
+import { Application } from '@bitloops/bl-boilerplate-core';
 import { AddTodoCommandHandler } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers/add-todo.handler';
 import { AddTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/add-todo.command';
 import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';

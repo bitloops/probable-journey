@@ -4,7 +4,7 @@ import {
   ok,
   fail,
   asyncLocalStorage,
-} from '@src/bitloops/bl-boilerplate-core';
+} from '@bitloops/bl-boilerplate-core';
 import { TodoReadModel } from '../../../domain/TodoReadModel';
 import { TodoReadRepoPort } from '../../../ports/TodoReadRepoPort';
 import {

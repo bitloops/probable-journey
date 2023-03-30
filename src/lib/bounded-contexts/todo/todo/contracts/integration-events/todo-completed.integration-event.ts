@@ -1,8 +1,5 @@
-import {
-  Domain,
-  Infra,
-  asyncLocalStorage,
-} from '@bitloops/bl-boilerplate-core';
+import { Domain, Infra } from '@bitloops/bl-boilerplate-core';
+import { asyncLocalStorage } from '@bitloops/bl-boilerplate-infra-telemetry';
 import { TodoCompletedDomainEvent } from '../../domain/events/todo-completed.event';
 
 export type IntegrationSchemaV1 = {
@@ -27,7 +24,7 @@ export class TodoCompletedIntegrationEvent
 
   constructor(public data: IntegrationSchemas, version: string) {
     this.metadata = {
-      createdAtTimestamp: Date.now(),
+      createdTimestamp: Date.now(),
       boundedContextId: TodoCompletedIntegrationEvent.boundedContextId,
       context: asyncLocalStorage.getStore()?.get('context'),
       messageId: new Domain.UUIDv4().toString(),

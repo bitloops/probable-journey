@@ -15,7 +15,7 @@ import {
   TodoWriteRepoPortToken,
 } from '../../ports/TodoWriteRepoPort';
 import { UserIdVO } from '../../domain/UserIdVO';
-import { Traceable } from '@src/bitloops/tracing';
+import { Traceable } from '@bitloops/bl-boilerplate-infra-telemetry';
 
 type AddTodoUseCaseResponse = Either<
   string,

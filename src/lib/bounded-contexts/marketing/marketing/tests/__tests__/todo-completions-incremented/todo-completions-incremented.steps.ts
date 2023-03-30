@@ -3,7 +3,7 @@ import { MockUserEmailReadRepo } from './user-email-read-repo.mock';
 import { TodoCompletionsIncrementedHandler } from '../../../application/event-handlers/domain/todo-completions-incremented.handler';
 import { MockNotificationTemplateReadRepo } from './notification-template-read-repo.mock';
 import { UserEntityBuilder } from '../../builders/user-entity.builder';
-import { Application, Domain } from '@src/bitloops/bl-boilerplate-core';
+import { Application, Domain } from '@bitloops/bl-boilerplate-core';
 import {
   SUCCESS_CASE,
   UNSUCCESS_EMAIL_NOT_FOUND_CASE,

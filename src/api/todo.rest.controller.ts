@@ -17,11 +17,11 @@ import { AddTodoDto } from './dto/add-todo.dto';
 import { CompleteTodoDto } from './dto/complete-todo.dto';
 import { GetTodosQuery } from '../lib/bounded-contexts/todo/todo/queries/get-todos.query';
 
-import { BUSES_TOKENS } from '@src/bitloops/nest-jetstream/buses/constants';
+import { BUSES_TOKENS } from '@bitloops/bl-boilerplate-infra-nest-jetsream';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
-import { JwtAuthGuard } from '@src/bitloops/nest-auth-passport';
-import { Traceable } from '@src/bitloops/tracing';
-import { Infra, asyncLocalStorage } from '@src/bitloops/bl-boilerplate-core';
+import { JwtAuthGuard } from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
+import { Traceable } from '@bitloops/bl-boilerplate-infra-telemetry';
+import { Infra, asyncLocalStorage } from '@bitloops/bl-boilerplate-core';
 import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 

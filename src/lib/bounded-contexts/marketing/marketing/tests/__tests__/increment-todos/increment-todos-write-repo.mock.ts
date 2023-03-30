@@ -4,7 +4,7 @@ import {
   Either,
   ok,
   fail,
-} from '@src/bitloops/bl-boilerplate-core';
+} from '@bitloops/bl-boilerplate-core';
 import { UserEntity } from '@src/lib/bounded-contexts/marketing/marketing/domain/user.entity';
 import { UserWriteRepoPort } from '@src/lib/bounded-contexts/marketing/marketing/ports/user-write.repo-port';
 import {

@@ -25,10 +25,8 @@ export class MongoModule {
             try {
               // mongodb://localhost:27017
               const connection = await client.connect();
-              console.log('*** After connect');
               return connection;
             } catch (error) {
-              console.log('*** In error');
               throw error;
             }
           },
@@ -78,10 +76,8 @@ export class MongoModule {
             try {
               // mongodb://localhost:27017
               const connection = await client.connect();
-              console.log('*** After connect');
               return connection;
             } catch (error) {
-              console.log('*** In error');
               throw error;
             }
           },

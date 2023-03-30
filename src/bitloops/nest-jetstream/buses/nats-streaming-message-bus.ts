@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   NatsConnection,
   JSONCodec,
@@ -20,6 +20,7 @@ const jsonCodec = JSONCodec();
 export class NatsStreamingMessageBus
   implements Infra.MessageBus.ISystemMessageBus
 {
+  private readonly logger = new Logger(NatsStreamingMessageBus.name);
   private nc: NatsConnection;
   private js: JetStreamClient;
   constructor(
@@ -42,7 +43,7 @@ export class NatsStreamingMessageBus
       await this.js.publish(topic, messageEncoded, options);
     } catch (err) {
       // NatsError: 503
-      console.error('Error publishing integration event to:', topic, err);
+      this.logger.error('Error publishing integration event to:', err);
     }
   }
 
@@ -75,7 +76,7 @@ export class NatsStreamingMessageBus
         }
       })();
     } catch (err) {
-      console.error('Error subscribing to topic:', subject, err);
+      this.logger.error('Error subscribing to topic:', subject, err);
     }
   }
   unsubscribe<T extends IMessage>(

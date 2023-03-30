@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { NatsConnection, JSONCodec, headers, Msg, MsgHdrs } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import {
@@ -14,6 +14,7 @@ const jsonCodec = JSONCodec<Infra.EventBus.IntegrationEvent<any>>();
 export class NatsPubSubIntegrationEventsBus
   implements Infra.EventBus.IEventBus
 {
+  private readonly logger = new Logger(NatsPubSubIntegrationEventsBus.name);
   private nc: NatsConnection;
   private static topicPrefix = 'IntegrationEvents_';
 
@@ -38,7 +39,7 @@ export class NatsPubSubIntegrationEventsBus
           NatsPubSubIntegrationEventsBus.getTopicFromEventInstance(
             integrationEvent,
           );
-        console.log('Publishing in pubsub-integration-event-bus :', topic);
+        this.logger.log('Publishing in pubsub-integration-event-bus :' + topic);
         const headers = this.generateHeaders(integrationEvent);
 
         return this.nc.publish(topic, jsonCodec.encode(integrationEvent), {
@@ -53,7 +54,7 @@ export class NatsPubSubIntegrationEventsBus
     handler: Application.IHandleIntegrationEvent,
   ) {
     try {
-      console.log('Subscribing to:', subject);
+      this.logger.log('Subscribing to:' + subject);
       const sub = this.nc.subscribe(subject);
       (async () => {
         for await (const m of sub) {
@@ -73,7 +74,10 @@ export class NatsPubSubIntegrationEventsBus
         }
       })();
     } catch (err) {
-      console.log('Error in pub-sub-integration-event-bus subscribe::', err);
+      this.logger.error(
+        'Error in pub-sub-integration-event-bus subscribe::',
+        err,
+      );
     }
   }
 

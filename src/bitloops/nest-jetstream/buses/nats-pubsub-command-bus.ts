@@ -1,9 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { NatsConnection, JSONCodec, headers, Msg, MsgHdrs } from 'nats';
 import { Application, Infra } from '@src/bitloops/bl-boilerplate-core';
 import {
   ASYNC_LOCAL_STORAGE,
-  METADATA_HEADERS,
   ProvidersConstants,
 } from '../jetstream.constants';
 import { ContextPropagation } from './utils/context-propagation';
@@ -14,6 +13,7 @@ const jsonCodec = JSONCodec();
 export class NatsPubSubCommandBus
   implements Infra.CommandBus.IPubSubCommandBus
 {
+  private readonly logger = new Logger(NatsPubSubCommandBus.name);
   private nc: NatsConnection;
   private static commandPrefix = 'Commands_';
 
@@ -27,7 +27,7 @@ export class NatsPubSubCommandBus
 
   async publish(command: Application.Command): Promise<void> {
     const topic = NatsPubSubCommandBus.getTopicFromCommandInstance(command);
-    console.log('Publishing in :', topic);
+    this.logger.log('Publishing in :' + topic);
     const headers = this.generateHeaders(command);
 
     this.nc.publish(topic, jsonCodec.encode(command), { headers });
@@ -36,7 +36,7 @@ export class NatsPubSubCommandBus
   async request(command: Application.Command): Promise<any> {
     const topic = NatsPubSubCommandBus.getTopicFromCommandInstance(command);
 
-    console.log('Publishing in :', topic);
+    this.logger.log('Requesting in :' + topic);
 
     const headers = this.generateHeaders(command);
 
@@ -47,7 +47,7 @@ export class NatsPubSubCommandBus
       });
       return jsonCodec.decode(response.data);
     } catch (error) {
-      console.log('Error in command request', error);
+      this.logger.error('Error in command request', error);
     }
   }
 
@@ -56,7 +56,7 @@ export class NatsPubSubCommandBus
     handler: Application.ICommandHandler<any, any>,
   ) {
     try {
-      console.log('Subscribing to:', subject);
+      this.logger.log('Subscribing to:' + subject);
       const sub = this.nc.subscribe(subject);
       (async () => {
         for await (const m of sub) {
@@ -72,7 +72,7 @@ export class NatsPubSubCommandBus
         }
       })();
     } catch (err) {
-      console.log('Error in command-bus subscribe::', err);
+      this.logger.error('Error in command-bus subscribe::', err);
     }
   }
 
@@ -130,6 +130,6 @@ export class NatsPubSubCommandBus
       );
     }
     if (!reply) return;
-    else console.error('Reply is neither ok nor error:', reply);
+    else this.logger.error('Reply is neither ok nor error:' + reply);
   }
 }

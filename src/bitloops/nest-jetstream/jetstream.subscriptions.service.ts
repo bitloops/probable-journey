@@ -55,7 +55,6 @@ export class SubscriptionsService {
         handler,
       );
     });
-    console.log(commandHandlers.length);
   }
 
   private subscribePubSubQueryHandlers(queryHandlers: any[]) {

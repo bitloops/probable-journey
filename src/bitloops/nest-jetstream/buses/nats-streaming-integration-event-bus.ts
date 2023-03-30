@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   NatsConnection,
   JSONCodec,
@@ -25,6 +25,7 @@ const jsonCodec = JSONCodec();
 export class NatsStreamingIntegrationEventBus
   implements Infra.EventBus.IEventBus
 {
+  private readonly logger = new Logger(NatsStreamingIntegrationEventBus.name);
   private nc: NatsConnection;
   private js: JetStreamClient;
   constructor(
@@ -58,13 +59,16 @@ export class NatsStreamingIntegrationEventBus
         NatsStreamingIntegrationEventBus.getSubjectFromEventInstance(
           integrationEvent,
         );
-      console.log('publishing integration event to:', subject);
+      this.logger.log('publishing integration event to:', subject);
 
       try {
         await this.js.publish(subject, message, options);
       } catch (err) {
         // NatsError: 503
-        console.error('Error publishing integration event to:', subject, err);
+        this.logger.error(
+          'Error publishing integration event to:' + subject,
+          err,
+        );
       }
 
       // the jetstream returns an acknowledgement with the
@@ -94,10 +98,7 @@ export class NatsStreamingIntegrationEventBus
     opts.deliverTo(createInbox());
 
     try {
-      console.log('---Subscribing integration event to:', {
-        subject,
-        durableName,
-      });
+      this.logger.log('Subscribing integration event to: ', subject);
       // this.logger.log(`
       //   Subscribing ${subject}!
       // `);
@@ -120,7 +121,7 @@ export class NatsStreamingIntegrationEventBus
             m.nak();
           } else m.ack();
 
-          console.log(
+          this.logger.log(
             `[${sub.getProcessed()}]: ${JSON.stringify(
               jsonCodec.decode(m.data),
             )}`,
@@ -128,7 +129,7 @@ export class NatsStreamingIntegrationEventBus
         }
       })();
     } catch (err) {
-      console.error('Error subscribing to integration event:', err);
+      this.logger.error('Error subscribing to integration event:', err);
     }
   }
 

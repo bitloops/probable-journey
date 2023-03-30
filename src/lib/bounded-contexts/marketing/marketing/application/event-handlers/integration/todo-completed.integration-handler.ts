@@ -22,11 +22,11 @@ export class TodoCompletedIntegrationEventHandler
   }
 
   get boundedContext() {
-    return TodoCompletedIntegrationEvent.fromContextId;
+    return TodoCompletedIntegrationEvent.boundedContextId;
   }
 
   get version() {
-    return TodoCompletedIntegrationEvent.versions[0];
+    return TodoCompletedIntegrationEvent.versions[0]; // here output will be 'v1'
   }
 
   public async handle(

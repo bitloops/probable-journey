@@ -26,7 +26,7 @@ export class UserRegisteredIntegrationEventHandler
   }
 
   get version() {
-    return UserRegisteredIntegrationEvent.versions[0];
+    return UserRegisteredIntegrationEvent.versions[0]; // here output will be 'v1'
   }
 
   public async handle(

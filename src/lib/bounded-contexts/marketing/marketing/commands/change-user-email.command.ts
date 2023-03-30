@@ -1,11 +1,11 @@
 import { Application, Domain } from '@bitloops/bl-boilerplate-core';
 import { asyncLocalStorage } from '@src/bitloops/tracing';
-export type TUpdateUserEmailCommand = {
+export type TChangeUserEmailCommand = {
   email: string;
   userId: string;
 };
 
-export class UpdateUserEmailCommand extends Application.Command {
+export class ChangeUserEmailCommand extends Application.Command {
   public readonly metadata: Application.TCommandMetadata = {
     boundedContextId: 'Marketing',
     createdTimestamp: Date.now(),
@@ -16,10 +16,7 @@ export class UpdateUserEmailCommand extends Application.Command {
   public email: string;
   public userId: string;
 
-  constructor(
-    props: TUpdateUserEmailCommand,
-    public readonly ctx: Application.TContext,
-  ) {
+  constructor(props: TChangeUserEmailCommand) {
     super();
     this.email = props.email;
     this.userId = props.userId;

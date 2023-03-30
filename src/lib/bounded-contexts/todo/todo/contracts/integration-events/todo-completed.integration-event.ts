@@ -16,7 +16,7 @@ export class TodoCompletedIntegrationEvent
   implements Infra.EventBus.IntegrationEvent<IntegrationSchemas>
 {
   static versions = ['v1'];
-  public static readonly fromContextId = 'Todo';
+  public static readonly boundedContextId = 'Todo';
   static versionMappers: Record<string, ToIntegrationDataMapper> = {
     v1: TodoCompletedIntegrationEvent.toIntegrationDataV1,
   };
@@ -25,7 +25,7 @@ export class TodoCompletedIntegrationEvent
   constructor(public data: IntegrationSchemas, version: string) {
     this.metadata = {
       createdAtTimestamp: Date.now(),
-      boundedContextId: TodoCompletedIntegrationEvent.fromContextId,
+      boundedContextId: TodoCompletedIntegrationEvent.boundedContextId,
       context: asyncLocalStorage.getStore()?.get('context'),
       messageId: new Domain.UUIDv4().toString(),
       correlationId: asyncLocalStorage.getStore()?.get('correlationId'),

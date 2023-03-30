@@ -8,7 +8,8 @@ import {
   NatsStreamingIntegrationEventBus,
 } from './buses';
 import { HANDLERS_TOKENS } from './jetstream.constants';
-import { Infra } from '../bl-boilerplate-core';
+import { Application, Infra } from '@bitloops/bl-boilerplate-core';
+import { NatsPubSubIntegrationEventsBus } from './buses/nats-pubsub-integration-events-bus';
 
 @Injectable()
 export class SubscriptionsService {
@@ -22,6 +23,8 @@ export class SubscriptionsService {
     private integrationEventHandlers: any[],
     @Inject(HANDLERS_TOKENS.STREAMING_COMMAND_HANDLERS)
     private streamingCommandHandlers: any[],
+    @Inject(HANDLERS_TOKENS.PUBSUB_INTEGRATION_EVENT_HANDLERS)
+    private pubSubIntegrationEventHandlers: any[],
     @Inject(BUSES_TOKENS.PUBSUB_COMMAND_BUS)
     private commandBus: Infra.CommandBus.IPubSubCommandBus,
     @Inject(BUSES_TOKENS.PUBSUB_QUERY_BYS)
@@ -32,12 +35,17 @@ export class SubscriptionsService {
     private integrationEventBus: NatsStreamingIntegrationEventBus,
     @Inject(BUSES_TOKENS.STREAMING_COMMAND_BUS)
     private streamingCommandBus: NatsStreamingCommandBus,
+    @Inject(BUSES_TOKENS.PUBSUB_INTEGRATION_EVENT_BUS)
+    private pubSubIntegrationEventBus: NatsPubSubIntegrationEventsBus,
   ) {
     this.subscribePubSubCommandHandlers(commandHandlers);
     this.subscribePubSubQueryHandlers(queryHandlers);
     this.subscribeStreamingDomainEventHandlers(domainEventHandlers);
     this.subscribeStreamingIntegrationEventHandlers(integrationEventHandlers);
     this.subscribeStreamingCommandHandlers(streamingCommandHandlers);
+    this.subscribePubSubIntegrationEventHandlers(
+      pubSubIntegrationEventHandlers,
+    );
   }
 
   private subscribePubSubCommandHandlers(commandHandlers: any[]) {
@@ -54,6 +62,17 @@ export class SubscriptionsService {
     queryHandlers.forEach((handler) => {
       this.queryBus.pubSubSubscribe(
         NatsPubSubQueryBus.getTopicFromHandler(handler),
+        handler,
+      );
+    });
+  }
+
+  private subscribePubSubIntegrationEventHandlers(
+    integrationEventHandlers: Application.IHandleIntegrationEvent[],
+  ) {
+    integrationEventHandlers.forEach((handler) => {
+      this.pubSubIntegrationEventBus.subscribe(
+        NatsPubSubIntegrationEventsBus.getTopicFromHandler(handler),
         handler,
       );
     });

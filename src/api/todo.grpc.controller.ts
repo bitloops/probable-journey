@@ -22,6 +22,8 @@ import {
 } from '@src/bitloops/nest-auth-passport';
 import { Infra, asyncLocalStorage } from '@src/bitloops/bl-boilerplate-core';
 import { CorrelationIdInterceptor } from '@src/bitloops/tracing';
+import { TodoReadModel } from '@src/lib/bounded-contexts/todo/todo/domain/TodoReadModel';
+import { GetTodosQuery } from '@src/lib/bounded-contexts/todo/todo/queries/get-todos.query';
 
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
@@ -68,6 +70,34 @@ export class TodoGrpcController {
           invalidTitleLengthError: new todo.ErrorResponse({
             code: error?.code || 'INVALID_TITLE_LENGTH_ERROR',
             message: error?.message || 'The title is too long.',
+          }),
+        }),
+      });
+      // throw new RpcException({
+      //   code: error?.message || 'Failed to create the todo',
+      //   message: error?.message || 'Failed to create the todo',
+      // });
+    }
+  }
+
+  @GrpcMethod('TodoApp', 'GetAllMyTodos')
+  async getAllMyTodos(): Promise<todo.GetAllMyTodosResponse> {
+    const results = await this.queryBus.request(new GetTodosQuery());
+
+    if (results.isOk) {
+      return new todo.GetAllMyTodosResponse({
+        ok: new todo.GetAllMyTodosOKResponse({
+          todos: results.data.map((i) => new todo.Todo(i)),
+        }),
+      });
+    } else {
+      const error = results.error;
+      console.error('Error while creating todo:', error?.message);
+      return new todo.GetAllMyTodosResponse({
+        error: new todo.GetAllMyTodosErrorResponse({
+          systemUnavailableError: new todo.ErrorResponse({
+            code: error?.code || 'SYSTEM_UNAVAILABLE_ERROR',
+            message: error?.message || 'The system is unavailable.',
           }),
         }),
       });

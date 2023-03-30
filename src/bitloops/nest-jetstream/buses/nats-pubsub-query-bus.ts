@@ -65,7 +65,7 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
             return handler.execute(query);
           });
           if (reply.isOk && reply.isOk() && m.reply) {
-            return this.nc.publish(
+            this.nc.publish(
               m.reply,
               jsonCodec.encode({
                 isOk: true,
@@ -73,7 +73,7 @@ export class NatsPubSubQueryBus implements Infra.QueryBus.IQueryBus {
               }),
             );
           } else if (reply.isFail && reply.isFail() && m.reply) {
-            return this.nc.publish(
+            this.nc.publish(
               m.reply,
               jsonCodec.encode({
                 isOk: false,

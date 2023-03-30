@@ -12,7 +12,7 @@ export class TodoCompletedDomainEvent
     const uuid = new Domain.UUIDv4();
     this.metadata = {
       boundedContextId: 'Todo',
-      createdAtTimestamp: Date.now(),
+      createdTimestamp: Date.now(),
       messageId: uuid.toString(),
       context: asyncLocalStorage.getStore()?.get('context'),
       correlationId: asyncLocalStorage.getStore()?.get('correlationId'),

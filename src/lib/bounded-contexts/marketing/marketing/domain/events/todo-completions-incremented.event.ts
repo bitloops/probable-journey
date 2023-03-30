@@ -12,7 +12,7 @@ export class TodoCompletionsIncrementedDomainEvent
     const uuid = new Domain.UUIDv4();
     this.metadata = {
       boundedContextId: 'Marketing',
-      createdAtTimestamp: Date.now(),
+      createdTimestamp: Date.now(),
       context: asyncLocalStorage.getStore()?.get('context'),
       messageId: uuid.toString(),
       correlationId: asyncLocalStorage.getStore()?.get('correlationId'),

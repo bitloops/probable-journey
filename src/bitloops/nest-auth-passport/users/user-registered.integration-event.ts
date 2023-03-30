@@ -20,7 +20,7 @@ export class UserRegisteredIntegrationEvent
     this.metadata = {
       boundedContextId: UserRegisteredIntegrationEvent.boundedContextId,
       version: UserRegisteredIntegrationEvent.versions[0],
-      createdAtTimestamp: Date.now(),
+      createdTimestamp: Date.now(),
       messageId: new Domain.UUIDv4().toString(),
       context: {},
       correlationId: asyncLocalStorage.getStore()?.get('correlationId'),

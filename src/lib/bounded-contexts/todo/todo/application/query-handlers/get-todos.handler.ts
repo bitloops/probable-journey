@@ -16,7 +16,6 @@ export type GetTodosQueryHandlerResponse = Either<
 export class GetTodosHandler
   implements Application.IQueryHandler<GetTodosQuery, TTodoReadModelSnapshot[]>
 {
-  private ctx: any;
   constructor(
     @Inject(TodoReadRepoPortToken)
     private readonly todoRepo: TodoReadRepoPort,
@@ -31,10 +30,9 @@ export class GetTodosHandler
   }
 
   async execute(command: GetTodosQuery): Promise<GetTodosQueryHandlerResponse> {
-    this.ctx = command.metadata.context;
     console.log('GetTodosQuery handler...');
 
-    const results = await this.todoRepo.getAll(this.ctx);
+    const results = await this.todoRepo.getAll();
     if (results.isFail()) return fail(results.value);
     if (results.value) return ok(results.value);
     return ok([]);

@@ -26,6 +26,7 @@ import { TodoReadModel } from '@src/lib/bounded-contexts/todo/todo/domain/TodoRe
 import { GetTodosQuery } from '@src/lib/bounded-contexts/todo/todo/queries/get-todos.query';
 import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 import { UncompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/uncomplete-todo.command';
+import { ModifyTodoTitleCommand } from '@src/lib/bounded-contexts/todo/todo/commands/modify-title-todo.command';
 
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
@@ -113,13 +114,13 @@ export class TodoGrpcController {
     data: todo.CompleteTodoRequest,
   ): Promise<todo.CompleteTodoResponse> {
     const command = new CompleteTodoCommand({ todoId: data.id });
-    const results = await this.commandBus.request(command);
-    if (results.isOk) {
+    const result = await this.commandBus.request(command);
+    if (result.isOk) {
       return new todo.CompleteTodoResponse({
         ok: new todo.CompleteTodoOKResponse(),
       });
     } else {
-      const error = results.error;
+      const error = result.error;
       console.error('Error while completing todo:', error?.message);
       return new todo.CompleteTodoResponse({
         error: new todo.CompleteTodoErrorResponse({
@@ -137,16 +138,43 @@ export class TodoGrpcController {
     data: todo.CompleteTodoRequest,
   ): Promise<todo.UncompleteTodoResponse> {
     const command = new UncompleteTodoCommand({ id: data.id });
-    const results = await this.commandBus.request(command);
-    if (results.isOk) {
+    const result = await this.commandBus.request(command);
+    if (result.isOk) {
       return new todo.UncompleteTodoResponse({
         ok: new todo.UncompleteTodoOKResponse(),
       });
     } else {
-      const error = results.error;
+      const error = result.error;
       console.error('Error while uncompleting todo:', error?.message);
       return new todo.UncompleteTodoResponse({
         error: new todo.UncompleteTodoErrorResponse({
+          systemUnavailableError: new todo.ErrorResponse({
+            code: error?.code || 'SYSTEM_UNAVAILABLE_ERROR',
+            message: error?.message || 'The system is unavailable.',
+          }),
+        }),
+      });
+    }
+  }
+
+  @GrpcMethod('TodoApp', 'ModifyTitle')
+  async modifyTitle(
+    data: todo.ModifyTitleTodoRequest,
+  ): Promise<todo.ModifyTitleTodoResponse> {
+    const command = new ModifyTodoTitleCommand({
+      id: data.id,
+      title: data.title,
+    });
+    const result = await this.commandBus.request(command);
+    if (result.isOk) {
+      return new todo.ModifyTitleTodoResponse({
+        ok: new todo.ModifyTitleTodoOKResponse(),
+      });
+    } else {
+      const error = result.error;
+      console.error('Error while uncompleting todo:', error?.message);
+      return new todo.ModifyTitleTodoResponse({
+        error: new todo.ModifyTitleTodoErrorResponse({
           systemUnavailableError: new todo.ErrorResponse({
             code: error?.code || 'SYSTEM_UNAVAILABLE_ERROR',
             message: error?.message || 'The system is unavailable.',

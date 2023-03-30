@@ -34,7 +34,6 @@ export class UncompleteTodoHandler
   get boundedContext() {
     return 'Todo';
   }
-  private ctx: Application.TContext;
   constructor(
     @Inject(TodoWriteRepoPortToken)
     private readonly todoRepo: TodoWriteRepoPort,
@@ -50,12 +49,8 @@ export class UncompleteTodoHandler
   async execute(
     command: UncompleteTodoCommand,
   ): Promise<UncompleteTodoUseCaseResponse> {
-    this.ctx = command.ctx;
     console.log('UncompleteTodoHandler');
-    const todo = await this.todoRepo.getById(
-      new Domain.UUIDv4(command.id),
-      this.ctx,
-    );
+    const todo = await this.todoRepo.getById(new Domain.UUIDv4(command.id));
     if (todo.isFail()) {
       return fail(todo.value);
     }
@@ -67,7 +62,7 @@ export class UncompleteTodoHandler
     if (uncompletedOrError.isFail()) {
       return fail(uncompletedOrError.value);
     }
-    const saveResult = await this.todoRepo.update(todo.value, this.ctx);
+    const saveResult = await this.todoRepo.update(todo.value);
     if (saveResult.isFail()) {
       return fail(saveResult.value);
     }

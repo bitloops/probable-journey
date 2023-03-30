@@ -13,7 +13,7 @@ export const PubSubCommandHandlers = [
   AddTodoCommandHandler,
   CompleteTodoHandler,
   UncompleteTodoHandler,
-  // ModifyTodoTitleHandler,
+  ModifyTodoTitleHandler,
 ];
 
 export const StreamingCommandHandlers = [

@@ -24,6 +24,7 @@ import { Infra, asyncLocalStorage } from '@src/bitloops/bl-boilerplate-core';
 import { CorrelationIdInterceptor } from '@src/bitloops/tracing';
 import { TodoReadModel } from '@src/lib/bounded-contexts/todo/todo/domain/TodoReadModel';
 import { GetTodosQuery } from '@src/lib/bounded-contexts/todo/todo/queries/get-todos.query';
+import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 
@@ -87,7 +88,9 @@ export class TodoGrpcController {
     if (results.isOk) {
       return new todo.GetAllTodosResponse({
         ok: new todo.GetAllTodosOKResponse({
-          todos: results.data.map((i) => new todo.Todo(i)),
+          todos: results.data.map(
+            (i) => new todo.Todo({ ...i, text: i.title }),
+          ),
         }),
       });
     } else {
@@ -101,10 +104,30 @@ export class TodoGrpcController {
           }),
         }),
       });
-      // throw new RpcException({
-      //   code: error?.message || 'Failed to create the todo',
-      //   message: error?.message || 'Failed to create the todo',
-      // });
+    }
+  }
+
+  @GrpcMethod('TodoApp', 'Complete')
+  async completeTodo(
+    data: todo.CompleteTodoRequest,
+  ): Promise<todo.CompleteTodoResponse> {
+    const command = new CompleteTodoCommand({ todoId: data.id });
+    const results = await this.commandBus.request(command);
+    if (results.isOk) {
+      return new todo.CompleteTodoResponse({
+        ok: new todo.CompleteTodoOKResponse(),
+      });
+    } else {
+      const error = results.error;
+      console.error('Error while creating todo:', error?.message);
+      return new todo.CompleteTodoResponse({
+        error: new todo.CompleteTodoErrorResponse({
+          systemUnavailableError: new todo.ErrorResponse({
+            code: error?.code || 'SYSTEM_UNAVAILABLE_ERROR',
+            message: error?.message || 'The system is unavailable.',
+          }),
+        }),
+      });
     }
   }
 }

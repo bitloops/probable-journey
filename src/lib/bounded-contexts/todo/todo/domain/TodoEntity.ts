@@ -7,6 +7,7 @@ import { TodoTitleModifiedDomainEvent } from './events/todo-title-modified.event
 import { TodoCompletedDomainEvent } from './events/todo-completed.event';
 import { TodoUncompletedDomainEvent } from './events/todo-uncompleted.event';
 import { Rules } from './rules';
+import { TodoDeletedDomainEvent } from './events/todo-deleted.event';
 
 export interface TodoProps {
   userId: UserIdVO;
@@ -75,6 +76,11 @@ export class TodoEntity extends Domain.Aggregate<TodoProps> {
     if (res) return fail(res);
     this.props.completed = false;
     this.addDomainEvent(new TodoUncompletedDomainEvent(this));
+    return ok();
+  }
+
+  public delete(): Either<void, void> {
+    this.addDomainEvent(new TodoDeletedDomainEvent(this));
     return ok();
   }
 

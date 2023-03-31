@@ -43,7 +43,7 @@ export class UserWriteRepository implements UserWriteRepoPort {
 
   @Application.Repo.Decorators.ReturnUnexpectedError()
   delete(
-    aggregateRootId: Domain.UUIDv4,
+    aggregate: UserEntity,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     throw new Error('Method not implemented.');
   }

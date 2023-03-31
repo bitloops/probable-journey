@@ -45,11 +45,12 @@ export class UserWritePostgresRepository implements UserWriteRepoPort {
 
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async delete(
-    aggregateRootId: Domain.UUIDv4,
+    aggregate: UserEntity,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
-    // We probably need also aggregate here in order to dispatch Events
+    const aggregateRootId = aggregate.id;
     const sqlStatement = `DELETE FROM ${this.tableName} WHERE id = $1`;
     await this.connection.query(sqlStatement, [aggregateRootId.toString()]);
+    this.domainEventBus.publish(aggregate.domainEvents);
     return ok();
   }
 

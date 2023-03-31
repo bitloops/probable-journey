@@ -1,4 +1,10 @@
-import { Application, Either, ok, fail } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Either,
+  ok,
+  fail,
+  asyncLocalStorage,
+} from '@bitloops/bl-boilerplate-core';
 import { TodoReadModel } from '../../../domain/TodoReadModel';
 import { TodoReadRepoPort } from '../../../ports/TodoReadRepoPort';
 import {
@@ -24,11 +30,10 @@ export class MockGetTodosReadRepo {
 
   private getMockGetAllMethod(): jest.Mock {
     return jest.fn(
-      (
-        ctx: Application.TContext,
-      ): Promise<
+      (): Promise<
         Either<TodoReadModel[] | null, Application.Repo.Errors.Unexpected>
       > => {
+        const ctx = asyncLocalStorage.getStore()?.get('context');
         if (ctx.userId === GET_TODOS_SUCCESS_CASE.userId) {
           const { userId, title, titleId, completed } = GET_TODOS_SUCCESS_CASE;
           const todo = TodoReadModel.fromPrimitives({

@@ -6,7 +6,7 @@ import {
   Domain,
 } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
-import { UpdateEmailCommand } from '../../commands/update-email.command';
+import { ChangeEmailCommand } from '../../commands/change-email.command';
 import { EmailVO } from '../../domain/EmailVO';
 import {
   UserWriteRepoPortToken,
@@ -14,13 +14,13 @@ import {
 } from '../../ports/UserWriteRepoPort';
 import { ApplicationErrors } from '../errors';
 
-type UpdateEmailResponse = Either<
+type ChangeEmailResponse = Either<
   void,
   ApplicationErrors.UserNotFoundApplicationError
 >;
 
-export class UpdateEmailHandler
-  implements Application.ICommandHandler<UpdateEmailCommand, void>
+export class ChangeEmailHandler
+  implements Application.ICommandHandler<ChangeEmailCommand, void>
 {
   constructor(
     @Inject(UserWriteRepoPortToken)
@@ -28,15 +28,15 @@ export class UpdateEmailHandler
   ) {}
 
   get command() {
-    return UpdateEmailCommand;
+    return ChangeEmailCommand;
   }
 
   get boundedContext() {
     return 'IAM';
   }
 
-  async execute(command: UpdateEmailCommand): Promise<UpdateEmailResponse> {
-    console.log('UpdateEmail command');
+  async execute(command: ChangeEmailCommand): Promise<ChangeEmailResponse> {
+    console.log('ChangeEmail command');
     const userId = new Domain.UUIDv4(command.userId);
     const email = EmailVO.create({ email: command.email });
     if (email.isFail()) {
@@ -48,7 +48,7 @@ export class UpdateEmailHandler
       return fail(userFound.value);
     }
 
-    if (userFound.value === null) {
+    if (!userFound.value) {
       return fail(
         new ApplicationErrors.UserNotFoundApplicationError(command.userId),
       );
@@ -56,10 +56,11 @@ export class UpdateEmailHandler
 
     userFound.value.updateEmail(email.value);
 
-    const saveResult = await this.userRepo.save(userFound.value);
+    const saveResult = await this.userRepo.update(userFound.value);
     if (saveResult.isFail()) {
       return fail(saveResult.value);
     }
+
     return ok();
   }
 }

@@ -1,4 +1,4 @@
 import { LogInHandler } from './log-in.handler';
-import { UpdateEmailHandler } from './update-email.handler';
+import { ChangeEmailHandler } from './change-email.handler';
 
-export const PubSubCommandHandlers = [LogInHandler, UpdateEmailHandler];
+export const PubSubCommandHandlers = [LogInHandler, ChangeEmailHandler];

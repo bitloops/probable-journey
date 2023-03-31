@@ -17,7 +17,7 @@ export class MockCreateUserReadRepo {
       getById: jest.fn(),
       getUserEmail: jest.fn(),
       create: this.mockCreateMethod,
-      save: jest.fn(),
+      update: jest.fn(),
     };
   }
 

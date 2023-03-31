@@ -1,3 +1,4 @@
+import { Application, Either, ok } from '@bitloops/bl-boilerplate-core';
 import { Injectable } from '@nestjs/common';
 import {
   EmailServicePort,
@@ -6,7 +7,10 @@ import {
 
 @Injectable()
 export class MockEmailService implements EmailServicePort {
-  send(data: SendEmailRequest): void {
+  send(
+    data: SendEmailRequest,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     console.log('MockEmailService sending data:', data);
+    return Promise.resolve(ok());
   }
 }

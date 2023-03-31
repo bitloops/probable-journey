@@ -52,7 +52,7 @@ export class ChangeUserEmailCommandHandler
       command.email,
     );
 
-    const updateOrError = await this.userEmailRepo.save(userIdEmail);
+    const updateOrError = await this.userEmailRepo.update(userIdEmail);
     if (updateOrError.isFail()) {
       return fail(updateOrError.value);
     }

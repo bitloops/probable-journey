@@ -25,7 +25,6 @@ type AddTodoUseCaseResponse = Either<
 export class AddTodoCommandHandler
   implements Application.ICommandHandler<AddTodoCommand, string>
 {
-  private ctx: Application.TContext;
   constructor(
     @Inject(TodoWriteRepoPortToken)
     private readonly todoRepo: TodoWriteRepoPort,
@@ -53,6 +52,7 @@ export class AddTodoCommandHandler
     if (title.isFail()) {
       return fail(title.value);
     }
+
     const userId = UserIdVO.create({
       id: new Domain.UUIDv4(command.metadata.context.userId),
     });

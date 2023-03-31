@@ -9,20 +9,21 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
-import { UpdateEmailCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/update-email.command';
+import { ChangeEmailCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/change-email.command';
 import { UpdateEmailDTO } from './dto/update-email.dto';
 import { RegisterDTO } from './dto/register.dto';
 import { BUSES_TOKENS } from '@bitloops/bl-boilerplate-infra-nest-jetsream';
-import { Application, Infra } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Infra,
+  asyncLocalStorage,
+} from '@bitloops/bl-boilerplate-core';
 import {
   AuthService,
   JwtAuthGuard,
   LocalAuthGuard,
 } from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
-import {
-  Traceable,
-  asyncLocalStorage,
-} from '@bitloops/bl-boilerplate-infra-telemetry';
+import { Traceable } from '@bitloops/bl-boilerplate-infra-telemetry';
 
 @Controller('auth')
 export class AuthController {
@@ -52,7 +53,7 @@ export class AuthController {
   @Post('updateEmail')
   async updateEmail(@Request() req, @Body() dto: UpdateEmailDTO) {
     console.log('req', req.user);
-    const command = new UpdateEmailCommand({
+    const command = new ChangeEmailCommand({
       email: dto.email,
       userId: req.user.userId,
     });

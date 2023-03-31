@@ -9,7 +9,7 @@ export class TodoCompletedIntegrationEventHandler
 {
   constructor(
     @Inject(StreamingCommandBusToken)
-    private commandBus: Infra.CommandBus.IPubSubCommandBus,
+    private commandBus: Infra.CommandBus.IStreamCommandBus,
   ) {}
 
   get event() {
@@ -32,7 +32,7 @@ export class TodoCompletedIntegrationEventHandler
     await this.commandBus.publish(command);
 
     console.log(
-      `[TodoCompletedIntegrationEvent]: Successfully sent IncrementDepositsCommand`,
+      `[TodoCompletedIntegrationEvent]: Successfully sent IncrementTodosCommand`,
     );
 
     return ok();

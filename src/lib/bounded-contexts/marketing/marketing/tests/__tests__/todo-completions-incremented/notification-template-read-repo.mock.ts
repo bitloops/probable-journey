@@ -1,6 +1,16 @@
-import { Application, Either, ok } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Either,
+  ok,
+  fail,
+  asyncLocalStorage,
+} from '@bitloops/bl-boilerplate-core';
 import { NotificationTemplateReadModel } from '../../../domain/read-models/notification-template.read-model';
 import { NotificationTemplateReadRepoPort } from '../../../ports/notification-template-read.repo-port.';
+import {
+  SUCCESS_CASE,
+  UNSUCCESS_REPO_ERROR_CASE,
+} from './todo-completions-incremented.mock';
 
 export class MockNotificationTemplateReadRepo {
   public readonly mockGetByTypeMethod: jest.Mock;
@@ -29,6 +39,20 @@ export class MockNotificationTemplateReadRepo {
           Application.Repo.Errors.Unexpected
         >
       > => {
+        if (type === SUCCESS_CASE.notificationTemplate.type) {
+          const ctx = asyncLocalStorage.getStore()?.get('context');
+          if (ctx.userId === UNSUCCESS_REPO_ERROR_CASE.userId) {
+            return Promise.resolve(
+              fail(new Application.Repo.Errors.Unexpected()),
+            );
+          }
+          const notificationResponse =
+            NotificationTemplateReadModel.fromPrimitives(
+              SUCCESS_CASE.notificationTemplate,
+            );
+          return Promise.resolve(ok(notificationResponse));
+        }
+
         return Promise.resolve(ok(null));
       },
     );

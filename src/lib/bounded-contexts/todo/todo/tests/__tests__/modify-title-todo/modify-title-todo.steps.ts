@@ -5,8 +5,8 @@ import { ModifyTodoTitleCommand } from '@src/lib/bounded-contexts/todo/todo/comm
 import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
 import { TodoTitleModifiedDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain/events/todo-title-modified.event';
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
-import { ContextBuilder } from '../../builders/context.builder';
 import { TodoPropsBuilder } from '../../builders/todo-props.builder';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
 import {
   MODIFY_INVALID_TITLE_CASE,
   MODIFY_TITLE_SUCCESS_CASE,
@@ -20,10 +20,10 @@ describe('Modify title todo feature test', () => {
   it('Todo title modified successfully', async () => {
     const { userId, titleId, titleAfterUpdate, completed } =
       MODIFY_TITLE_SUCCESS_CASE;
+    mockAsyncLocalStorageGet(userId);
 
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
     const modifyTodoTitleCommand = new ModifyTodoTitleCommand({
       title: titleAfterUpdate,
       id: titleId,
@@ -45,11 +45,9 @@ describe('Modify title todo feature test', () => {
 
     expect(mockTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
       new Domain.UUIDv4(titleId),
-      ctx,
     );
     expect(mockTodoWriteRepo.mockUpdateMethod).toHaveBeenCalledWith(
       expect.any(TodoEntity),
-      ctx,
     );
     const todoAggregate = mockTodoWriteRepo.mockUpdateMethod.mock.calls[0][0];
     expect(todoAggregate.props).toEqual(todoProps);
@@ -64,7 +62,6 @@ describe('Modify title todo feature test', () => {
 
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
     const modifyTodoTitleCommand = new ModifyTodoTitleCommand({
       title: titleAfterUpdate,
       id: titleId,
@@ -79,7 +76,6 @@ describe('Modify title todo feature test', () => {
     //then
     expect(mockTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
       new Domain.UUIDv4(titleId),
-      ctx,
     );
     expect(mockTodoWriteRepo.mockUpdateMethod).not.toHaveBeenCalled();
     expect(result.value).toBeInstanceOf(DomainErrors.TitleOutOfBoundsError);
@@ -90,7 +86,6 @@ describe('Modify title todo feature test', () => {
 
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
     const modifyTodoTitleCommand = new ModifyTodoTitleCommand({
       title: titleAfterUpdate,
       id: titleId,
@@ -105,7 +100,6 @@ describe('Modify title todo feature test', () => {
     //then
     expect(mockTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
       new Domain.UUIDv4(titleId),
-      ctx,
     );
     expect(mockTodoWriteRepo.mockUpdateMethod).not.toHaveBeenCalled();
     expect(result.value).toBeInstanceOf(ApplicationErrors.TodoNotFoundError);
@@ -117,7 +111,6 @@ describe('Modify title todo feature test', () => {
 
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
     const modifyTodoTitleCommand = new ModifyTodoTitleCommand({
       title: titleAfterUpdate,
       id: titleId,
@@ -132,7 +125,6 @@ describe('Modify title todo feature test', () => {
     //then
     expect(mockTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
       new Domain.UUIDv4(titleId),
-      ctx,
     );
     expect(mockTodoWriteRepo.mockUpdateMethod).not.toHaveBeenCalled();
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
@@ -144,7 +136,6 @@ describe('Modify title todo feature test', () => {
 
     // given
     const mockTodoWriteRepo = new ModifyTitleWriteRepo();
-    const ctx = new ContextBuilder().withUserId(userId).build();
     const modifyTodoTitleCommand = new ModifyTodoTitleCommand({
       title: titleAfterUpdate,
       id: titleId,
@@ -159,11 +150,9 @@ describe('Modify title todo feature test', () => {
     //then
     expect(mockTodoWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
       new Domain.UUIDv4(titleId),
-      ctx,
     );
     expect(mockTodoWriteRepo.mockUpdateMethod).toHaveBeenCalledWith(
       expect.any(TodoEntity),
-      ctx,
     );
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });

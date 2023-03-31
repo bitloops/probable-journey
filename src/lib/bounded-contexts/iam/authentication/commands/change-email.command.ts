@@ -3,12 +3,12 @@ import {
   asyncLocalStorage,
   Domain,
 } from '@bitloops/bl-boilerplate-core';
-import { UpdateEmailCommandDTO } from '../dtos/update-email-command.dto';
-export type TUpdateEmailCommand = {
+import { ChangeEmailCommandDTO } from '../dtos/change-email-command.dto';
+export type TChangeEmailCommand = {
   userId: string;
   email: string;
 };
-export class UpdateEmailCommand extends Application.Command {
+export class ChangeEmailCommand extends Application.Command {
   public readonly userId: string;
   public readonly email: string;
   public readonly metadata: Application.TCommandMetadata = {
@@ -18,9 +18,9 @@ export class UpdateEmailCommand extends Application.Command {
     correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
     context: asyncLocalStorage.getStore()?.get('context'),
   };
-  constructor(updateEmailCommandDTO: UpdateEmailCommandDTO) {
+  constructor(changeEmailCommandDTO: ChangeEmailCommandDTO) {
     super();
-    this.userId = updateEmailCommandDTO.userId;
-    this.email = updateEmailCommandDTO.email;
+    this.userId = changeEmailCommandDTO.userId;
+    this.email = changeEmailCommandDTO.email;
   }
 }

@@ -9,7 +9,7 @@ export class UserRegisteredIntegrationEventHandler
 {
   constructor(
     @Inject(StreamingCommandBusToken)
-    private commandBus: Infra.CommandBus.IPubSubCommandBus,
+    private commandBus: Infra.CommandBus.IStreamCommandBus,
   ) {}
 
   get event() {

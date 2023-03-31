@@ -1,5 +1,8 @@
-import { Application, Domain } from '@bitloops/bl-boilerplate-core';
-import { asyncLocalStorage } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Domain,
+  asyncLocalStorage,
+} from '@bitloops/bl-boilerplate-core';
 export type TLogInCommand = {
   userId: string;
 };
@@ -12,7 +15,7 @@ export class LogInCommand extends Application.Command {
     context: asyncLocalStorage.getStore()?.get('context'),
     correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
   };
-  constructor(loginCommand: LogInCommand) {
+  constructor(loginCommand: TLogInCommand) {
     super();
     this.userId = loginCommand.userId;
   }

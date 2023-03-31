@@ -2,11 +2,12 @@ syntax = "proto3";
 
 package todo;
 
-service TodoApp {
+service TodoService {
 	rpc Add(AddTodoRequest) returns (AddTodoResponse);
   rpc Complete (CompleteTodoRequest) returns (CompleteTodoResponse);
   rpc Uncomplete (UncompleteTodoRequest) returns (UncompleteTodoResponse);
   rpc ModifyTitle (ModifyTitleTodoRequest) returns (ModifyTitleTodoResponse);
+  rpc Delete (DeleteTodoRequest) returns (DeleteTodoResponse);
 	rpc GetAll(GetAllTodosRequest) returns (GetAllTodosResponse);
   rpc OnAdded (OnAddedRequest) returns (stream Todo);
   rpc OnCompleted (OnCompletedRequest) returns (stream Todo);
@@ -54,6 +55,27 @@ message CompleteTodoResponse {
 }
 
 message CompleteTodoErrorResponse {
+  oneof error {
+    ErrorResponse unauthorizedError = 1;
+    ErrorResponse systemUnavailableError = 2;
+    ErrorResponse todoAlreadyExistsError = 3;
+  }
+}
+
+message DeleteTodoOKResponse {}
+
+message DeleteTodoRequest {
+  string id = 1;
+}
+
+message DeleteTodoResponse {
+  oneof result {
+    DeleteTodoOKResponse ok = 1;
+    DeleteTodoErrorResponse error = 2;
+  }
+}
+
+message DeleteTodoErrorResponse {
   oneof error {
     ErrorResponse unauthorizedError = 1;
     ErrorResponse systemUnavailableError = 2;
@@ -129,7 +151,7 @@ message UncompleteTodoOKResponse {}
 
 message Todo {
   string id = 1;
-  string text = 2;
+  string title = 2;
   bool completed = 3;
 }
 

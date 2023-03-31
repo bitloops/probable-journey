@@ -77,10 +77,22 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
     todo: TodoEntity,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
     const ctx = asyncLocalStorage.getStore()?.get('context');
-    const { id, ...todoInfo } = todo.toPrimitives();
+    const { jwt } = ctx;
+    let jwtPayload: null | any = null;
+    try {
+      jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
+    } catch (err) {
+      throw new Error('Invalid JWT!');
+    }
+    const deletedTodo = todo.toPrimitives();
+    if (deletedTodo.userId !== jwtPayload.sub) {
+      throw new Error('Unauthorized userId');
+    }
+    const { id, userId, ...todoInfo } = todo.toPrimitives();
     await this.collection.updateOne(
       {
         _id: id as any,
+        userId: userId,
       },
       {
         $set: todoInfo,
@@ -92,9 +104,27 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
 
   @Application.Repo.Decorators.ReturnUnexpectedError()
   async delete(
-    id: Domain.UUIDv4,
+    todo: TodoEntity,
   ): Promise<Either<void, Application.Repo.Errors.Unexpected>> {
-    throw new Error('Method not implemented.');
+    const ctx = asyncLocalStorage.getStore()?.get('context');
+    const { jwt } = ctx;
+    let jwtPayload: null | any = null;
+    try {
+      jwtPayload = jwtwebtoken.verify(jwt, this.JWT_SECRET);
+    } catch (err) {
+      throw new Error('Invalid JWT!');
+    }
+    const deletedTodo = todo.toPrimitives();
+    if (deletedTodo.userId !== jwtPayload.sub) {
+      throw new Error('Unauthorized userId');
+    }
+    const { id, userId } = deletedTodo;
+    await this.collection.deleteOne({
+      _id: id as any,
+      userId,
+    });
+    this.domainEventBus.publish(todo.domainEvents);
+    return ok();
   }
 
   @Application.Repo.Decorators.ReturnUnexpectedError()
@@ -111,7 +141,7 @@ export class TodoWriteRepository implements TodoWriteRepoPort {
     }
     const createdTodo = todo.toPrimitives();
     if (createdTodo.userId !== jwtPayload.sub) {
-      throw new Error('Invalid userId');
+      throw new Error('Unauthorized userId');
     }
     const { id, ...todoInfo } = createdTodo;
     await this.collection.insertOne({

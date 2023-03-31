@@ -26,8 +26,22 @@ import { GetTodosQuery } from '@src/lib/bounded-contexts/todo/todo/queries/get-t
 import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 import { UncompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/uncomplete-todo.command';
 import { ModifyTodoTitleCommand } from '@src/lib/bounded-contexts/todo/todo/commands/modify-title-todo.command';
+import { DeleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/delete-todo.command';
 
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
+async function sha256Hash(message: string) {
+  // Convert the message to a Uint8Array
+  const encoder = new TextEncoder();
+  const data = encoder.encode(message);
+  // Generate the hash
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  // Convert the hash to a hexadecimal string
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  return hashHex;
+}
 
 @Injectable()
 @Controller()
@@ -48,12 +62,12 @@ export class TodoGrpcController {
     }
   }
 
-  @GrpcMethod('TodoApp', 'Add')
+  @GrpcMethod('TodoService', 'Add')
   async addTodo(
     data: todo.AddTodoRequest,
-    metadata: Metadata, // @TODO figure out how to get the metadata https://github.com/nestjs/nest/issues/4851
-    call: ServerUnaryCall<todo.AddTodoRequest, todo.AddTodoResponse>, // @TODO figure out how to get the call
-    authData: any,
+    metadata: Metadata,
+    call: ServerUnaryCall<todo.AddTodoRequest, todo.AddTodoResponse>,
+    // authData: any,
   ): Promise<todo.AddTodoResponse> {
     // console.log('metadata', metadata);
     // console.log('call', call);
@@ -82,16 +96,45 @@ export class TodoGrpcController {
     }
   }
 
-  @GrpcMethod('TodoApp', 'GetAll')
-  async getAll(): Promise<todo.GetAllTodosResponse> {
+  @GrpcMethod('TodoService', 'GetAll')
+  async getAll(
+    data: todo.GetAllTodosRequest,
+    metadata: Metadata, // @TODO figure out how to get the metadata https://github.com/nestjs/nest/issues/4851
+    // call: ServerUnaryCall<todo.GetAllTodosRequest, todo.GetAllTodosResponse>, // @TODO figure out how to get the call
+    // authData: any,
+  ): Promise<todo.GetAllTodosResponse> {
+    console.log('metadata', metadata.get('cache-hash'));
+    // console.log('call', call);
+    // const myTodo: todo.Todo = new todo.Todo({
+    //   id: '1',
+    //   title: 'test',
+    //   completed: false,
+    // });
+    // return new todo.GetAllTodosResponse({
+    //   ok: new todo.GetAllTodosOKResponse({
+    //     todos: [myTodo],
+    //   }),
+    // });
     const results = await this.queryBus.request(new GetTodosQuery());
-
+    // console.log('resutls', results);
     if (results.isOk) {
+      const mappedData = results.data.map((i) => ({
+        id: i.id,
+        title: i.title,
+        completed: i.completed,
+      }));
+      const dbHash = await sha256Hash(JSON.stringify(mappedData));
+      const cachedHashesAreEqual = dbHash === metadata.get('cache-hash')[0];
+      console.log('dbHash', dbHash);
+      console.log('cachedHash', metadata.get('cache-hash')[0]);
+      if (cachedHashesAreEqual) {
+        throw new RpcException('CACHE_HIT');
+      }
+      // console.log('data', JSON.stringify(mappedData));
+      // console.log('results hash', await sha256Hash(JSON.stringify(mappedData)));
       return new todo.GetAllTodosResponse({
         ok: new todo.GetAllTodosOKResponse({
-          todos: results.data.map(
-            (i) => new todo.Todo({ ...i, text: i.title }),
-          ),
+          todos: mappedData.map((i) => new todo.Todo(i)),
         }),
       });
     } else {
@@ -108,7 +151,7 @@ export class TodoGrpcController {
     }
   }
 
-  @GrpcMethod('TodoApp', 'Complete')
+  @GrpcMethod('TodoService', 'Complete')
   async completeTodo(
     data: todo.CompleteTodoRequest,
   ): Promise<todo.CompleteTodoResponse> {
@@ -132,7 +175,7 @@ export class TodoGrpcController {
     }
   }
 
-  @GrpcMethod('TodoApp', 'Uncomplete')
+  @GrpcMethod('TodoService', 'Uncomplete')
   async uncompleteTodo(
     data: todo.CompleteTodoRequest,
   ): Promise<todo.UncompleteTodoResponse> {
@@ -156,7 +199,31 @@ export class TodoGrpcController {
     }
   }
 
-  @GrpcMethod('TodoApp', 'ModifyTitle')
+  @GrpcMethod('TodoService', 'Delete')
+  async deleteTodo(
+    data: todo.DeleteTodoRequest,
+  ): Promise<todo.DeleteTodoResponse> {
+    const command = new DeleteTodoCommand({ id: data.id });
+    const result = await this.commandBus.request(command);
+    if (result.isOk) {
+      return new todo.DeleteTodoResponse({
+        ok: new todo.DeleteTodoOKResponse(),
+      });
+    } else {
+      const error = result.error;
+      console.error('Error while deleting todo:', error?.message);
+      return new todo.DeleteTodoResponse({
+        error: new todo.DeleteTodoErrorResponse({
+          systemUnavailableError: new todo.ErrorResponse({
+            code: error?.code || 'SYSTEM_UNAVAILABLE_ERROR',
+            message: error?.message || 'The system is unavailable.',
+          }),
+        }),
+      });
+    }
+  }
+
+  @GrpcMethod('TodoService', 'ModifyTitle')
   async modifyTitle(
     data: todo.ModifyTitleTodoRequest,
   ): Promise<todo.ModifyTitleTodoResponse> {

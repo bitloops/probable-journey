@@ -1100,6 +1100,28 @@
     "@nestjs/common" "^9.0.0"
     mongodb "^4.10.0"
 
+"@bitloops/bl-boilerplate-infra-nest-auth-passport@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-nest-auth-passport/-/bl-boilerplate-infra-nest-auth-passport-0.1.3.tgz#bd423d30e3229e10b6eac5a68788939103505d24"
+  integrity sha512-Rq8MthJC+T0fL2hmySt47nQIuhidkwwN59PLaROKbpN8/gHQNx6TYimcUCnP4AzTe+k01vz6Dcr+4k6ASpfT7A==
+  dependencies:
+    "@bitloops/bl-boilerplate-infra-postgres" "^0.1.1"
+    "@nestjs/jwt" "^10.0.2"
+    "@nestjs/passport" "^9.0.3"
+    bcrypt "^5.1.0"
+    class-validator "^0.14.0"
+    passport-jwt "^4.0.1"
+    passport-local "^1.0.0"
+    rxjs "^7.8.0"
+
+"@bitloops/bl-boilerplate-infra-nest-jetsream@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-nest-jetsream/-/bl-boilerplate-infra-nest-jetsream-0.1.3.tgz#6af3548c833ad0e3e75c285e75cd54e9e63e9aaa"
+  integrity sha512-Xc8kt0aqVGGQuF+9xfa0nFlKJZeX3zJb0YePR8h3deFfkmtuweje0RwcxY+hZsPX528ONWEcjg/ubanWO8mrnQ==
+  dependencies:
+    async-mutex "^0.4.0"
+    nats "^2.13.1"
+
 "@bitloops/bl-boilerplate-infra-postgres@^0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-postgres/-/bl-boilerplate-infra-postgres-0.1.1.tgz#195bc43cc366c05f502164a4c95c2248ceb4b8ed"
@@ -1107,6 +1129,13 @@
   dependencies:
     "@nestjs/common" "^9.0.0"
     pg "^8.10.0"
+
+"@bitloops/bl-boilerplate-infra-telemetry@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@bitloops/bl-boilerplate-infra-telemetry/-/bl-boilerplate-infra-telemetry-0.1.2.tgz#9379a3961cb1d19b6c635aa548ffa5741845a4f5"
+  integrity sha512-eb9Kl9iTGcPiTRiTSo5HF5SucB8Y72ycHEZcAo7UHZqfQVOUo5HU+XShQ2kzqxdT5uP2hKvQDCsltpNn6bWRAQ==
+  dependencies:
+    fastify "^4.15.0"
 
 "@colors/colors@1.5.0":
   version "1.5.0"
@@ -1152,7 +1181,7 @@
   resolved "https://registry.npmjs.org/@eslint/js/-/js-8.36.0.tgz"
   integrity sha512-lxJ9R5ygVm8ZWgYdUweoq5ownDlJ4upvoWmO4eLxBYHdMo+vZ/Rx0EN6MbKWDJOSUGrqJy2Gt+Dyv/VKml0fjg==
 
-"@fastify/ajv-compiler@^3.3.1":
+"@fastify/ajv-compiler@^3.3.1", "@fastify/ajv-compiler@^3.5.0":
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/@fastify/ajv-compiler/-/ajv-compiler-3.5.0.tgz#459bff00fefbf86c96ec30e62e933d2379e46670"
   integrity sha512-ebbEtlI7dxXF5ziNdr05mOY8NnDiPB1XvAlLHctRt/Rc+C3LCOVW5imUVX+mhvUhnNzmPBHewUkOFgGlCxgdAA==
@@ -1179,7 +1208,7 @@
   resolved "https://registry.yarnpkg.com/@fastify/error/-/error-3.2.0.tgz#9010e0acfe07965f5fc7d2b367f58f042d0f4106"
   integrity sha512-KAfcLa+CnknwVi5fWogrLXgidLic+GXnLjijXdpl8pvkvbXU5BGa37iZO9FGvsh9ZL4y+oFi5cbHBm5UOG+dmQ==
 
-"@fastify/fast-json-stringify-compiler@^4.1.0":
+"@fastify/fast-json-stringify-compiler@^4.1.0", "@fastify/fast-json-stringify-compiler@^4.2.0":
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/@fastify/fast-json-stringify-compiler/-/fast-json-stringify-compiler-4.2.0.tgz#52d047fac76b0d75bd660f04a5dd606659f57c5a"
   integrity sha512-ypZynRvXA3dibfPykQN3RB5wBdEUgSGgny8Qc6k163wYPLD4mEGEDkACp+00YmqkGvIm8D/xYoHajwyEdWD/eg==
@@ -4663,6 +4692,27 @@ fastify@4.13.0:
     semver "^7.3.7"
     tiny-lru "^10.0.0"
 
+fastify@^4.15.0:
+  version "4.15.0"
+  resolved "https://registry.yarnpkg.com/fastify/-/fastify-4.15.0.tgz#4ebadaea706217467a332341f9cfa632072d51f2"
+  integrity sha512-m/CaRN8nf5uyYdrDe2qqq+0z3oGyE+A++qlKQoLJTI4WI0nWK9D6R3FxXQ3MVwt/md977GMR4F43pE9oqrS2zw==
+  dependencies:
+    "@fastify/ajv-compiler" "^3.5.0"
+    "@fastify/error" "^3.0.0"
+    "@fastify/fast-json-stringify-compiler" "^4.2.0"
+    abstract-logging "^2.0.1"
+    avvio "^8.2.0"
+    fast-content-type-parse "^1.0.0"
+    find-my-way "^7.6.0"
+    light-my-request "^5.6.1"
+    pino "^8.5.0"
+    process-warning "^2.0.0"
+    proxy-addr "^2.0.7"
+    rfdc "^1.3.0"
+    secure-json-parse "^2.5.0"
+    semver "^7.3.7"
+    tiny-lru "^10.0.0"
+
 fastq@^1.6.0, fastq@^1.6.1:
   version "1.15.0"
   resolved "https://registry.npmjs.org/fastq/-/fastq-1.15.0.tgz"
@@ -4711,7 +4761,7 @@ finalhandler@1.2.0:
     statuses "2.0.1"
     unpipe "~1.0.0"
 
-find-my-way@^7.3.0:
+find-my-way@^7.3.0, find-my-way@^7.6.0:
   version "7.6.0"
   resolved "https://registry.yarnpkg.com/find-my-way/-/find-my-way-7.6.0.tgz#f1e271fd1aafe87e87860662f9940124274f73c7"
   integrity sha512-H7berWdHJ+5CNVr4ilLWPai4ml7Y2qAsxjw3pfeBxPigZmaDTzF0wjJLj90xRCmGcWYcyt050yN+34OZDJm1eQ==

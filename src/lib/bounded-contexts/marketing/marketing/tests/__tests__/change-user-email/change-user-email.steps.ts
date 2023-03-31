@@ -6,8 +6,8 @@ import { UserEmailReadModelBuilder } from '../../builders/user-read-model.builde
 import { Application } from '@bitloops/bl-boilerplate-core';
 import { ChangeUserEmailCommand } from '@src/lib/bounded-contexts/marketing/marketing/commands/change-user-email.command';
 import { ChangeUserEmailCommandHandler } from '@src/lib/bounded-contexts/marketing/marketing/application/command-handlers/change-user-email.command-handler';
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 import { MockUpdateUserReadRepo } from './change-user-email-read-repo.mock';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
 
 describe('Change user email feature test', () => {
   it('Changed user email successfully,', async () => {

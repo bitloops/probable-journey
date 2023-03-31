@@ -3,39 +3,44 @@ import {
   UserEntity,
   UserProps,
 } from '@src/lib/bounded-contexts/iam/authentication/domain/UserEntity';
-import { CompletedTodosVO } from '@src/lib/bounded-contexts/marketing/marketing/domain/completed-todos.vo';
 import { EmailVO } from '../../domain/EmailVO';
 
-export class UserEntityBuilder {
+export class UserPropsBuilder {
   private id: string;
   private email: string;
   private password: string;
+  private lastLogin: string;
 
-  withEmail(email: string): UserEntityBuilder {
+  withEmail(email: string): UserPropsBuilder {
     this.email = email;
     return this;
   }
 
-  withId(id: string): UserEntityBuilder {
+  withId(id: string): UserPropsBuilder {
     this.id = id;
     return this;
   }
 
-  withPassword(password: string): UserEntityBuilder {
+  withPassword(password: string): UserPropsBuilder {
     this.password = password;
     return this;
   }
 
-  build(): UserEntity {
+  withLastLogin(lastLogin: any): UserPropsBuilder {
+    this.lastLogin = lastLogin;
+    return this;
+  }
+
+  build(): UserProps {
     const userProps: UserProps = {
       email: EmailVO.create({ email: this.email }).value as EmailVO,
       password: this.password,
+      lastLogin: this.lastLogin,
     };
     if (this.id) {
       userProps.id = new Domain.UUIDv4(this.id);
     }
 
-    const userEntity = UserEntity.create(userProps).value as UserEntity;
-    return userEntity;
+    return userProps;
   }
 }

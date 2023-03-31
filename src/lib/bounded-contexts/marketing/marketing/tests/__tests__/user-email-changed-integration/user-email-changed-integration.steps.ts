@@ -1,7 +1,7 @@
 import { UserEmailChangedIntegrationEvent } from '@src/lib/bounded-contexts/iam/authentication/contracts/integration-events/user-email-changed.integration-event';
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 import { UserEmailChangedIntegrationEventHandler } from '../../../application/event-handlers/integration/user-email-changed.integration-handler';
-import { MockStreamCommandBus } from './stream-command-bus.mock';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
+import { MockStreamCommandBus } from '../../mocks/stream-command-bus.mock';
 import { SUCCESS_CASE } from './user-email-changed.mock';
 
 describe('UserEmailChangedIntegrationEvent feature test', () => {

@@ -2,13 +2,13 @@ import { Application } from '@bitloops/bl-boilerplate-core';
 import { GetTodosHandler } from '../../../application/query-handlers/get-todos.handler';
 import { GetTodosQuery } from '../../../queries/get-todos.query';
 import { TodoReadModelBuilder } from '../../builders/todo-read-model.builder';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
 import { MockGetTodosReadRepo } from './get-todos-read-repo.mock';
 import {
   GET_TODOS_EMPTY_ARRAY_CASE,
   GET_TODOS_REPO_ERROR_CASE,
   GET_TODOS_SUCCESS_CASE,
 } from './get-todos.mock';
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 
 describe('Get todos feature test', () => {
   it('Get all todos successfully', async () => {

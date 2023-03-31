@@ -9,7 +9,7 @@ export class MockEmailService {
   private mockEmailServicePort: EmailServicePort;
 
   constructor() {
-    this.mockSendMethod = this.getMockSaveMethod();
+    this.mockSendMethod = this.getMockSendMethod();
     this.mockEmailServicePort = {
       send: this.mockSendMethod,
     };
@@ -19,11 +19,17 @@ export class MockEmailService {
     return this.mockEmailServicePort;
   }
 
-  private getMockSaveMethod(): jest.Mock {
+  private getMockSendMethod(): jest.Mock {
     return jest.fn(
       (
         emailRequest: SendEmailRequest,
       ): Promise<Either<void, Application.Repo.Errors.Unexpected>> => {
+        if (emailRequest.destination === 'user@bitloops.com')
+          return Promise.resolve(ok());
+        if (emailRequest.destination === 'user2@bitloops.com')
+          return Promise.resolve(
+            fail(new Application.Repo.Errors.Unexpected()),
+          );
         return Promise.resolve(ok());
       },
     );

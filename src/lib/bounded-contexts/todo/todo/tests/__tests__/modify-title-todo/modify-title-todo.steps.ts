@@ -6,6 +6,7 @@ import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors'
 import { TodoTitleModifiedDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain/events/todo-title-modified.event';
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 import { TodoPropsBuilder } from '../../builders/todo-props.builder';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
 import {
   MODIFY_INVALID_TITLE_CASE,
   MODIFY_TITLE_SUCCESS_CASE,
@@ -14,7 +15,6 @@ import {
   MODIFY_TODO_UPDATE_REPO_ERROR_CASE,
 } from './modify-title-todo.mock';
 import { ModifyTitleWriteRepo } from './modify-title-write-repo.mock';
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 
 describe('Modify title todo feature test', () => {
   it('Todo title modified successfully', async () => {

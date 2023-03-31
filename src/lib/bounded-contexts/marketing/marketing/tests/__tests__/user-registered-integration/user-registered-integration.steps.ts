@@ -1,7 +1,7 @@
 import { UserRegisteredIntegrationEvent } from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 import { UserRegisteredIntegrationEventHandler } from '../../../application/event-handlers/integration/user-registered.integration-handler';
-import { MockStreamCommandBus } from './stream-command-bus.mock';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
+import { MockStreamCommandBus } from '../../mocks/stream-command-bus.mock';
 import { SUCCESS_CASE } from './user-registered-integration.mock';
 
 describe('UserRegisteredIntegrationEvent feature test', () => {

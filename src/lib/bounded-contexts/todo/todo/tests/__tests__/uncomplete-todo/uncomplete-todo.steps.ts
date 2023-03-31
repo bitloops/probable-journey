@@ -13,8 +13,8 @@ import {
 import { Application } from '@bitloops/bl-boilerplate-core';
 import { TodoUncompletedDomainEvent } from '../../../domain/events/todo-uncompleted.event';
 import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 import { UncompleteTodoCommand } from '../../../commands/uncomplete-todo.command';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
 
 describe('Uncomplete todo feature test', () => {
   it('Todo uncompleted successfully', async () => {

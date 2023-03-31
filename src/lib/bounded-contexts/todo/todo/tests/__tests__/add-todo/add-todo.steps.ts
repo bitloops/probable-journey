@@ -5,13 +5,13 @@ import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors'
 import { TodoAddedDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain/events/todo-added.event';
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 import { TodoPropsBuilder } from '../../builders/todo-props.builder';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
 import { MockAddTodoWriteRepo } from './add-todo-write-repo.mock';
 import {
   ADD_TODO_INVALID_TITLE_CASE,
   ADD_TODO_REPO_ERROR_CASE,
   ADD_TODO_SUCCESS_CASE,
 } from './add-todo.mock';
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 
 describe('Add todo feature test', () => {
   it('Todo created successfully', async () => {

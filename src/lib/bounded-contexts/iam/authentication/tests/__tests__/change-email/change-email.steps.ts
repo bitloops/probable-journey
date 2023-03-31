@@ -1,4 +1,3 @@
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 import { Application, Domain } from '@bitloops/bl-boilerplate-core';
 import {
   CHANGE_EMAIL_SUCCESS_CASE,
@@ -10,11 +9,12 @@ import {
 import { MockUserWriteRepo } from './change-email-write-repo.mock';
 import { ChangeEmailCommand } from '../../../commands/change-email.command';
 import { ChangeEmailHandler } from '../../../application/command-handlers/change-email.handler';
-import { UserEntityBuilder } from '../../builders/user-entity.builder';
+import { UserPropsBuilder } from '../../builders/user-props.builder';
 import { UserEntity } from '../../../domain/UserEntity';
 import { DomainErrors } from '../../../domain/errors';
 import { ApplicationErrors } from '../../../application/errors';
 import { UserUpdatedEmailDomainEvent } from '../../../domain/events/user-updated-email.event';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
 
 describe('Change user email feature test', () => {
   it('Changed user email successfully', async () => {
@@ -35,10 +35,11 @@ describe('Change user email feature test', () => {
     const result = await changeEmailHandler.execute(changeEmailCommand);
 
     //then
-    const userEntity = new UserEntityBuilder()
+    const userProps = new UserPropsBuilder()
       .withId(id)
       .withEmail(email)
       .withPassword(password)
+      .withLastLogin(undefined)
       .build();
 
     expect(mockUserWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
@@ -51,9 +52,7 @@ describe('Change user email feature test', () => {
     expect(userAggregate.domainEvents[0]).toBeInstanceOf(
       UserUpdatedEmailDomainEvent,
     );
-    expect(userAggregate.id).toEqual(userEntity.id);
-    expect(userAggregate.email).toEqual(userEntity.email);
-    expect(userAggregate.password).toEqual(userEntity.password);
+    expect(userAggregate.props).toEqual(userProps);
     expect(result.value).toBe(undefined);
   });
   it('Changed user email failed, invalid email', async () => {
@@ -145,10 +144,11 @@ describe('Change user email feature test', () => {
     const result = await changeEmailHandler.execute(changeEmailCommand);
 
     //then
-    const userEntity = new UserEntityBuilder()
+    const userProps = new UserPropsBuilder()
       .withId(id)
       .withEmail(email)
       .withPassword(password)
+      .withLastLogin(undefined)
       .build();
 
     expect(mockUserWriteRepo.mockGetByIdMethod).toHaveBeenCalledWith(
@@ -161,9 +161,7 @@ describe('Change user email feature test', () => {
     expect(userAggregate.domainEvents[0]).toBeInstanceOf(
       UserUpdatedEmailDomainEvent,
     );
-    expect(userAggregate.id).toEqual(userEntity.id);
-    expect(userAggregate.email).toEqual(userEntity.email);
-    expect(userAggregate.password).toEqual(userEntity.password);
+    expect(userAggregate.props).toEqual(userProps);
     expect(result.value).toBeInstanceOf(Application.Repo.Errors.Unexpected);
   });
 });

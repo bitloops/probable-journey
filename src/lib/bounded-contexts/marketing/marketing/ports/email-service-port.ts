@@ -1,3 +1,5 @@
+import { Application, Either } from '@bitloops/bl-boilerplate-core';
+
 export type SendEmailRequest = {
   origin: string;
   destination: string;
@@ -5,5 +7,7 @@ export type SendEmailRequest = {
 };
 
 export interface EmailServicePort {
-  send(data: SendEmailRequest): void;
+  send(
+    data: SendEmailRequest,
+  ): Promise<Either<void, Application.Repo.Errors.Unexpected>>;
 }

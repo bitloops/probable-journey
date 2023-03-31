@@ -1,7 +1,7 @@
 import { TodoCompletedIntegrationEvent } from '@src/lib/bounded-contexts/todo/todo/contracts/integration-events/todo-completed.integration-event';
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
 import { TodoCompletedIntegrationEventHandler } from '../../../application/event-handlers/integration/todo-completed.integration-handler';
-import { MockStreamCommandBus } from './stream-command-bus.mock';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
+import { MockStreamCommandBus } from '../../mocks/stream-command-bus.mock';
 import { SUCCESS_CASE } from './todo-completed-integration.mock';
 
 describe('TodoCompletedIntegrationEvent feature test', () => {

@@ -7,7 +7,7 @@ import { MockCreateUserReadRepo } from './create-user-read-repo.mock';
 import { CreateUserCommandHandler } from '@src/lib/bounded-contexts/marketing/marketing/application/command-handlers/create-user.command-handler';
 import { UserEmailReadModelBuilder } from '../../builders/user-read-model.builder';
 import { Application } from '@bitloops/bl-boilerplate-core';
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
 
 describe('Create user feature test', () => {
   it('Created user successfully,', async () => {

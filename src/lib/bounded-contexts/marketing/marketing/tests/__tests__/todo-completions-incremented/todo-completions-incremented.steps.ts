@@ -12,9 +12,9 @@ import {
   UNSUCCESS_USER_REPO_ERROR_CASE,
 } from './todo-completions-incremented.mock';
 import { NotificationTemplateReadModel } from '../../../domain/read-models/notification-template.read-model';
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
-import { MockStreamCommandBus } from './stream-command-bus.mock';
 import { ApplicationErrors } from '../../../application/errors';
+import { MockStreamCommandBus } from '../../mocks/stream-command-bus.mock';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
 
 describe('Todo completions incremented feature test', () => {
   it('Todo completions incremented successfully, email sent', async () => {
@@ -38,7 +38,7 @@ describe('Todo completions incremented feature test', () => {
     // when
     const todoCompletionsIncrementedEventHandler =
       new TodoCompletionsIncrementedHandler(
-        mockStreamCommandBus.getMockStreamingCommandBus(),
+        mockStreamCommandBus.getMockStreamCommandBus(),
         mockUserEmailReadRepo.getMockUserEmailReadRepo(),
         mockNotificationTemplateReadRepo.getMockNotificationTemplateReadRepo(),
       );
@@ -81,7 +81,7 @@ describe('Todo completions incremented feature test', () => {
     // when
     const todoCompletionsIncrementedEventHandler =
       new TodoCompletionsIncrementedHandler(
-        mockStreamCommandBus.getMockStreamingCommandBus(),
+        mockStreamCommandBus.getMockStreamCommandBus(),
         mockUserEmailReadRepo.getMockUserEmailReadRepo(),
         mockNotificationTemplateReadRepo.getMockNotificationTemplateReadRepo(),
       );
@@ -114,7 +114,7 @@ describe('Todo completions incremented feature test', () => {
     // when
     const todoCompletionsIncrementedEventHandler =
       new TodoCompletionsIncrementedHandler(
-        mockStreamCommandBus.getMockStreamingCommandBus(),
+        mockStreamCommandBus.getMockStreamCommandBus(),
         mockUserEmailReadRepo.getMockUserEmailReadRepo(),
         mockNotificationTemplateReadRepo.getMockNotificationTemplateReadRepo(),
       );
@@ -145,7 +145,7 @@ describe('Todo completions incremented feature test', () => {
     // when
     const todoCompletionsIncrementedEventHandler =
       new TodoCompletionsIncrementedHandler(
-        mockStreamCommandBus.getMockStreamingCommandBus(),
+        mockStreamCommandBus.getMockStreamCommandBus(),
         mockUserEmailReadRepo.getMockUserEmailReadRepo(),
         mockNotificationTemplateReadRepo.getMockNotificationTemplateReadRepo(),
       );
@@ -183,7 +183,7 @@ describe('Todo completions incremented feature test', () => {
     // when
     const todoCompletionsIncrementedEventHandler =
       new TodoCompletionsIncrementedHandler(
-        mockStreamCommandBus.getMockStreamingCommandBus(),
+        mockStreamCommandBus.getMockStreamCommandBus(),
         mockUserEmailReadRepo.getMockUserEmailReadRepo(),
         mockNotificationTemplateReadRepo.getMockNotificationTemplateReadRepo(),
       );

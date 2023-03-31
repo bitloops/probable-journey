@@ -13,7 +13,7 @@ import {
 import { UserEntity } from '@src/lib/bounded-contexts/marketing/marketing/domain/user.entity';
 import { TodoCompletionsIncrementedDomainEvent } from '@src/lib/bounded-contexts/marketing/marketing/domain/events/todo-completions-incremented.event';
 import { DomainErrors } from '@src/lib/bounded-contexts/marketing/marketing/domain/errors';
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
 
 describe('Increment completed todos feature test', () => {
   it('Incremented completed todos successfully, user exists', async () => {

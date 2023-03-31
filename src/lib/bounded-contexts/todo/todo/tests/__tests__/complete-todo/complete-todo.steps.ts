@@ -14,8 +14,7 @@ import {
 } from './complete-todo.mock';
 import { Application } from '@bitloops/bl-boilerplate-core';
 import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
-
-import { mockAsyncLocalStorageGet } from '../../../../../../../../test/mocks/mockAsynLocalStorageGet.mock';
+import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
 
 describe('Complete todo feature test', () => {
   it('Todo completed successfully', async () => {

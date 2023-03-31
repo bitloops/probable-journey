@@ -1,18 +1,6 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: test
-    ports:
-      - '3306:3306'
-    volumes:
-      - mysql_data:/usr/share/docker/mysql
-    networks:
-      - bitloops
-
   mongo:
     image: mongo:latest
     ports:
@@ -48,7 +36,7 @@ services:
       - nats_data:/usr/share/docker/nats-server
     networks:
       - bitloops
-    command: [ "-js", "-m", "8223" ]
+    command: ['-js', '-m', '8223']
 
   postgres:
     image: postgres:latest
@@ -70,16 +58,9 @@ services:
     # POSTGRES_DB: yourdbname
     # POSTGRES_USER: yourusername
     ports:
-      - "7777:7777"
+      - '7777:7777'
     command:
-      [
-        "-DV",
-        "-gatewayz",
-        "-connz",
-        "-varz",
-        "-jsz=all",
-        "http://nats:8223"
-      ]
+      ['-DV', '-gatewayz', '-connz', '-varz', '-jsz=all', 'http://nats:8223']
     networks:
       - bitloops
 
@@ -88,16 +69,16 @@ services:
     ports:
       # - "16686:16686"
       # - "14268:14268"
-      - "6831:6831"
-      - "6832:6832"
-      - "5778:5778"
-      - "16686:16686"
-      - "4317:4317"
-      - "4318:4318"
-      - "14250:14250"
-      - "14268:14268"
-      - "14269:14269"
-      - "9411:9411"
+      - '6831:6831'
+      - '6832:6832'
+      - '5778:5778'
+      - '16686:16686'
+      - '4317:4317'
+      - '4318:4318'
+      - '14250:14250'
+      - '14268:14268'
+      - '14269:14269'
+      - '9411:9411'
     environment:
       - COLLECTOR_OTLP_ENABLED=true
       - LOG_LEVEL=debug
@@ -126,11 +107,11 @@ services:
     expose:
       - 9091
     ports:
-      - "9091:9091"
+      - '9091:9091'
     networks:
       - bitloops
     labels:
-      org.label-schema.group: "monitoring"
+      org.label-schema.group: 'monitoring'
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -146,11 +127,11 @@ services:
       - '--web.enable-lifecycle'
     restart: unless-stopped
     ports:
-      - "9090:9090"
+      - '9090:9090'
     networks:
       - bitloops
     labels:
-      org.label-schema.group: "monitoring"
+      org.label-schema.group: 'monitoring'
 
   grafana:
     image: grafana/grafana:latest
@@ -166,20 +147,18 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     restart: unless-stopped
     ports:
-      - "3003:9090"
+      - '3003:9090'
     networks:
       - bitloops
     labels:
-      org.label-schema.group: "monitoring"
+      org.label-schema.group: 'monitoring'
 
 volumes:
-  mysql_data:
   mongo_data:
   nats_data:
   postgres_data:
   prometheus_data:
   grafana_data:
-
 
 networks:
   bitloops:

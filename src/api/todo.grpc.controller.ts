@@ -5,9 +5,9 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { RpcException, GrpcMethod, Payload } from '@nestjs/microservices';
+import { RpcException, GrpcMethod } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
-import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
+import { Metadata, ServerUnaryCall, ServerWritableStream } from '@grpc/grpc-js';
 
 import { todo } from '../proto/generated/todo';
 
@@ -21,7 +21,6 @@ import {
 } from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
 import { Infra, asyncLocalStorage } from '@bitloops/bl-boilerplate-core';
 import { CorrelationIdInterceptor } from '@bitloops/bl-boilerplate-infra-telemetry';
-import { TodoReadModel } from '@src/lib/bounded-contexts/todo/todo/domain/TodoReadModel';
 import { GetTodosQuery } from '@src/lib/bounded-contexts/todo/todo/queries/get-todos.query';
 import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 import { UncompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/uncomplete-todo.command';
@@ -154,6 +153,7 @@ export class TodoGrpcController {
   @GrpcMethod('TodoService', 'Complete')
   async completeTodo(
     data: todo.CompleteTodoRequest,
+    metadata: Metadata,
   ): Promise<todo.CompleteTodoResponse> {
     const command = new CompleteTodoCommand({ todoId: data.id });
     const result = await this.commandBus.request(command);
@@ -249,4 +249,37 @@ export class TodoGrpcController {
       });
     }
   }
+
+  @GrpcMethod('TodoService', 'OnAdded')
+  async onAdded(
+    request: todo.OnAddedTodoRequest,
+    metadata: Metadata,
+    call: ServerWritableStream<todo.OnAddedTodoRequest, todo.ServerMessage>,
+  ) {
+    await new Promise((resolve, reject) => {
+      setInterval(() => {
+        const myTodo = JSON.stringify({
+          id: 'b779cb10-72c8-416f-9399-273eab8e3421',
+          title: 'Fix the server streaming',
+          completed: false,
+        });
+        console.log('Sending streaming data', myTodo);
+        const message = new todo.ServerMessage({ message: myTodo });
+        call.write(message);
+      }, 5000);
+
+      call.on('end', () => {
+        console.log('end');
+      });
+
+      setTimeout(() => {
+        call.end();
+        resolve(true);
+      }, 30000);
+    });
+  }
 }
+
+// const sendMeta = new Metadata();
+// sendMeta.add('test', 'test');
+// call.sendMetadata(sendMeta);

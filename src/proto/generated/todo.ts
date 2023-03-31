@@ -6,6 +6,73 @@
 import * as pb_1 from "google-protobuf";
 import * as grpc_1 from "@grpc/grpc-js";
 export namespace todo {
+    export class ServerMessage extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            message?: string;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("message" in data && data.message != undefined) {
+                    this.message = data.message;
+                }
+            }
+        }
+        get message() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set message(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        static fromObject(data: {
+            message?: string;
+        }): ServerMessage {
+            const message = new ServerMessage({});
+            if (data.message != null) {
+                message.message = data.message;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                message?: string;
+            } = {};
+            if (this.message != null) {
+                data.message = this.message;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.message.length)
+                writer.writeString(1, this.message);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ServerMessage {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ServerMessage();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.message = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ServerMessage {
+            return ServerMessage.deserialize(bytes);
+        }
+    }
     export class ErrorResponse extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
@@ -2403,15 +2470,15 @@ export namespace todo {
             return Todo.deserialize(bytes);
         }
     }
-    export class OnAddedRequest extends pb_1.Message {
+    export class OnAddedTodoRequest extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {}) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") { }
         }
-        static fromObject(data: {}): OnAddedRequest {
-            const message = new OnAddedRequest({});
+        static fromObject(data: {}): OnAddedTodoRequest {
+            const message = new OnAddedTodoRequest({});
             return message;
         }
         toObject() {
@@ -2425,8 +2492,8 @@ export namespace todo {
             if (!w)
                 return writer.getResultBuffer();
         }
-        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): OnAddedRequest {
-            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new OnAddedRequest();
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): OnAddedTodoRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new OnAddedTodoRequest();
             while (reader.nextField()) {
                 if (reader.isEndGroup())
                     break;
@@ -2439,19 +2506,19 @@ export namespace todo {
         serializeBinary(): Uint8Array {
             return this.serialize();
         }
-        static deserializeBinary(bytes: Uint8Array): OnAddedRequest {
-            return OnAddedRequest.deserialize(bytes);
+        static deserializeBinary(bytes: Uint8Array): OnAddedTodoRequest {
+            return OnAddedTodoRequest.deserialize(bytes);
         }
     }
-    export class OnCompletedRequest extends pb_1.Message {
+    export class OnCompletedTodoRequest extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {}) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") { }
         }
-        static fromObject(data: {}): OnCompletedRequest {
-            const message = new OnCompletedRequest({});
+        static fromObject(data: {}): OnCompletedTodoRequest {
+            const message = new OnCompletedTodoRequest({});
             return message;
         }
         toObject() {
@@ -2465,8 +2532,8 @@ export namespace todo {
             if (!w)
                 return writer.getResultBuffer();
         }
-        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): OnCompletedRequest {
-            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new OnCompletedRequest();
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): OnCompletedTodoRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new OnCompletedTodoRequest();
             while (reader.nextField()) {
                 if (reader.isEndGroup())
                     break;
@@ -2479,19 +2546,19 @@ export namespace todo {
         serializeBinary(): Uint8Array {
             return this.serialize();
         }
-        static deserializeBinary(bytes: Uint8Array): OnCompletedRequest {
-            return OnCompletedRequest.deserialize(bytes);
+        static deserializeBinary(bytes: Uint8Array): OnCompletedTodoRequest {
+            return OnCompletedTodoRequest.deserialize(bytes);
         }
     }
-    export class OnUncompletedRequest extends pb_1.Message {
+    export class OnUncompletedTodoRequest extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {}) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") { }
         }
-        static fromObject(data: {}): OnUncompletedRequest {
-            const message = new OnUncompletedRequest({});
+        static fromObject(data: {}): OnUncompletedTodoRequest {
+            const message = new OnUncompletedTodoRequest({});
             return message;
         }
         toObject() {
@@ -2505,8 +2572,8 @@ export namespace todo {
             if (!w)
                 return writer.getResultBuffer();
         }
-        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): OnUncompletedRequest {
-            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new OnUncompletedRequest();
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): OnUncompletedTodoRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new OnUncompletedTodoRequest();
             while (reader.nextField()) {
                 if (reader.isEndGroup())
                     break;
@@ -2519,19 +2586,19 @@ export namespace todo {
         serializeBinary(): Uint8Array {
             return this.serialize();
         }
-        static deserializeBinary(bytes: Uint8Array): OnUncompletedRequest {
-            return OnUncompletedRequest.deserialize(bytes);
+        static deserializeBinary(bytes: Uint8Array): OnUncompletedTodoRequest {
+            return OnUncompletedTodoRequest.deserialize(bytes);
         }
     }
-    export class OnModifiedTitleRequest extends pb_1.Message {
+    export class OnModifiedTitleTodoRequest extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {}) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") { }
         }
-        static fromObject(data: {}): OnModifiedTitleRequest {
-            const message = new OnModifiedTitleRequest({});
+        static fromObject(data: {}): OnModifiedTitleTodoRequest {
+            const message = new OnModifiedTitleTodoRequest({});
             return message;
         }
         toObject() {
@@ -2545,8 +2612,8 @@ export namespace todo {
             if (!w)
                 return writer.getResultBuffer();
         }
-        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): OnModifiedTitleRequest {
-            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new OnModifiedTitleRequest();
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): OnModifiedTitleTodoRequest {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new OnModifiedTitleTodoRequest();
             while (reader.nextField()) {
                 if (reader.isEndGroup())
                     break;
@@ -2559,8 +2626,8 @@ export namespace todo {
         serializeBinary(): Uint8Array {
             return this.serialize();
         }
-        static deserializeBinary(bytes: Uint8Array): OnModifiedTitleRequest {
-            return OnModifiedTitleRequest.deserialize(bytes);
+        static deserializeBinary(bytes: Uint8Array): OnModifiedTitleTodoRequest {
+            return OnModifiedTitleTodoRequest.deserialize(bytes);
         }
     }
     interface GrpcUnaryServiceInterface<P, R> {
@@ -2647,17 +2714,17 @@ export namespace todo {
                 path: "/todo.TodoService/OnAdded",
                 requestStream: false,
                 responseStream: true,
-                requestSerialize: (message: OnAddedRequest) => Buffer.from(message.serialize()),
-                requestDeserialize: (bytes: Buffer) => OnAddedRequest.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: Todo) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => Todo.deserialize(new Uint8Array(bytes))
+                requestSerialize: (message: OnAddedTodoRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => OnAddedTodoRequest.deserialize(new Uint8Array(bytes)),
+                responseSerialize: (message: ServerMessage) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => ServerMessage.deserialize(new Uint8Array(bytes))
             },
             OnCompleted: {
                 path: "/todo.TodoService/OnCompleted",
                 requestStream: false,
                 responseStream: true,
-                requestSerialize: (message: OnCompletedRequest) => Buffer.from(message.serialize()),
-                requestDeserialize: (bytes: Buffer) => OnCompletedRequest.deserialize(new Uint8Array(bytes)),
+                requestSerialize: (message: OnCompletedTodoRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => OnCompletedTodoRequest.deserialize(new Uint8Array(bytes)),
                 responseSerialize: (message: Todo) => Buffer.from(message.serialize()),
                 responseDeserialize: (bytes: Buffer) => Todo.deserialize(new Uint8Array(bytes))
             },
@@ -2665,8 +2732,8 @@ export namespace todo {
                 path: "/todo.TodoService/OnUncompleted",
                 requestStream: false,
                 responseStream: true,
-                requestSerialize: (message: OnUncompletedRequest) => Buffer.from(message.serialize()),
-                requestDeserialize: (bytes: Buffer) => OnUncompletedRequest.deserialize(new Uint8Array(bytes)),
+                requestSerialize: (message: OnUncompletedTodoRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => OnUncompletedTodoRequest.deserialize(new Uint8Array(bytes)),
                 responseSerialize: (message: Todo) => Buffer.from(message.serialize()),
                 responseDeserialize: (bytes: Buffer) => Todo.deserialize(new Uint8Array(bytes))
             },
@@ -2674,8 +2741,8 @@ export namespace todo {
                 path: "/todo.TodoService/OnModifiedTitle",
                 requestStream: false,
                 responseStream: true,
-                requestSerialize: (message: OnModifiedTitleRequest) => Buffer.from(message.serialize()),
-                requestDeserialize: (bytes: Buffer) => OnModifiedTitleRequest.deserialize(new Uint8Array(bytes)),
+                requestSerialize: (message: OnModifiedTitleTodoRequest) => Buffer.from(message.serialize()),
+                requestDeserialize: (bytes: Buffer) => OnModifiedTitleTodoRequest.deserialize(new Uint8Array(bytes)),
                 responseSerialize: (message: Todo) => Buffer.from(message.serialize()),
                 responseDeserialize: (bytes: Buffer) => Todo.deserialize(new Uint8Array(bytes))
             }
@@ -2687,10 +2754,10 @@ export namespace todo {
         abstract ModifyTitle(call: grpc_1.ServerUnaryCall<ModifyTitleTodoRequest, ModifyTitleTodoResponse>, callback: grpc_1.sendUnaryData<ModifyTitleTodoResponse>): void;
         abstract Delete(call: grpc_1.ServerUnaryCall<DeleteTodoRequest, DeleteTodoResponse>, callback: grpc_1.sendUnaryData<DeleteTodoResponse>): void;
         abstract GetAll(call: grpc_1.ServerUnaryCall<GetAllTodosRequest, GetAllTodosResponse>, callback: grpc_1.sendUnaryData<GetAllTodosResponse>): void;
-        abstract OnAdded(call: grpc_1.ServerWritableStream<OnAddedRequest, Todo>): void;
-        abstract OnCompleted(call: grpc_1.ServerWritableStream<OnCompletedRequest, Todo>): void;
-        abstract OnUncompleted(call: grpc_1.ServerWritableStream<OnUncompletedRequest, Todo>): void;
-        abstract OnModifiedTitle(call: grpc_1.ServerWritableStream<OnModifiedTitleRequest, Todo>): void;
+        abstract OnAdded(call: grpc_1.ServerWritableStream<OnAddedTodoRequest, ServerMessage>): void;
+        abstract OnCompleted(call: grpc_1.ServerWritableStream<OnCompletedTodoRequest, Todo>): void;
+        abstract OnUncompleted(call: grpc_1.ServerWritableStream<OnUncompletedTodoRequest, Todo>): void;
+        abstract OnModifiedTitle(call: grpc_1.ServerWritableStream<OnModifiedTitleTodoRequest, Todo>): void;
     }
     export class TodoServiceClient extends grpc_1.makeGenericClientConstructor(UnimplementedTodoServiceService.definition, "TodoService", {}) {
         constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
@@ -2714,16 +2781,16 @@ export namespace todo {
         GetAll: GrpcUnaryServiceInterface<GetAllTodosRequest, GetAllTodosResponse> = (message: GetAllTodosRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<GetAllTodosResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<GetAllTodosResponse>, callback?: grpc_1.requestCallback<GetAllTodosResponse>): grpc_1.ClientUnaryCall => {
             return super.GetAll(message, metadata, options, callback);
         };
-        OnAdded: GrpcStreamServiceInterface<OnAddedRequest, OnAddedRequest> = (message: OnAddedRequest, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<OnAddedRequest> => {
+        OnAdded: GrpcStreamServiceInterface<OnAddedTodoRequest, OnAddedTodoRequest> = (message: OnAddedTodoRequest, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<OnAddedTodoRequest> => {
             return super.OnAdded(message, metadata, options);
         };
-        OnCompleted: GrpcStreamServiceInterface<OnCompletedRequest, OnCompletedRequest> = (message: OnCompletedRequest, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<OnCompletedRequest> => {
+        OnCompleted: GrpcStreamServiceInterface<OnCompletedTodoRequest, OnCompletedTodoRequest> = (message: OnCompletedTodoRequest, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<OnCompletedTodoRequest> => {
             return super.OnCompleted(message, metadata, options);
         };
-        OnUncompleted: GrpcStreamServiceInterface<OnUncompletedRequest, OnUncompletedRequest> = (message: OnUncompletedRequest, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<OnUncompletedRequest> => {
+        OnUncompleted: GrpcStreamServiceInterface<OnUncompletedTodoRequest, OnUncompletedTodoRequest> = (message: OnUncompletedTodoRequest, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<OnUncompletedTodoRequest> => {
             return super.OnUncompleted(message, metadata, options);
         };
-        OnModifiedTitle: GrpcStreamServiceInterface<OnModifiedTitleRequest, OnModifiedTitleRequest> = (message: OnModifiedTitleRequest, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<OnModifiedTitleRequest> => {
+        OnModifiedTitle: GrpcStreamServiceInterface<OnModifiedTitleTodoRequest, OnModifiedTitleTodoRequest> = (message: OnModifiedTitleTodoRequest, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<OnModifiedTitleTodoRequest> => {
             return super.OnModifiedTitle(message, metadata, options);
         };
     }

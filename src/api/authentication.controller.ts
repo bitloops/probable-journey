@@ -12,7 +12,7 @@ import {
 import { ChangeEmailCommand } from '@src/lib/bounded-contexts/iam/authentication/commands/change-email.command';
 import { UpdateEmailDTO } from './dto/update-email.dto';
 import { RegisterDTO } from './dto/register.dto';
-import { BUSES_TOKENS } from '@bitloops/bl-boilerplate-infra-nest-jetsream';
+import { BUSES_TOKENS } from '@bitloops/bl-boilerplate-infra-nest-jetstream';
 import {
   Application,
   Infra,

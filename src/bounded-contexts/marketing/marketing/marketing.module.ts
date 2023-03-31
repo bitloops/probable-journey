@@ -18,7 +18,7 @@ import { StreamingCommandHandlers } from '@src/lib/bounded-contexts/marketing/ma
 import {
   NatsStreamingCommandBus,
   JetstreamModule,
-} from '@bitloops/bl-boilerplate-infra-nest-jetsream';
+} from '@bitloops/bl-boilerplate-infra-nest-jetstream';
 
 const RepoProviders = [
   {

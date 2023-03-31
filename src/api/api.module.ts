@@ -7,7 +7,7 @@ import {
   JetstreamModule,
   NatsStreamingIntegrationEventBus,
   NatsStreamingMessageBus,
-} from '@bitloops/bl-boilerplate-infra-nest-jetsream';
+} from '@bitloops/bl-boilerplate-infra-nest-jetstream';
 import configuration from '@src/config/configuration';
 import authConfiguration, {
   AuthEnvironmentVariables,

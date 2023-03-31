@@ -17,7 +17,7 @@ import { AddTodoDto } from './dto/add-todo.dto';
 import { CompleteTodoDto } from './dto/complete-todo.dto';
 import { GetTodosQuery } from '../lib/bounded-contexts/todo/todo/queries/get-todos.query';
 
-import { BUSES_TOKENS } from '@bitloops/bl-boilerplate-infra-nest-jetsream';
+import { BUSES_TOKENS } from '@bitloops/bl-boilerplate-infra-nest-jetstream';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import { JwtAuthGuard } from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
 import { Traceable } from '@bitloops/bl-boilerplate-infra-telemetry';

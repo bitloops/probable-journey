@@ -14,12 +14,14 @@ import {
 import {
   StreamingDomainEventBusToken,
   StreamingIntegrationEventBusToken,
+  PubSubIntegrationEventBusToken,
 } from '@src/lib/bounded-contexts/todo/todo/constants';
 import {
   JetstreamModule,
   NatsStreamingDomainEventBus,
   NatsStreamingIntegrationEventBus,
-} from '@bitloops/bl-boilerplate-infra-nest-jetsream';
+  NatsPubSubIntegrationEventsBus,
+} from '@bitloops/bl-boilerplate-infra-nest-jetstream';
 
 const providers = [
   {
@@ -37,6 +39,10 @@ const providers = [
   {
     provide: StreamingDomainEventBusToken,
     useClass: NatsStreamingDomainEventBus,
+  },
+  {
+    provide: PubSubIntegrationEventBusToken,
+    useClass: NatsPubSubIntegrationEventsBus,
   },
 ];
 @Module({

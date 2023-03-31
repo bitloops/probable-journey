@@ -159,3 +159,4 @@ message OnAddedTodoRequest {}
 message OnCompletedTodoRequest {}
 message OnUncompletedTodoRequest {}
 message OnModifiedTitleTodoRequest {}
+message OnDeletedTodoRequest {}

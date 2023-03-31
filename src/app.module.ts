@@ -5,7 +5,7 @@ import { IamModule } from './bounded-contexts/iam/iam/iam.module';
 import {
   JetstreamModule,
   NatsStreamingMessageBus,
-} from '@bitloops/bl-boilerplate-infra-nest-jetsream';
+} from '@bitloops/bl-boilerplate-infra-nest-jetstream';
 import { PostgresModule } from '@bitloops/bl-boilerplate-infra-postgres';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';

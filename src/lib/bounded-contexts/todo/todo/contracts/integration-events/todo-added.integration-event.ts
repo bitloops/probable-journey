@@ -4,6 +4,7 @@ import {
   Infra,
 } from '@bitloops/bl-boilerplate-core';
 import { TodoAddedDomainEvent } from '../../domain/events/todo-added.event';
+import { TodoEntity } from '../../domain/TodoEntity';
 
 export type IntegrationSchemaV1 = {
   todoId: string;
@@ -46,9 +47,12 @@ export class TodoAddedIntegrationEvent
   }
 
   static toIntegrationDataV1(event: TodoAddedDomainEvent): IntegrationSchemaV1 {
+    // This is one way to handle (toPrimitives call from when publishing the domainEvent), we are the receiver
+    const data: any = event.data;
+    const todoEntity = TodoEntity.fromPrimitives(data);
     return {
       todoId: event.data.id.toString(),
-      title: event.data.title.title,
+      title: todoEntity.title.title, //event.data.title.title,
       userId: event.data.userId.toString(),
     };
   }

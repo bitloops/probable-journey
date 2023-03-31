@@ -8,12 +8,15 @@ import {
 import { RpcException, GrpcMethod } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { Metadata, ServerUnaryCall, ServerWritableStream } from '@grpc/grpc-js';
-
+import { v4 as uuid } from 'uuid';
 import { todo } from '../proto/generated/todo';
 
 import { AddTodoCommand } from '../lib/bounded-contexts/todo/todo/commands/add-todo.command';
 
-import { BUSES_TOKENS } from '@bitloops/bl-boilerplate-infra-nest-jetsream';
+import {
+  BUSES_TOKENS,
+  NatsPubSubIntegrationEventsBus,
+} from '@bitloops/bl-boilerplate-infra-nest-jetstream';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import {
   AsyncLocalStorageInterceptor,
@@ -26,8 +29,65 @@ import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/command
 import { UncompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/uncomplete-todo.command';
 import { ModifyTodoTitleCommand } from '@src/lib/bounded-contexts/todo/todo/commands/modify-title-todo.command';
 import { DeleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/delete-todo.command';
+import { TodoAddedPubSubIntegrationEventHandler } from './pub-sub-handlers/todo-completed.integration-handler';
 
-// import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
+export type Subscribers = {
+  [subscriberId: string]: {
+    timestamp: number;
+    call: ServerWritableStream<any, todo.Todo>;
+    authToken: string;
+    userId: string;
+  };
+};
+const subscribers: Subscribers = {};
+
+export type Subscriptions = {
+  [integrationEvent: string]: {
+    subscribers: string[];
+  };
+};
+const subscriptions: Subscriptions = {};
+
+async function subscribe(
+  subscriberId: string,
+  call: ServerWritableStream<any, todo.Todo>,
+  topic: string,
+) {
+  const authContext = asyncLocalStorage.getStore()?.get('context');
+  console.log('authContext', authContext);
+  await new Promise((resolve) => {
+    call.on('end', () => {
+      resolve(true);
+    });
+
+    call.on('error', () => {
+      resolve(true);
+    });
+
+    call.on('close', () => {
+      resolve(true);
+    });
+
+    call.on('finish', () => {
+      resolve(true);
+    });
+    subscribers[subscriberId] = {
+      timestamp: Date.now(),
+      call,
+      authToken: authContext.jwt,
+      userId: authContext.userId,
+    };
+    if (!subscriptions[topic]) {
+      subscriptions[topic] = {
+        subscribers: [subscriberId],
+      };
+    } else {
+      subscriptions[topic].subscribers.push(subscriberId);
+    }
+    console.log('updated subscriptions', subscriptions);
+  });
+}
+
 async function sha256Hash(message: string) {
   // Convert the message to a Uint8Array
   const encoder = new TextEncoder();
@@ -53,12 +113,25 @@ export class TodoGrpcController {
     private readonly commandBus: Infra.CommandBus.IPubSubCommandBus,
     @Inject(BUSES_TOKENS.PUBSUB_QUERY_BYS)
     private readonly queryBus: Infra.QueryBus.IQueryBus,
+    @Inject(BUSES_TOKENS.PUBSUB_INTEGRATION_EVENT_BUS)
+    private readonly pubSubIntegrationEventBus: Infra.EventBus.IEventBus,
     private configService: ConfigService<AuthEnvironmentVariables, true>,
   ) {
     this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
     if (this.JWT_SECRET === '') {
       throw new Error('JWT_SECRET is not defined in env!');
     }
+    this.subscribeToPubSubIntegrationEvents();
+  }
+
+  async subscribeToPubSubIntegrationEvents() {
+    const handler = new TodoAddedPubSubIntegrationEventHandler(
+      subscriptions,
+      subscribers,
+    );
+    const topic = NatsPubSubIntegrationEventsBus.getTopicFromHandler(handler);
+    console.log(`Subscribing to pubsub integration event ${topic}`);
+    await this.pubSubIntegrationEventBus.subscribe(topic, handler);
   }
 
   @GrpcMethod('TodoService', 'Add')
@@ -254,29 +327,55 @@ export class TodoGrpcController {
   async onAdded(
     request: todo.OnAddedTodoRequest,
     metadata: Metadata,
-    call: ServerWritableStream<todo.OnAddedTodoRequest, todo.ServerMessage>,
+    call: ServerWritableStream<todo.OnAddedTodoRequest, todo.Todo>,
   ) {
-    await new Promise((resolve, reject) => {
-      setInterval(() => {
-        const myTodo = JSON.stringify({
-          id: 'b779cb10-72c8-416f-9399-273eab8e3421',
-          title: 'Fix the server streaming',
-          completed: false,
-        });
-        console.log('Sending streaming data', myTodo);
-        const message = new todo.ServerMessage({ message: myTodo });
-        call.write(message);
-      }, 5000);
-
-      call.on('end', () => {
-        console.log('end');
-      });
-
-      setTimeout(() => {
-        call.end();
-        resolve(true);
-      }, 30000);
+    await new Promise((resolve) => {
+      const subscriberId = uuid();
+      subscribe(
+        subscriberId,
+        call,
+        TodoAddedPubSubIntegrationEventHandler.name,
+      );
     });
+  }
+
+  @GrpcMethod('TodoService', 'OnCompleted')
+  async onCompleted(
+    request: todo.OnCompletedTodoRequest,
+    metadata: Metadata,
+    call: ServerWritableStream<todo.OnCompletedTodoRequest, todo.Todo>,
+  ) {
+    const subscriberId = uuid();
+    subscribe(subscriberId, call, '');
+  }
+
+  @GrpcMethod('TodoService', 'OnUncompleted')
+  async onUncompleted(
+    request: todo.OnUncompletedTodoRequest,
+    metadata: Metadata,
+    call: ServerWritableStream<todo.OnUncompletedTodoRequest, todo.Todo>,
+  ) {
+    const subscriberId = uuid();
+    subscribe(subscriberId, call, '');
+  }
+
+  @GrpcMethod('TodoService', 'OnModifiedTitle')
+  async onModifiedTitle(
+    request: todo.OnModifiedTitleTodoRequest,
+    metadata: Metadata,
+    call: ServerWritableStream<todo.OnModifiedTitleTodoRequest, todo.Todo>,
+  ) {
+    const subscriberId = uuid();
+    subscribe(subscriberId, call, '');
+  }
+  @GrpcMethod('TodoService', 'OnDeleted')
+  async onDeleted(
+    request: todo.OnDeletedTodoRequest,
+    metadata: Metadata,
+    call: ServerWritableStream<todo.OnDeletedTodoRequest, todo.Todo>,
+  ) {
+    const subscriberId = uuid();
+    subscribe(subscriberId, call, '');
   }
 }
 

@@ -9,7 +9,7 @@ import {
   JetstreamModule,
   NatsStreamingDomainEventBus,
   NatsStreamingIntegrationEventBus,
-} from '@bitloops/bl-boilerplate-infra-nest-jetsream';
+} from '@bitloops/bl-boilerplate-infra-nest-jetstream';
 import { StreamingDomainEventHandlers } from '@src/lib/bounded-contexts/iam/authentication/application/event-handlers';
 import {
   StreamingDomainEventBusToken,

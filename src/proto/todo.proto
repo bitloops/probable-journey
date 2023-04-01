@@ -189,9 +189,3 @@ message Todo {
   bool completed = 3;
   string userId = 4;
 }
-
-// message OnAddedTodoRequest {}
-// message OnCompletedTodoRequest {}
-// message OnUncompletedTodoRequest {}
-// message OnModifiedTitleTodoRequest {}
-// message OnDeletedTodoRequest {}

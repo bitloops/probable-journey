@@ -6531,7 +6531,8 @@ proto.todo.Todo.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     title: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    completed: jspb.Message.getBooleanFieldWithDefault(msg, 3, false)
+    completed: jspb.Message.getBooleanFieldWithDefault(msg, 3, false),
+    userid: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -6580,6 +6581,10 @@ proto.todo.Todo.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setCompleted(value);
       break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserid(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -6627,6 +6632,13 @@ proto.todo.Todo.serializeBinaryToWriter = function(message, writer) {
   if (f) {
     writer.writeBool(
       3,
+      f
+    );
+  }
+  f = message.getUserid();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
       f
     );
   }
@@ -6684,6 +6696,24 @@ proto.todo.Todo.prototype.getCompleted = function() {
  */
 proto.todo.Todo.prototype.setCompleted = function(value) {
   return jspb.Message.setProto3BooleanField(this, 3, value);
+};
+
+
+/**
+ * optional string userId = 4;
+ * @return {string}
+ */
+proto.todo.Todo.prototype.getUserid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.todo.Todo} returns this
+ */
+proto.todo.Todo.prototype.setUserid = function(value) {
+  return jspb.Message.setProto3StringField(this, 4, value);
 };
 
 

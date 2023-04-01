@@ -1,9 +1,9 @@
 import { Application, ok, Either } from '@bitloops/bl-boilerplate-core';
-import { TodoCompletedIntegrationEvent } from '@src/lib/bounded-contexts/todo/todo/contracts/integration-events/todo-completed.integration-event';
+import { TodoAddedIntegrationEvent } from '@src/lib/bounded-contexts/todo/todo/contracts/integration-events/todo-added.integration-event';
 import { todo } from '../../proto/generated/todo';
 import { Subscriptions, Subscribers } from '../todo.grpc.controller';
 
-export class TodoCompletedPubSubIntegrationEventHandler
+export class TodoAddedPubSubIntegrationEventHandler
   implements Application.IHandleIntegrationEvent
 {
   constructor(
@@ -11,22 +11,22 @@ export class TodoCompletedPubSubIntegrationEventHandler
     private readonly subscribers: Subscribers,
   ) {}
   get event() {
-    return TodoCompletedIntegrationEvent;
+    return TodoAddedIntegrationEvent;
   }
 
   get boundedContext() {
-    return TodoCompletedIntegrationEvent.boundedContextId;
+    return TodoAddedIntegrationEvent.boundedContextId;
   }
 
   get version() {
-    return TodoCompletedIntegrationEvent.versions[0]; // here output will be 'v1'
+    return TodoAddedIntegrationEvent.versions[0]; // here output will be 'v1'
   }
 
   public async handle(
-    event: TodoCompletedIntegrationEvent,
+    event: TodoAddedIntegrationEvent,
   ): Promise<Either<void, never>> {
     console.log(
-      `[TodoCompletedIntegrationEvent]: Successfully received TodoCompleted PubSub IntegrationEvent`,
+      `[TodoCompletedIntegrationEvent]: Successfully received TodoAdded PubSub IntegrationEvent`,
     );
     const { data } = event;
 
@@ -37,7 +37,7 @@ export class TodoCompletedPubSubIntegrationEventHandler
     // const call = this.subscribers[userId]?.call;
     // console.log('call', call);
     const subscription =
-      this.subscriptions[TodoCompletedPubSubIntegrationEventHandler.name];
+      this.subscriptions[TodoAddedPubSubIntegrationEventHandler.name];
     const subscriptionsSubscribers = subscription?.subscribers;
     console.log('found subscribers', subscriptionsSubscribers);
     if (subscriptionsSubscribers) {
@@ -47,11 +47,12 @@ export class TodoCompletedPubSubIntegrationEventHandler
         if (call) {
           const todoObject = new todo.Todo({
             id: data.todoId,
-            userId: userId,
+            title: data.title,
+            completed: false, // data.completed, // put completed in schema?
           });
           // console.log({ todoObject });
           const message = new todo.OnEvent({
-            onCompleted: todoObject,
+            onAdded: todoObject,
           });
           call.write(message as any);
           // const subscriberIds = Object.keys(this.subscribers);

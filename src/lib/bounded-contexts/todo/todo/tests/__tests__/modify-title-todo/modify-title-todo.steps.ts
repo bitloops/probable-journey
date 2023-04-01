@@ -3,7 +3,7 @@ import { ModifyTodoTitleHandler } from '@src/lib/bounded-contexts/todo/todo/appl
 import { ApplicationErrors } from '@src/lib/bounded-contexts/todo/todo/application/errors';
 import { ModifyTodoTitleCommand } from '@src/lib/bounded-contexts/todo/todo/commands/modify-title-todo.command';
 import { DomainErrors } from '@src/lib/bounded-contexts/todo/todo/domain/errors';
-import { TodoTitleModifiedDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain/events/todo-title-modified.event';
+import { TodoModifiedTitleDomainEvent } from '@src/lib/bounded-contexts/todo/todo/domain/events/todo-modified-title.event';
 import { TodoEntity } from '@src/lib/bounded-contexts/todo/todo/domain/TodoEntity';
 import { TodoPropsBuilder } from '../../builders/todo-props.builder';
 import { mockAsyncLocalStorageGet } from '../../mocks/mockAsynLocalStorageGet.mock';
@@ -52,7 +52,7 @@ describe('Modify title todo feature test', () => {
     const todoAggregate = mockTodoWriteRepo.mockUpdateMethod.mock.calls[0][0];
     expect(todoAggregate.props).toEqual(todoProps);
     expect(todoAggregate.domainEvents[0]).toBeInstanceOf(
-      TodoTitleModifiedDomainEvent,
+      TodoModifiedTitleDomainEvent,
     );
     expect(result.value).toBe(undefined);
   });

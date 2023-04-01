@@ -29,7 +29,11 @@ import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 
 import { todo } from '../proto/generated/todo';
 import { AddTodoCommand } from '../lib/bounded-contexts/todo/todo/commands/add-todo.command';
-import { TodoAddedPubSubIntegrationEventHandler } from './pub-sub-handlers/todo-completed.integration-handler';
+import { TodoAddedPubSubIntegrationEventHandler } from './pub-sub-handlers/todo-added.integration-handler';
+import { TodoDeletedPubSubIntegrationEventHandler } from './pub-sub-handlers/todo-deleted.integration-handler';
+import { TodoCompletedPubSubIntegrationEventHandler } from './pub-sub-handlers/todo-completed.integration-handler';
+import { TodoUncompletedPubSubIntegrationEventHandler } from './pub-sub-handlers/todo-uncompleted.integration-handler';
+import { TodoModifiedTitlePubSubIntegrationEventHandler } from './pub-sub-handlers/todo-modified-title.integration-handler';
 
 export type Subscribers = {
   [subscriberId: string]: {
@@ -147,13 +151,70 @@ export class TodoGrpcController {
   }
 
   async subscribeToPubSubIntegrationEvents() {
-    const handler = new TodoAddedPubSubIntegrationEventHandler(
+    // Added
+    const addedHandler = new TodoAddedPubSubIntegrationEventHandler(
       subscriptions,
       subscribers,
     );
-    const topic = NatsPubSubIntegrationEventsBus.getTopicFromHandler(handler);
-    console.log(`Subscribing to PubSub integration event ${topic}`);
-    await this.pubSubIntegrationEventBus.subscribe(topic, handler);
+    const adddedTopic =
+      NatsPubSubIntegrationEventsBus.getTopicFromHandler(addedHandler);
+    console.log(`Subscribing to PubSub integration event ${adddedTopic}`);
+    await this.pubSubIntegrationEventBus.subscribe(adddedTopic, addedHandler);
+
+    // Deleted
+    const deletedHandler = new TodoDeletedPubSubIntegrationEventHandler(
+      subscriptions,
+      subscribers,
+    );
+    const deletedTopic =
+      NatsPubSubIntegrationEventsBus.getTopicFromHandler(deletedHandler);
+    console.log(`Subscribing to PubSub integration event ${deletedTopic}`);
+    await this.pubSubIntegrationEventBus.subscribe(
+      deletedTopic,
+      deletedHandler,
+    );
+
+    // Completed
+    const completedHandler = new TodoCompletedPubSubIntegrationEventHandler(
+      subscriptions,
+      subscribers,
+    );
+    const completedTopic =
+      NatsPubSubIntegrationEventsBus.getTopicFromHandler(completedHandler);
+    console.log(`Subscribing to PubSub integration event ${completedTopic}`);
+    await this.pubSubIntegrationEventBus.subscribe(
+      completedTopic,
+      completedHandler,
+    );
+
+    // Uncompleted
+    const uncompletedHandler = new TodoUncompletedPubSubIntegrationEventHandler(
+      subscriptions,
+      subscribers,
+    );
+    const uncompletedTopic =
+      NatsPubSubIntegrationEventsBus.getTopicFromHandler(uncompletedHandler);
+    console.log(`Subscribing to PubSub integration event ${uncompletedTopic}`);
+    await this.pubSubIntegrationEventBus.subscribe(
+      uncompletedTopic,
+      uncompletedHandler,
+    );
+
+    // ModifiedTitle
+    const modifiedTitleHandler =
+      new TodoModifiedTitlePubSubIntegrationEventHandler(
+        subscriptions,
+        subscribers,
+      );
+    const modifiedTitleTopic =
+      NatsPubSubIntegrationEventsBus.getTopicFromHandler(modifiedTitleHandler);
+    console.log(
+      `Subscribing to PubSub integration event ${modifiedTitleTopic}`,
+    );
+    await this.pubSubIntegrationEventBus.subscribe(
+      modifiedTitleTopic,
+      modifiedTitleHandler,
+    );
   }
 
   @GrpcMethod('TodoService', 'Add')
@@ -414,13 +475,13 @@ export class TodoGrpcController {
           case todo.TODO_EVENTS.ADDED:
             return TodoAddedPubSubIntegrationEventHandler.name;
           case todo.TODO_EVENTS.DELETED:
-            return 'todo.deleted';
+            return TodoDeletedPubSubIntegrationEventHandler.name;
           case todo.TODO_EVENTS.MODIFIED_TITLE:
-            return 'todo.modified';
+            return TodoModifiedTitlePubSubIntegrationEventHandler.name;
           case todo.TODO_EVENTS.COMPLETED:
-            return 'todo.completed';
+            return TodoCompletedPubSubIntegrationEventHandler.name;
           case todo.TODO_EVENTS.UNCOMPLETED:
-            return 'todo.uncompleted';
+            return TodoUncompletedPubSubIntegrationEventHandler.name;
         }
       });
       subscribe(subscriberId, topics, call, resolve);

@@ -1,7 +1,7 @@
 import { Domain, asyncLocalStorage } from '@bitloops/bl-boilerplate-core';
 import { TodoEntity } from '../TodoEntity';
 
-export class TodoTitleModifiedDomainEvent
+export class TodoModifiedTitleDomainEvent
   implements Domain.IDomainEvent<TodoEntity>
 {
   public aggregateId: any;

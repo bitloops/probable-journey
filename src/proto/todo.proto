@@ -187,6 +187,7 @@ message Todo {
   string id = 1;
   string title = 2;
   bool completed = 3;
+  string userId = 4;
 }
 
 // message OnAddedTodoRequest {}

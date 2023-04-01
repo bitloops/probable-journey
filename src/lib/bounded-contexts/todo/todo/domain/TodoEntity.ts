@@ -3,7 +3,7 @@ import { TitleVO } from './TitleVO';
 import { UserIdVO } from './UserIdVO';
 import { DomainErrors } from './errors';
 import { TodoAddedDomainEvent } from './events/todo-added.event';
-import { TodoTitleModifiedDomainEvent } from './events/todo-title-modified.event';
+import { TodoModifiedTitleDomainEvent } from './events/todo-modified-title.event';
 import { TodoCompletedDomainEvent } from './events/todo-completed.event';
 import { TodoUncompletedDomainEvent } from './events/todo-uncompleted.event';
 import { Rules } from './rules';
@@ -86,7 +86,7 @@ export class TodoEntity extends Domain.Aggregate<TodoProps> {
 
   public modifyTitle(title: TitleVO): Either<void, never> {
     this.props.title = title;
-    this.addDomainEvent(new TodoTitleModifiedDomainEvent(this));
+    this.addDomainEvent(new TodoModifiedTitleDomainEvent(this));
     return ok();
   }
 

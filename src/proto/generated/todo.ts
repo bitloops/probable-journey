@@ -2857,6 +2857,7 @@ export namespace todo {
             id?: string;
             title?: string;
             completed?: boolean;
+            userId?: string;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
@@ -2869,6 +2870,9 @@ export namespace todo {
                 }
                 if ("completed" in data && data.completed != undefined) {
                     this.completed = data.completed;
+                }
+                if ("userId" in data && data.userId != undefined) {
+                    this.userId = data.userId;
                 }
             }
         }
@@ -2890,10 +2894,17 @@ export namespace todo {
         set completed(value: boolean) {
             pb_1.Message.setField(this, 3, value);
         }
+        get userId() {
+            return pb_1.Message.getFieldWithDefault(this, 4, "") as string;
+        }
+        set userId(value: string) {
+            pb_1.Message.setField(this, 4, value);
+        }
         static fromObject(data: {
             id?: string;
             title?: string;
             completed?: boolean;
+            userId?: string;
         }): Todo {
             const message = new Todo({});
             if (data.id != null) {
@@ -2905,6 +2916,9 @@ export namespace todo {
             if (data.completed != null) {
                 message.completed = data.completed;
             }
+            if (data.userId != null) {
+                message.userId = data.userId;
+            }
             return message;
         }
         toObject() {
@@ -2912,6 +2926,7 @@ export namespace todo {
                 id?: string;
                 title?: string;
                 completed?: boolean;
+                userId?: string;
             } = {};
             if (this.id != null) {
                 data.id = this.id;
@@ -2921,6 +2936,9 @@ export namespace todo {
             }
             if (this.completed != null) {
                 data.completed = this.completed;
+            }
+            if (this.userId != null) {
+                data.userId = this.userId;
             }
             return data;
         }
@@ -2934,6 +2952,8 @@ export namespace todo {
                 writer.writeString(2, this.title);
             if (this.completed != false)
                 writer.writeBool(3, this.completed);
+            if (this.userId.length)
+                writer.writeString(4, this.userId);
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -2951,6 +2971,9 @@ export namespace todo {
                         break;
                     case 3:
                         message.completed = reader.readBool();
+                        break;
+                    case 4:
+                        message.userId = reader.readString();
                         break;
                     default: reader.skipField();
                 }

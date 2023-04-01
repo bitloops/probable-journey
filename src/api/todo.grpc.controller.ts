@@ -7,17 +7,13 @@ import {
 } from '@nestjs/common';
 import { RpcException, GrpcMethod } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
-import { Metadata, ServerUnaryCall, ServerWritableStream } from '@grpc/grpc-js';
+import { Metadata, ServerWritableStream } from '@grpc/grpc-js';
 import { v4 as uuid } from 'uuid';
-import { todo } from '../proto/generated/todo';
-
-import { AddTodoCommand } from '../lib/bounded-contexts/todo/todo/commands/add-todo.command';
-
+import * as jwtwebtoken from 'jsonwebtoken';
 import {
   BUSES_TOKENS,
   NatsPubSubIntegrationEventsBus,
 } from '@bitloops/bl-boilerplate-infra-nest-jetstream';
-import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import {
   AsyncLocalStorageInterceptor,
   JwtGrpcAuthGuard,
@@ -29,12 +25,16 @@ import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/command
 import { UncompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/uncomplete-todo.command';
 import { ModifyTodoTitleCommand } from '@src/lib/bounded-contexts/todo/todo/commands/modify-title-todo.command';
 import { DeleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/delete-todo.command';
+import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
+
+import { todo } from '../proto/generated/todo';
+import { AddTodoCommand } from '../lib/bounded-contexts/todo/todo/commands/add-todo.command';
 import { TodoAddedPubSubIntegrationEventHandler } from './pub-sub-handlers/todo-completed.integration-handler';
 
 export type Subscribers = {
   [subscriberId: string]: {
     timestamp: number;
-    call: ServerWritableStream<any, todo.Todo>;
+    call?: ServerWritableStream<any, todo.Todo>;
     authToken: string;
     userId: string;
   };
@@ -48,43 +48,61 @@ export type Subscriptions = {
 };
 const subscriptions: Subscriptions = {};
 
+// Every 30 seconds, we check if a subscriber has been inactive for more than 1 minute
+// If so, we end their call and promise and remove them from the subscribers list
+setInterval(() => {
+  const subscriberIds = Object.keys(subscribers);
+  for (const subscriberId of subscriberIds) {
+    const subscriber = subscribers[subscriberId];
+    if (subscriber.timestamp < Date.now() - 600 * 1000) {
+      subscriber.call?.end();
+      delete subscribers[subscriberId];
+    }
+  }
+}, 30 * 1000);
+
 async function subscribe(
   subscriberId: string,
+  topics: string[],
   call: ServerWritableStream<any, todo.Todo>,
-  topic: string,
+  resolveSubscription: (value: unknown) => void,
 ) {
-  const authContext = asyncLocalStorage.getStore()?.get('context');
-  console.log('authContext', authContext);
+  const ctx = asyncLocalStorage.getStore()?.get('context');
   await new Promise((resolve) => {
     call.on('end', () => {
+      resolveSubscription(true);
       resolve(true);
     });
 
     call.on('error', () => {
+      resolveSubscription(true);
       resolve(true);
     });
 
     call.on('close', () => {
+      resolveSubscription(true);
       resolve(true);
     });
 
     call.on('finish', () => {
+      resolveSubscription(true);
       resolve(true);
     });
     subscribers[subscriberId] = {
       timestamp: Date.now(),
       call,
-      authToken: authContext.jwt,
-      userId: authContext.userId,
+      authToken: ctx.jwt,
+      userId: ctx.userId,
     };
-    if (!subscriptions[topic]) {
-      subscriptions[topic] = {
-        subscribers: [subscriberId],
-      };
-    } else {
-      subscriptions[topic].subscribers.push(subscriberId);
-    }
-    console.log('updated subscriptions', subscriptions);
+    topics.forEach((topic) => {
+      if (!subscriptions[topic]) {
+        subscriptions[topic] = {
+          subscribers: [subscriberId],
+        };
+      } else {
+        subscriptions[topic].subscribers.push(subscriberId);
+      }
+    });
   });
 }
 
@@ -108,6 +126,7 @@ async function sha256Hash(message: string) {
 @UseInterceptors(CorrelationIdInterceptor, AsyncLocalStorageInterceptor)
 export class TodoGrpcController {
   private readonly JWT_SECRET: string;
+  private readonly JWT_LIFETIME_SECONDS: string;
   constructor(
     @Inject(BUSES_TOKENS.PUBSUB_COMMAND_BUS)
     private readonly commandBus: Infra.CommandBus.IPubSubCommandBus,
@@ -118,6 +137,9 @@ export class TodoGrpcController {
     private configService: ConfigService<AuthEnvironmentVariables, true>,
   ) {
     this.JWT_SECRET = this.configService.get('jwtSecret', { infer: true });
+    this.JWT_LIFETIME_SECONDS = this.configService.get('JWT_LIFETIME_SECONDS', {
+      infer: true,
+    });
     if (this.JWT_SECRET === '') {
       throw new Error('JWT_SECRET is not defined in env!');
     }
@@ -130,20 +152,17 @@ export class TodoGrpcController {
       subscribers,
     );
     const topic = NatsPubSubIntegrationEventsBus.getTopicFromHandler(handler);
-    console.log(`Subscribing to pubsub integration event ${topic}`);
+    console.log(`Subscribing to PubSub integration event ${topic}`);
     await this.pubSubIntegrationEventBus.subscribe(topic, handler);
   }
 
   @GrpcMethod('TodoService', 'Add')
   async addTodo(
     data: todo.AddTodoRequest,
-    metadata: Metadata,
-    call: ServerUnaryCall<todo.AddTodoRequest, todo.AddTodoResponse>,
-    // authData: any,
+    // metadata: Metadata,
+    // call: ServerUnaryCall<todo.AddTodoRequest, todo.AddTodoResponse>,
   ): Promise<todo.AddTodoResponse> {
-    // console.log('metadata', metadata);
-    // console.log('call', call);
-    const context = asyncLocalStorage.getStore()?.get('context');
+    // const context = asyncLocalStorage.getStore()?.get('context');
     const command = new AddTodoCommand({ title: data.title });
     const results = await this.commandBus.request(command);
     if (results.isOk) {
@@ -161,34 +180,16 @@ export class TodoGrpcController {
           }),
         }),
       });
-      // throw new RpcException({
-      //   code: error?.message || 'Failed to create the todo',
-      //   message: error?.message || 'Failed to create the todo',
-      // });
     }
   }
 
   @GrpcMethod('TodoService', 'GetAll')
   async getAll(
     data: todo.GetAllTodosRequest,
-    metadata: Metadata, // @TODO figure out how to get the metadata https://github.com/nestjs/nest/issues/4851
-    // call: ServerUnaryCall<todo.GetAllTodosRequest, todo.GetAllTodosResponse>, // @TODO figure out how to get the call
-    // authData: any,
+    metadata: Metadata,
+    // call: ServerUnaryCall<todo.GetAllTodosRequest, todo.GetAllTodosResponse>,
   ): Promise<todo.GetAllTodosResponse> {
-    console.log('metadata', metadata.get('cache-hash'));
-    // console.log('call', call);
-    // const myTodo: todo.Todo = new todo.Todo({
-    //   id: '1',
-    //   title: 'test',
-    //   completed: false,
-    // });
-    // return new todo.GetAllTodosResponse({
-    //   ok: new todo.GetAllTodosOKResponse({
-    //     todos: [myTodo],
-    //   }),
-    // });
     const results = await this.queryBus.request(new GetTodosQuery());
-    // console.log('resutls', results);
     if (results.isOk) {
       const mappedData = results.data.map((i) => ({
         id: i.id,
@@ -197,13 +198,9 @@ export class TodoGrpcController {
       }));
       const dbHash = await sha256Hash(JSON.stringify(mappedData));
       const cachedHashesAreEqual = dbHash === metadata.get('cache-hash')[0];
-      console.log('dbHash', dbHash);
-      console.log('cachedHash', metadata.get('cache-hash')[0]);
       if (cachedHashesAreEqual) {
         throw new RpcException('CACHE_HIT');
       }
-      // console.log('data', JSON.stringify(mappedData));
-      // console.log('results hash', await sha256Hash(JSON.stringify(mappedData)));
       return new todo.GetAllTodosResponse({
         ok: new todo.GetAllTodosOKResponse({
           todos: mappedData.map((i) => new todo.Todo(i)),
@@ -226,7 +223,7 @@ export class TodoGrpcController {
   @GrpcMethod('TodoService', 'Complete')
   async completeTodo(
     data: todo.CompleteTodoRequest,
-    metadata: Metadata,
+    // metadata: Metadata,
   ): Promise<todo.CompleteTodoResponse> {
     const command = new CompleteTodoCommand({ todoId: data.id });
     const result = await this.commandBus.request(command);
@@ -323,62 +320,110 @@ export class TodoGrpcController {
     }
   }
 
-  @GrpcMethod('TodoService', 'OnAdded')
-  async onAdded(
-    request: todo.OnAddedTodoRequest,
+  @GrpcMethod('TodoService', 'InitializeSubscriptionConnection')
+  async initializeSubscriptionConnection(): Promise<todo.InitializeConnectionResponse> {
+    // request: todo.InitializeConnectionRequest,
+    // metadata: Metadata,
+    // call: ServerUnaryCall<
+    //   todo.InitializeConnectionRequest,
+    //   todo.InitializeConnectionResponse
+    // >,
+    const ctx = await asyncLocalStorage.getStore()?.get('context');
+    const authToken = ctx.jwt;
+    const userId = ctx.userId;
+    const subscriberId = uuid();
+    subscribers[subscriberId] = {
+      timestamp: Date.now(),
+      authToken,
+      userId,
+    };
+    const response = new todo.InitializeConnectionResponse({ subscriberId });
+    console.log('Subscription response', response.toObject());
+    return response;
+  }
+
+  @GrpcMethod('TodoService', 'KeepSubscriptionAlive')
+  async keepSubscriptionAlive(
+    request: todo.KeepSubscriptionAliveRequest,
+  ): Promise<todo.KeepSubscriptionAliveResponse> {
+    // metadata: Metadata,
+    // call: ServerUnaryCall<
+    //   todo.InitializeConnectionRequest,
+    //   todo.InitializeConnectionResponse
+    // >,
+    const subscriberId = request.subscriberId;
+    const subscriber = subscribers[subscriberId];
+    if (!subscriber) {
+      throw new RpcException('Invalid subscription');
+    }
+    const ctx = await asyncLocalStorage.getStore()?.get('context');
+    const { userId, jwt, email } = ctx;
+    // Step 1. Check if the subscriber exists and that the userId matches
+    if (subscriber.authToken !== jwt || subscriber.userId !== userId) {
+      throw new RpcException('Invalid subscription');
+    }
+    // Step 2. Check if the JWT is nearing expiration and update if necessary
+    let renewedAuthToken: string | undefined = undefined;
+    try {
+      const jwtPayload = jwtwebtoken.verify(
+        jwt,
+        this.JWT_SECRET,
+      ) as jwtwebtoken.JwtPayload;
+      if (
+        jwtPayload.exp &&
+        jwtPayload.exp - Math.floor(Date.now() / 1000) < 3550
+      ) {
+        renewedAuthToken = jwtwebtoken.sign(
+          {
+            email,
+            iat: Math.floor(Date.now() / 1000),
+            exp:
+              Math.floor(Date.now() / 1000) + Number(this.JWT_LIFETIME_SECONDS),
+            sub: userId,
+          },
+          this.JWT_SECRET,
+        );
+      }
+    } catch (err) {
+      console.error('Error while verifying JWT', err);
+      throw new RpcException('Invalid JWT!');
+    }
+    // Step 3. Updated the timestamp to show that the subscriber is still alive
+    subscribers[subscriberId] = {
+      ...subscribers[subscriberId],
+      timestamp: Date.now(),
+      authToken: renewedAuthToken || subscribers[subscriberId].authToken,
+    };
+    // Step 4. Send back the response
+    const response = new todo.KeepSubscriptionAliveResponse({
+      renewedAuthToken,
+    });
+    return response;
+  }
+
+  @GrpcMethod('TodoService', 'On')
+  async on(
+    request: todo.OnTodoRequest,
     metadata: Metadata,
-    call: ServerWritableStream<todo.OnAddedTodoRequest, todo.Todo>,
+    call: ServerWritableStream<todo.OnTodoRequest, todo.Todo>,
   ) {
+    const { subscriberId, events } = request;
     await new Promise((resolve) => {
-      const subscriberId = uuid();
-      subscribe(
-        subscriberId,
-        call,
-        TodoAddedPubSubIntegrationEventHandler.name,
-      );
+      const topics = events.map((i) => {
+        switch (i) {
+          case todo.TODO_EVENTS.ADDED:
+            return TodoAddedPubSubIntegrationEventHandler.name;
+          case todo.TODO_EVENTS.DELETED:
+            return 'todo.deleted';
+          case todo.TODO_EVENTS.MODIFIED_TITLE:
+            return 'todo.modified';
+          case todo.TODO_EVENTS.COMPLETED:
+            return 'todo.completed';
+          case todo.TODO_EVENTS.UNCOMPLETED:
+            return 'todo.uncompleted';
+        }
+      });
+      subscribe(subscriberId, topics, call, resolve);
     });
   }
-
-  @GrpcMethod('TodoService', 'OnCompleted')
-  async onCompleted(
-    request: todo.OnCompletedTodoRequest,
-    metadata: Metadata,
-    call: ServerWritableStream<todo.OnCompletedTodoRequest, todo.Todo>,
-  ) {
-    const subscriberId = uuid();
-    subscribe(subscriberId, call, '');
-  }
-
-  @GrpcMethod('TodoService', 'OnUncompleted')
-  async onUncompleted(
-    request: todo.OnUncompletedTodoRequest,
-    metadata: Metadata,
-    call: ServerWritableStream<todo.OnUncompletedTodoRequest, todo.Todo>,
-  ) {
-    const subscriberId = uuid();
-    subscribe(subscriberId, call, '');
-  }
-
-  @GrpcMethod('TodoService', 'OnModifiedTitle')
-  async onModifiedTitle(
-    request: todo.OnModifiedTitleTodoRequest,
-    metadata: Metadata,
-    call: ServerWritableStream<todo.OnModifiedTitleTodoRequest, todo.Todo>,
-  ) {
-    const subscriberId = uuid();
-    subscribe(subscriberId, call, '');
-  }
-  @GrpcMethod('TodoService', 'OnDeleted')
-  async onDeleted(
-    request: todo.OnDeletedTodoRequest,
-    metadata: Metadata,
-    call: ServerWritableStream<todo.OnDeletedTodoRequest, todo.Todo>,
-  ) {
-    const subscriberId = uuid();
-    subscribe(subscriberId, call, '');
-  }
 }
-
-// const sendMeta = new Metadata();
-// sendMeta.add('test', 'test');
-// call.sendMetadata(sendMeta);

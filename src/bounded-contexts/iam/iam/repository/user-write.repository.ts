@@ -4,14 +4,14 @@ import {
   Either,
   Infra,
   ok,
-  fail,
+  // fail,
   asyncLocalStorage,
 } from '@bitloops/bl-boilerplate-core';
 import { Injectable, Inject } from '@nestjs/common';
 import {
   Collection,
   MongoClient,
-  TransactionOptions,
+  // TransactionOptions,
   ClientSession,
 } from 'mongodb';
 import * as jwtwebtoken from 'jsonwebtoken';

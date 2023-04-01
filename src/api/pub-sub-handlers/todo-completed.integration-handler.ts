@@ -34,7 +34,7 @@ export class TodoAddedPubSubIntegrationEventHandler
     console.log('TodoIntegrationEvent', event);
     // console.log('subscritpions', this.subscriptions);
     // console.log('subscribers', this.subscribers);
-    const call = this.subscribers[userId]?.call;
+    // const call = this.subscribers[userId]?.call;
     // console.log('call', call);
     const subscription =
       this.subscriptions[TodoAddedPubSubIntegrationEventHandler.name];
@@ -50,8 +50,11 @@ export class TodoAddedPubSubIntegrationEventHandler
             title: data.title,
             completed: false, // data.completed, // put completed in schema?
           });
-          console.log({ todoObject });
-          call.write(todoObject);
+          // console.log({ todoObject });
+          const message = new todo.OnEvent({
+            onAdded: todoObject,
+          });
+          call.write(message as any);
           // const subscriberIds = Object.keys(this.subscribers);
           // for (const subscriberId of subscriberIds) {
           //   const subscriber = this.subscribers[subscriberId];

@@ -12,10 +12,6 @@ service TodoService {
   rpc InitializeSubscriptionConnection(InitializeConnectionRequest) returns (InitializeConnectionResponse);
   rpc KeepSubscriptionAlive(KeepSubscriptionAliveRequest) returns (KeepSubscriptionAliveResponse);
   rpc On(OnTodoRequest) returns (stream OnEvent);
-  // rpc OnAdded (OnAddedTodoRequest) returns (stream Todo);
-  // rpc OnCompleted (OnCompletedTodoRequest) returns (stream Todo);
-  // rpc OnUncompleted (OnUncompletedTodoRequest) returns (stream Todo);
-  // rpc OnModifiedTitle (OnModifiedTitleTodoRequest) returns (stream Todo);
 }
 
 message InitializeConnectionRequest {}

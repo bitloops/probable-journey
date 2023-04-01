@@ -14,7 +14,7 @@ import authConfiguration, {
 } from '@src/config/auth.configuration';
 import { AuthModule } from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
 import {
-  CorrelationIdMiddleware,
+  // CorrelationIdMiddleware,
   TracingModule,
 } from '@bitloops/bl-boilerplate-infra-telemetry';
 
@@ -31,7 +31,9 @@ import {
           configService: ConfigService<AuthEnvironmentVariables, true>,
         ) => ({
           secret: configService.get('jwtSecret'),
-          signOptions: { expiresIn: '3600s' },
+          signOptions: {
+            expiresIn: `${configService.get('JWT_LIFETIME_SECONDS')}s`,
+          },
         }),
         inject: [ConfigService],
       },

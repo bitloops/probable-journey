@@ -16,7 +16,7 @@ import { BUSES_TOKENS } from '@bitloops/bl-boilerplate-infra-nest-jetstream';
 import {
   Application,
   Infra,
-  asyncLocalStorage,
+  // asyncLocalStorage,
 } from '@bitloops/bl-boilerplate-core';
 import {
   AuthService,
@@ -41,11 +41,11 @@ export class AuthController {
     operation: 'LoginController',
   })
   async login(@Request() req) {
-    const store = asyncLocalStorage.getStore();
+    // const store = asyncLocalStorage.getStore();
     const jwt = this.authService.login(req.user);
     // this.commandBus.execute(
-    //         new LogInCommand({ userId: dto.userId }),
-    //       );
+    //   new LogInCommand({ userId: dto.userId }),
+    // );
     return jwt;
   }
 

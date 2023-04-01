@@ -21,7 +21,7 @@ import { BUSES_TOKENS } from '@bitloops/bl-boilerplate-infra-nest-jetstream';
 import { AuthEnvironmentVariables } from '@src/config/auth.configuration';
 import { JwtAuthGuard } from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
 import { Traceable } from '@bitloops/bl-boilerplate-infra-telemetry';
-import { Infra, asyncLocalStorage } from '@bitloops/bl-boilerplate-core';
+import { Infra } from '@bitloops/bl-boilerplate-core';
 import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 // import { CompleteTodoCommand } from '@src/lib/bounded-contexts/todo/todo/commands/complete-todo.command';
 

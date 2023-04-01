@@ -1,5 +1,6 @@
 export interface AuthEnvironmentVariables {
   jwtSecret: string;
+  JWT_LIFETIME_SECONDS: number;
   database: {
     host: string;
     port: number;
@@ -15,6 +16,7 @@ export default () => ({
     (() => {
       throw new Error('JWT_SECRET is required');
     })(),
+  JWT_LIFETIME_SECONDS: process.env.JWT_LIFETIME_SECONDS || 3600,
   database: {
     host: process.env.PG_HOST ?? 'localhost',
     port: process.env.PG_PORT ? +process.env.PG_PORT : 5432,

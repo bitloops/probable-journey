@@ -1,26 +1,66 @@
-import { Application, Either, ok } from '@bitloops/bl-boilerplate-core';
+import { Application, Either, ok, fail } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
-import { QueryHandler } from '@nestjs/cqrs';
-import { TodoReadModel } from '../../domain/TodoReadModel';
+// import { QueryHandler } from '@nestjs/cqrs';
+import { TTodoReadModelSnapshot } from '../../domain/TodoReadModel';
 import {
   TodoReadRepoPortToken,
   TodoReadRepoPort,
 } from '../../ports/TodoReadRepoPort';
 import { GetTodosQuery } from '../../queries/get-todos.query';
 
-export type GetTodosQueryHandlerResponse = Either<TodoReadModel[], never>;
+export type GetTodosQueryHandlerResponse = Either<
+  TTodoReadModelSnapshot[],
+  Application.Repo.Errors.Unexpected
+>;
 
-@QueryHandler(GetTodosQuery)
 export class GetTodosHandler
-  implements
-    Application.IUseCase<GetTodosQuery, Promise<GetTodosQueryHandlerResponse>>
+  implements Application.IQueryHandler<GetTodosQuery, TTodoReadModelSnapshot[]>
 {
   constructor(
-    @Inject(TodoReadRepoPortToken) private todoRepo: TodoReadRepoPort,
+    @Inject(TodoReadRepoPortToken)
+    private readonly todoRepo: TodoReadRepoPort,
   ) {}
-  async execute(query: GetTodosQuery): Promise<GetTodosQueryHandlerResponse> {
-    const todos = await this.todoRepo.getAll();
-    if (todos) return ok(todos);
+
+  get query() {
+    return GetTodosQuery;
+  }
+
+  get boundedContext() {
+    return 'Todo';
+  }
+
+  async execute(command: GetTodosQuery): Promise<GetTodosQueryHandlerResponse> {
+    console.log('GetTodosQuery handler...');
+
+    const results = await this.todoRepo.getAll();
+    if (results.isFail()) return fail(results.value);
+    if (results.value) return ok(results.value);
     return ok([]);
   }
 }
+
+// @QueryHandler(GetTodosQuery)
+// export class GetTodosHandler
+//   implements
+//     Application.IQueryHandler<
+//       GetTodosQuery,
+//       Promise<GetTodosQueryHandlerResponse>
+//     >
+// {
+//   get query() {
+//     return GetTodosQuery;
+//   }
+
+//   get boundedContext() {
+//     return 'Todo';
+//   }
+//   constructor(
+//     @Inject(TodoReadRepoPortToken) private todoRepo: TodoReadRepoPort,
+//   ) {}
+
+//   async execute(query: GetTodosQuery): Promise<GetTodosQueryHandlerResponse> {
+//     const todos = await this.todoRepo.getAll(query.ctx);
+//     if (todos) return ok(todos);
+//     return ok([]);
+//   }
+// }

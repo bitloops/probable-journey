@@ -1,6 +1,6 @@
-import { Domain } from '@bitloops/bl-boilerplate-core';
+import { Application } from '@bitloops/bl-boilerplate-core';
 
-export class TodoNotFoundError extends Domain.Error {
+export class TodoNotFoundError extends Application.Error {
   static readonly errorId = '';
 
   constructor(id: string) {

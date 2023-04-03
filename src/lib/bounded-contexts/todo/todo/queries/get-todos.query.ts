@@ -1,11 +1,21 @@
-import { Application } from '@bitloops/bl-boilerplate-core';
+import {
+  Application,
+  Domain,
+  asyncLocalStorage,
+} from '@bitloops/bl-boilerplate-core';
 
 export class GetTodosQuery extends Application.Query {
-  public static readonly queryName = 'Todo.GET_TODOS';
+  public metadata: Application.TQueryMetadata;
+  public readonly boundedContext = 'Todo';
+
   constructor() {
-    super(GetTodosQuery.queryName, 'Todo');
-  }
-  static getQueryTopic(): string {
-    return super.getQueryTopic(GetTodosQuery.queryName, 'Todo');
+    super();
+    this.metadata = {
+      boundedContextId: 'Todo',
+      createdTimestamp: Date.now(),
+      correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
+      context: asyncLocalStorage.getStore()?.get('context'),
+      messageId: new Domain.UUIDv4().toString(),
+    };
   }
 }

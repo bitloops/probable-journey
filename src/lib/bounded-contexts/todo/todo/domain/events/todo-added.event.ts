@@ -1,19 +1,18 @@
 import { Domain } from '@bitloops/bl-boilerplate-core';
+import { asyncLocalStorage } from '@bitloops/bl-boilerplate-core';
 import { TodoEntity } from '../TodoEntity';
 
-export class TodoAddedDomainEvent extends Domain.Event<TodoEntity> {
-  public static readonly eventName = TodoAddedDomainEvent.name;
-  public static readonly fromContextId = 'Todo';
+export class TodoAddedDomainEvent implements Domain.IDomainEvent<TodoEntity> {
+  public aggregateId: string;
+  public readonly metadata: Domain.TDomainEventMetadata = {
+    boundedContextId: 'Todo',
+    createdTimestamp: Date.now(),
+    messageId: new Domain.UUIDv4().toString(),
+    correlationId: asyncLocalStorage.getStore()?.get('correlationId'),
+    context: asyncLocalStorage.getStore()?.get('context'),
+  };
 
-  constructor(public readonly todo: TodoEntity, uuid?: string) {
-    const metadata = {
-      fromContextId: TodoAddedDomainEvent.fromContextId,
-      id: uuid,
-    };
-    super(TodoAddedDomainEvent.getEventTopic(), todo, metadata, todo.id);
-  }
-
-  static getEventTopic() {
-    return TodoAddedDomainEvent.eventName;
+  constructor(public readonly data: TodoEntity) {
+    this.aggregateId = data.id.toString();
   }
 }

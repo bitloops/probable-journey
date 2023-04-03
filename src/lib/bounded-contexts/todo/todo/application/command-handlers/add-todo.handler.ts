@@ -6,7 +6,6 @@ import {
   Domain,
 } from '@bitloops/bl-boilerplate-core';
 import { Inject } from '@nestjs/common';
-import { CommandHandler } from '@nestjs/cqrs';
 import { AddTodoCommand } from '../../commands/add-todo.command';
 import { DomainErrors } from '../../domain/errors';
 import { TitleVO } from '../../domain/TitleVO';
@@ -16,19 +15,36 @@ import {
   TodoWriteRepoPortToken,
 } from '../../ports/TodoWriteRepoPort';
 import { UserIdVO } from '../../domain/UserIdVO';
+import { Traceable } from '@bitloops/bl-boilerplate-infra-telemetry';
 
-type AddTodoUseCaseResponse = Either<void, DomainErrors.TitleOutOfBoundsError>;
+type AddTodoUseCaseResponse = Either<
+  string,
+  DomainErrors.TitleOutOfBoundsError | Application.Repo.Errors.Unexpected
+>;
 
-@CommandHandler(AddTodoCommand)
-export class AddTodoHandler
-  implements
-    Application.IUseCase<AddTodoCommand, Promise<AddTodoUseCaseResponse>>
+export class AddTodoCommandHandler
+  implements Application.ICommandHandler<AddTodoCommand, string>
 {
   constructor(
     @Inject(TodoWriteRepoPortToken)
     private readonly todoRepo: TodoWriteRepoPort,
   ) {}
 
+  get command() {
+    return AddTodoCommand;
+  }
+
+  get boundedContext() {
+    return 'Todo';
+  }
+
+  @Traceable({
+    operation: 'AddTodoCommandHandler',
+    metrics: {
+      name: 'AddTodoCommandHandler',
+      category: 'commandHandler',
+    },
+  })
   async execute(command: AddTodoCommand): Promise<AddTodoUseCaseResponse> {
     console.log('AddTodoCommand...');
 
@@ -36,7 +52,10 @@ export class AddTodoHandler
     if (title.isFail()) {
       return fail(title.value);
     }
-    const userId = UserIdVO.create({ id: new Domain.UUIDv4(command.userId) });
+
+    const userId = UserIdVO.create({
+      id: new Domain.UUIDv4(command.metadata.context.userId),
+    });
     const todo = TodoEntity.create({
       title: title.value,
       completed: false,
@@ -46,8 +65,11 @@ export class AddTodoHandler
       return fail(todo.value);
     }
 
-    await this.todoRepo.save(todo.value);
+    const saveResult = await this.todoRepo.save(todo.value);
+    if (saveResult.isFail()) {
+      return fail(saveResult.value);
+    }
 
-    return ok();
+    return ok(todo.value.id.toString());
   }
 }

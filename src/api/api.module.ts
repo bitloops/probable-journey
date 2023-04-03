@@ -1,44 +1,75 @@
-import { Module } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
-import { NestjsJetstream } from '@src/infra/jetstream/nestjs-jetstream.class';
-import { CommandHandlers } from '@src/lib/bounded-contexts/todo/todo/application/command-handlers';
-import { TodoCompletedDomainToIntegrationEventHandler } from '@src/lib/bounded-contexts/todo/todo/application/event-handlers/domain/todo-completed.handler';
-import { JetstreamModule } from '../infra/jetstream/jetstream.module';
-import { TodoController } from './todo.controller';
-import { TodosController } from './todos.controller';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthController } from './authentication.controller';
+import { TodoController } from './todo.rest.controller';
+import { TodoGrpcController } from './todo.grpc.controller';
+import {
+  JetstreamModule,
+  NatsStreamingIntegrationEventBus,
+  NatsStreamingMessageBus,
+} from '@bitloops/bl-boilerplate-infra-nest-jetstream';
+import configuration from '@src/config/configuration';
+import authConfiguration, {
+  AuthEnvironmentVariables,
+} from '@src/config/auth.configuration';
+import { AuthModule } from '@bitloops/bl-boilerplate-infra-nest-auth-passport';
+import {
+  // CorrelationIdMiddleware,
+  TracingModule,
+} from '@bitloops/bl-boilerplate-infra-telemetry';
 
 @Module({
   imports: [
-    CqrsModule,
-    JetstreamModule.forFeature({
-      featureSubjectPrefix: '', // Events will be published with this prefix.
-      subscriptions: [
-        {
-          name: 'test.test-subject', // Insert the consumer delivery target
-        },
-      ],
-      eventHandlers: {
-        // TodoCompletedDomainEvent: (data, ack, raw) =>
-        //   new TodoCompletedDomainToIntegrationEventHandler().handle({
-        //     data,
-        //     metadata: { ack: ack as () => Promise<void> },
-        //   }),
-        // 'USER.UserLoggedInEvent': (data, ack, raw) =>
-        //   new UserLoggedInEvent(data, ack, raw),
-        // 'USER.UserRegisteredEvent': (data, ack, raw) =>
-        //   new UserRegisteredEvent(data, ack, raw),
-        // 'USER.EmailVerifiedEvent': (data, ack, raw) =>
-        //   new EmailVerifiedEvent(data, ack, raw),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.development.env', // TODO make dynamic
+      load: [configuration, authConfiguration],
+    }),
+    AuthModule.forRootAsync({
+      jwtOptions: {
+        useFactory: (
+          configService: ConfigService<AuthEnvironmentVariables, true>,
+        ) => ({
+          secret: configService.get('jwtSecret'),
+          signOptions: {
+            expiresIn: `${configService.get('JWT_LIFETIME_SECONDS')}s`,
+          },
+        }),
+        inject: [ConfigService],
       },
+      postgresOptions: {
+        useFactory: (
+          configService: ConfigService<AuthEnvironmentVariables, true>,
+        ) => ({
+          database: configService.get('database.database', { infer: true }),
+          host: configService.get('database.host', { infer: true }),
+          port: configService.get('database.port', { infer: true }),
+          user: configService.get('database.user', { infer: true }),
+          password: configService.get('database.password', { infer: true }),
+          max: 20,
+        }),
+        inject: [ConfigService],
+      },
+      // TODO fix this
+      integrationEventBus: NatsStreamingIntegrationEventBus as any,
+    }),
+    JetstreamModule.forRoot({
+      servers: [
+        `nats://${process.env.NATS_HOST ?? 'localhost'}:${
+          process.env.NATS_PORT ?? 4222
+        }`,
+      ],
+    }),
+
+    TracingModule.register({
+      messageBus: NatsStreamingMessageBus,
     }),
   ],
-  providers: [
-    // CommandBus,
-    // {
-    //   provide: 'SIMPLE_NATS',
-    //   useClass: NestjsJetstream,
-    // },
-  ],
-  controllers: [TodoController, TodosController],
+  controllers: [AuthController, TodoController, TodoGrpcController],
 })
-export class ApiModule {}
+// implements NestModule
+export class ApiModule {
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+  // }
+}

@@ -1,11 +1,13 @@
-import { Domain, Either, ok } from '@bitloops/bl-boilerplate-core';
+import { Domain, Either, ok, fail } from '@bitloops/bl-boilerplate-core';
 import { TitleVO } from './TitleVO';
 import { UserIdVO } from './UserIdVO';
 import { DomainErrors } from './errors';
 import { TodoAddedDomainEvent } from './events/todo-added.event';
-import { TodoTitleModifiedDomainEvent } from './events/todo-title-modified.event';
-import { TodoCompletedDomainEvent } from './events/todo-completed.Event';
+import { TodoModifiedTitleDomainEvent } from './events/todo-modified-title.event';
+import { TodoCompletedDomainEvent } from './events/todo-completed.event';
 import { TodoUncompletedDomainEvent } from './events/todo-uncompleted.event';
+import { Rules } from './rules';
+import { TodoDeletedDomainEvent } from './events/todo-deleted.event';
 
 export interface TodoProps {
   userId: UserIdVO;
@@ -54,38 +56,45 @@ export class TodoEntity extends Domain.Aggregate<TodoProps> {
   }
 
   public complete(): Either<void, DomainErrors.TodoAlreadyCompletedError> {
-    if (this.props.completed) {
-      return fail(
-        new DomainErrors.TodoAlreadyCompletedError(this.id.toString()),
-      );
-    }
+    const res = Domain.applyRules([
+      new Rules.TodoAlreadyCompleted(this.props.completed, this.id.toString()),
+    ]);
+    if (res) return fail(res);
+
     this.props.completed = true;
     this.addDomainEvent(new TodoCompletedDomainEvent(this));
     return ok();
   }
 
   public uncomplete(): Either<void, DomainErrors.TodoAlreadyUncompletedError> {
-    if (!this.props.completed) {
-      return fail(
-        new DomainErrors.TodoAlreadyUncompletedError(this.id.toString()),
-      );
-    }
+    const res = Domain.applyRules([
+      new Rules.TodoAlreadyUncompleted(
+        this.props.completed,
+        this.id.toString(),
+      ),
+    ]);
+    if (res) return fail(res);
     this.props.completed = false;
     this.addDomainEvent(new TodoUncompletedDomainEvent(this));
     return ok();
   }
 
+  public delete(): Either<void, void> {
+    this.addDomainEvent(new TodoDeletedDomainEvent(this));
+    return ok();
+  }
+
   public modifyTitle(title: TitleVO): Either<void, never> {
     this.props.title = title;
-    this.addDomainEvent(new TodoTitleModifiedDomainEvent(this));
+    this.addDomainEvent(new TodoModifiedTitleDomainEvent(this));
     return ok();
   }
 
   public static fromPrimitives(data: TTodoEntityPrimitives): TodoEntity {
-    const TodoEntityProps = {
+    const TodoEntityProps: TodoProps = {
       userId: UserIdVO.create({ id: new Domain.UUIDv4(data.userId) })
         .value as UserIdVO,
-      id: new Domain.UUIDv4(data.id) as Domain.UUIDv4,
+      id: new Domain.UUIDv4(data.id),
       title: TitleVO.create({
         title: data.title,
       }).value as TitleVO,
@@ -97,7 +106,7 @@ export class TodoEntity extends Domain.Aggregate<TodoProps> {
   public toPrimitives(): TTodoEntityPrimitives {
     return {
       userId: this.props.userId.id.toString(),
-      id: this.id.toString(),
+      id: this._id.toString(),
       title: this.props.title.title,
       completed: this.props.completed,
     };

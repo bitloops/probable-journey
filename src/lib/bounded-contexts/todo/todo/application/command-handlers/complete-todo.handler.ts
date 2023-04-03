@@ -5,7 +5,6 @@ import {
   ok,
   Domain,
 } from '@bitloops/bl-boilerplate-core';
-import { CommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { CompleteTodoCommand } from '../../commands/complete-todo.command';
 import { DomainErrors } from '../../domain/errors';
@@ -14,13 +13,13 @@ import {
   TodoWriteRepoPort,
   TodoWriteRepoPortToken,
 } from '../../ports/TodoWriteRepoPort';
+import { Traceable } from '@bitloops/bl-boilerplate-infra-telemetry';
 
 type CompleteTodoUseCaseResponse = Either<
   void,
   DomainErrors.TodoAlreadyCompletedError | ApplicationErrors.TodoNotFoundError
 >;
 
-@CommandHandler(CompleteTodoCommand)
 export class CompleteTodoHandler
   implements
     Application.IUseCase<
@@ -33,21 +32,42 @@ export class CompleteTodoHandler
     private readonly todoRepo: TodoWriteRepoPort,
   ) {}
 
+  get command() {
+    return CompleteTodoCommand;
+  }
+
+  get boundedContext() {
+    return 'Todo';
+  }
+
+  @Traceable({
+    operation: 'CompleteTodoCommandHandler',
+    metrics: {
+      name: 'CompleteTodoCommandHandler',
+      category: 'commandHandler',
+    },
+  })
   async execute(
     command: CompleteTodoCommand,
   ): Promise<CompleteTodoUseCaseResponse> {
     console.log('CompleteTodoHandler');
 
     const todo = await this.todoRepo.getById(new Domain.UUIDv4(command.id));
-    if (todo === null) {
+
+    if (todo.isFail()) {
+      return fail(todo.value);
+    }
+    if (!todo.value) {
       return fail(new ApplicationErrors.TodoNotFoundError(command.id));
     }
-
-    const completedOrError = todo.complete();
+    const completedOrError = todo.value.complete();
     if (completedOrError.isFail()) {
       return fail(completedOrError.value);
     }
-    await this.todoRepo.save(todo);
+    const saveResult = await this.todoRepo.update(todo.value);
+    if (saveResult.isFail()) {
+      return fail(saveResult.value);
+    }
 
     return ok();
   }
